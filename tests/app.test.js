@@ -180,7 +180,7 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   check(await page.locator('.tab.on').innerText() === 'Plan', 'clicking a cell opens that period on the map');
 
   console.log('Timetables to print');
-  await page.getByRole('button', { name: 'Timetables' }).click();
+  await page.getByRole('button', { name: 'Timetables', exact: true }).click();
   check(await page.locator('.sheet').count() === 4, 'one page per pupil');
   check(await page.locator('.sheet').first().locator('.pt-subject').first().innerText() === 'Maths', 'AB’s Monday P1 says Maths');
   await shot(page, '04-print-pupils');
@@ -192,6 +192,9 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   await page.emulateMedia({ media: 'screen' });
   await page.locator('.print-controls .seg button', { hasText: /^Staff$/ }).click();
   check(await page.locator('.sheet').count() === 3, 'one page per member of staff');
+  check(await page.locator('.sheet.staffsheet .pt-name').count() === 3 && await page.locator('.sheet.staffsheet .pt-name').first().evaluate((e) => getComputedStyle(e).backgroundColor) === 'rgb(248, 201, 155)', 'staff timetables use the pupils’ layout, in orange');
+  await page.locator('.print-controls .seg button', { hasText: /^Rooms$/ }).click();
+  check((await page.locator('.sheet').first().boundingBox()).height > 300, 'room timetables show as full pages');
   await page.locator('.print-controls .seg button', { hasText: 'Days by room' }).click();
   check(await page.locator('.sheet').count() === 5, 'one day sheet per day');
   await shot(page, '05-print-day');
@@ -341,7 +344,7 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   check(err10.length === 0, 'no errors in either window' + (err10.length ? ': ' + err10.join(' | ') : ''));
 
   console.log('Pupil timetables for their books');
-  await p10.getByRole('button', { name: 'Timetables' }).click();
+  await p10.getByRole('button', { name: 'Timetables', exact: true }).click();
   await p10.locator('#print-who').selectOption({ label: 'KB' });
   const kb = p10.locator('.sheet.pupil');
   const kbText = await kb.innerText();
@@ -377,7 +380,7 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   await p10.getByRole('button', { name: 'Change the picture for Animal care' }).waitFor();
   check(await p10.locator('select[aria-label="Animal care type"]').inputValue() === 'wellbeing' && await p10.locator('select[aria-label="Phonics type"]').inputValue() === 'academic', 'lesson types guessed from the name');
   await p10.locator('select[aria-label="Phonics type"]').selectOption('wellbeing');
-  await p10.getByRole('button', { name: 'Timetables' }).click();
+  await p10.getByRole('button', { name: 'Timetables', exact: true }).click();
   await p10.locator('.print-controls .seg button', { hasText: /^Pupils$/ }).click();
   await p10.locator('#print-who').selectOption({ label: 'KB' });
   await p10.getByRole('button', { name: 'Words' }).click();
@@ -395,7 +398,7 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   const bj = JSON.parse(fs.readFileSync(bkPath, 'utf8'));
   check(/^data:image\/jpeg/.test((bj.people.find((x) => x.name === 'Abi') || {}).photo || '') && /^data:image\/png/.test(bj.symbols['animal care'] || '') && bj.subjectTypes.phonics === 'wellbeing', 'the backup carries the photo, the picture and the lesson types');
   await p10.reload();
-  await p10.getByRole('button', { name: 'Timetables' }).click();
+  await p10.getByRole('button', { name: 'Timetables', exact: true }).click();
   check(await p10.locator('.sheet.pupil img.pt-photo').count() >= 1, 'and they are still there after a reload');
 
   console.log('The school day');
@@ -420,6 +423,9 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   p11.on('pageerror', (e) => err11.push(e.message));
   await p11.goto(APP);
   await p11.getByRole('button', { name: 'Or try the example school (made-up people)' }).click();
+  check(await p11.evaluate(() => !document.body.classList.contains('alerts-on')), 'alerts are off until ticked');
+  await p11.getByRole('checkbox', { name: 'Show alerts' }).check();
+  check(await p11.evaluate(() => document.body.classList.contains('alerts-on')), 'Show alerts turns them on');
   const dragBox = async (from, to) => {
     const a = await from.boundingBox(), z = await to.boundingBox();
     await p11.mouse.move(a.x + a.width / 2, a.y + a.height / 2);
@@ -473,8 +479,8 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   await p11.locator('.room[data-area="A15"]').click({ position: { x: 30, y: 60 } });
   check(await p11.locator('.room[data-area="A15"] .chip').count() === 6, 'then tapping a room puts them there');
   // The Groups screen
-  await p11.getByRole('button', { name: 'Groups', exact: true }).first().click();
-  check(await p11.locator('.seg button.on').innerText() === 'Literacy' && await p11.locator('table.gweek thead th').count() === 6, 'the Groups screen: literacy first, a column per day');
+  await p11.getByRole('button', { name: 'Lead teachers', exact: true }).click();
+  check(await p11.locator('.lead-seg button.on').innerText() === 'Literacy lead' && await p11.locator('table.gweek thead th').count() === 6, 'the Lead teachers screen: the literacy lead first, a column per day');
   check(await p11.locator('td[data-cell="Mon|P1"] .gchip', { hasText: 'Literacy set 1' }).count() === 1, 'shows where groups already are');
   await dragBox(p11.locator('.gw-tray .gchip', { hasText: 'Literacy set 1' }), p11.locator('td[data-cell="Tue|P2"]'));
   check(await p11.locator('td[data-cell="Tue|P2"] .gchip', { hasText: 'Literacy set 1' }).count() === 1 && /2\/2/.test(await p11.locator('.gw-tray .gchip', { hasText: 'Literacy set 1' }).innerText()), 'drag a group onto the week; it counts towards its lessons');
@@ -482,21 +488,55 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   check(await p11.locator('td[data-cell="Tue|P2"] .gchip').count() === 0 && await p11.locator('td[data-cell="Thu|P3"] .gchip', { hasText: 'Literacy set 1' }).count() === 1, 'drag it to another lesson to move it');
   await dragBox(p11.locator('td[data-cell="Thu|P3"] .gchip', { hasText: 'Literacy set 1' }), p11.locator('.gw-tray'));
   check(await p11.locator('td[data-cell="Thu|P3"] .gchip').count() === 0, 'or back to the list to take it out');
-  await p11.locator('.seg button', { hasText: 'Numeracy' }).click();
+  await p11.locator('.lead-seg button', { hasText: 'Numeracy' }).click();
   await dragBox(p11.locator('.gw-tray .gchip', { hasText: 'Numeracy set 1' }), p11.locator('td[data-cell="Mon|P1"]'));
   check(await p11.locator('dialog').innerText().then((t) => /Clash/.test(t) && /AB is also in Literacy set 1/.test(t)), 'asks before splitting another group');
   await p11.getByRole('button', { name: 'Move them anyway' }).click();
-  await p11.locator('.seg button', { hasText: 'Literacy' }).click();
+  await p11.locator('.lead-seg button', { hasText: 'Literacy' }).click();
   check(/Literacy set 1: AB elsewhere/.test((await p11.locator('td[data-cell="Mon|P1"] .gw-split').allInnerTexts()).join(' ')), 'the split group is flagged');
-  await p11.locator('.seg button', { hasText: 'D&D' }).click();
+  await p11.locator('.lead-seg button', { hasText: 'D&D' }).click();
   await p11.locator('.gw-tray .gchip', { hasText: 'D&D' }).click();
   await p11.locator('td[data-cell="Fri|P4"]').click();
   check(await p11.locator('dialog').innerText().then((t) => /Which room for D&D/.test(t)), 'tap a group then a lesson; with no usual room it asks which');
   await p11.locator('dialog input[name="gw-room"]').nth(2).check();
   await p11.getByRole('button', { name: 'Put it there' }).click();
   check(await p11.locator('td[data-cell="Fri|P4"] .gchip', { hasText: 'D&D' }).count() === 1, 'and puts it there');
+  // A lead teacher's page: the teacher goes in with the group, and PPA can be dragged on
+  await p11.locator('.lead-seg button', { hasText: 'Literacy' }).click();
+  await p11.locator('select[aria-label="Teacher for this page"]').selectOption({ label: 'Carys' });
+  check(await p11.locator('.lead-seg button.on').innerText() === 'Carys · Literacy', 'a lead teacher’s page is named after them');
+  const lit2 = p11.locator('.gw-tray .gchip', { hasText: 'Literacy set 2' });
+  const lb = await lit2.boundingBox();
+  await p11.mouse.move(lb.x + 20, lb.y + 10); await p11.mouse.down(); await p11.mouse.move(lb.x + 120, lb.y + 60, { steps: 5 });
+  check(await p11.locator('.ghost .ghost-list .chip').count() === 6, 'dragging a group shows the children in it');
+  const wed3 = await p11.locator('td[data-cell="Wed|P3"]').boundingBox();
+  await p11.mouse.move(wed3.x + wed3.width / 2, wed3.y + wed3.height / 2, { steps: 5 }); await p11.mouse.up(); await p11.waitForTimeout(150);
+  const s1 = await p11.evaluate(() => JSON.parse(localStorage.getItem('lifehouse_timetabler_v2')));
+  await p11.waitForTimeout(400);
+  const saved = await p11.evaluate(() => JSON.parse(localStorage.getItem('lifehouse_timetabler_v2')));
+  check(saved.slots['Wed|P3'].at.T03 === saved.slots['Wed|P3'].at.S06, 'the page’s teacher goes in with the group');
+  await dragBox(p11.locator('.gw-tray .ppa-chip'), p11.locator('td[data-cell="Thu|P4"]'));
+  check(await p11.locator('td[data-cell="Thu|P4"] .ppa-chip').count() === 1, 'PPA dragged onto the week');
+  await dragBox(p11.locator('td[data-cell="Thu|P4"] .ppa-chip'), p11.locator('.gw-tray'));
+  check(await p11.locator('td[data-cell="Thu|P4"] .ppa-chip').count() === 0, 'and dragged back off');
+  await p11.getByRole('button', { name: '+ Add a teacher' }).click();
+  await p11.locator('dialog select').selectOption({ label: 'Kat' });
+  await p11.locator('dialog label', { hasText: 'Forest school' }).locator('input').check();
+  await p11.getByRole('button', { name: 'Add page' }).click();
+  check(await p11.locator('.lead-seg button.on').innerText() === 'Kat · Forest school' && await p11.locator('.gw-tray .gchip', { hasText: 'Woods' }).count() === 1, 'another teacher’s page can be added');
   await p11.getByRole('button', { name: 'Week', exact: true }).click();
   check(await p11.getByText(/Literacy set 1 has [01] of 2 lessons this week/).count() === 1, 'the Week view lists groups short of their lessons');
+  console.log('Generate timetables');
+  await p11.getByRole('button', { name: 'Generate timetables…' }).click();
+  check(await p11.locator('dialog .gen-checks details').count() >= 2 && /Pupils not placed|Rooms|Groups/.test(await p11.locator('dialog .gen-checks').innerText()), 'a last check lists what to look at, by kind');
+  for (const id of ['pupils', 'staff', 'days']) await p11.locator('dialog input[value="' + id + '"]').uncheck();
+  const [genX] = await Promise.all([p11.waitForEvent('download'), p11.getByRole('button', { name: 'Make them anyway' }).click()]);
+  check(/\.xlsx$/.test(genX.suggestedFilename()), 'then makes the files chosen (here the Excel day sheets)');
+  await p11.getByRole('button', { name: 'Generate timetables…' }).click();
+  await p11.locator('dialog .gen-checks summary', { hasText: 'Groups' }).click();
+  await p11.locator('dialog .gen-checks details', { hasText: 'Groups' }).locator('.check').first().click();
+  check(await p11.locator('dialog[open]').count() === 0, 'clicking a check goes to fix it');
+
   console.log('What each pupil needs');
   await setupTo(p11, 'Pupils');
   check(await p11.locator('th.need-head > span').allInnerTexts().then((t) => t.join('|').toLowerCase() === 'numeracy|literacy|humanities|biology|science|therapy|expressive arts|dt|pe|intervention'), 'a column for each main subject');
