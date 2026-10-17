@@ -28,7 +28,9 @@ It is one HTML file. It needs no internet, no installing and no server, and it n
 5. **Check.** Each period in the strip shows ✓ when everyone is placed, a number for pupils not placed yet, and ! for a room with pupils but no staff. **Week** shows the whole week by room (which rooms are free when) or by person (each person's week in one row), with a list of things to check.
 6. **Print.** **Timetables** makes one A4 landscape page per pupil, member of staff or room, plus a whole-school sheet for each day. To email them, print to PDF.
 
-The map starts as the school's floor plan, with a box over each room. The off-site place called "Local village" can be renamed in Setup; the name stays on your computer. **Setup → Use the standard floor plan** puts the plan back if the rooms get muddled.
+The map starts in the **roomy layout**: the school's rooms in the same arrangement as the floor plan, each big enough for a list of names. **Setup → Change map layout** switches to the **to-scale** layout on the floor plan drawing and back; names, room types and everyone's places stay put. The off-site place called "Local village" can be renamed in Setup; the name stays on your computer.
+
+**Full screen** (top right, or press <kbd>F</kbd>) hides the browser's bars and tightens the app around the map. <kbd>Esc</kbd> or <kbd>F</kbd> leaves it.
 
 **Edit layout** (bottom right of the map) moves, resizes, renames, adds and removes rooms. To make the map look like the school, add a **floor plan picture** (a drawn site plan, or a photo of the fire evacuation plan) and drag the rooms onto it, draw **building outlines** behind the rooms, and place **labels** such as "West building" or "Yard". Double-click any name on the map to rename it. If you redraw the picture later, keep it the same shape and the rooms stay where they are. **Setup** also sets period names and times, and optional limits on how many pupils a room takes. You can also set how many PPA periods each member of staff needs, and the Week view warns when someone is short.
 
