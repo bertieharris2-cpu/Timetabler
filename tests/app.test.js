@@ -13,6 +13,11 @@ const PEOPLE_CSV = path.join(TMP, 'people.csv');
 fs.writeFileSync(PEOPLE_CSV, 'person_id,name,role\nS01,AB,student\nS02,CD,student\nS03,EF,student\nS04,GH,student\nT01,Alex,staff\nT02,Blake,staff\nT03,Casey,staff\n');
 
 let failures = 0, passes = 0;
+// Setup is in sections: open Setup, then the named section.
+async function setupTo(pg, section) {
+  await pg.getByRole('button', { name: 'Setup', exact: true }).click();
+  await pg.locator('.setup-nav button', { hasText: section }).click();
+}
 function check(ok, label) {
   if (ok) { passes++; console.log('  ok   ' + label); }
   else { failures++; console.log('  FAIL ' + label); }
@@ -129,7 +134,7 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   check(/^Lifehouse timetable backup - plan - \d{4}-\d\d-\d\d \d{4}\.json$/.test(dl.suggestedFilename()), 'backup file name: ' + dl.suggestedFilename());
 
   console.log('Export for Excel');
-  await page.getByRole('button', { name: 'Setup' }).click();
+  await setupTo(page, 'Plan and files');
   const [csv1] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Rows per period' }).click()]);
   const csvPath = path.join(TMP, 'a.csv');
   await csv1.saveAs(csvPath);
@@ -144,9 +149,12 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   check(grid[0].replace(/^\uFEFF/, '').startsWith('Name,Role,Mon P1,Mon P2') && grid.length === 8, 'week grid: header plus 7 people');
 
   console.log('Part-time days');
+  await page.locator('.setup-nav button', { hasText: 'Pupils' }).click();
   await page.locator('.days-in[aria-label="GH days in"] button').nth(2).click();
   check(await page.locator('.days-in[aria-label="GH days in"] button.out').count() === 1, 'GH marked not in on Wednesday');
+  await page.locator('.setup-nav button', { hasText: 'Plan and files' }).click();
   await page.fill('#plan-name', 'Autumn 2 2026');
+  await page.locator('.setup-nav button', { hasText: 'Staff' }).click();
   await page.locator('.edit-table input[aria-label="Alex PPA periods a week"]').fill('2');
 
   console.log('Week view');
@@ -253,7 +261,7 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   await p7.keyboard.press('f');
   check(await p7.evaluate(() => !document.body.classList.contains('fs')), 'F leaves full screen');
   const inLs3 = await p7.locator('.room[data-area="A1"] .chip').count();
-  await p7.getByRole('button', { name: 'Setup' }).click();
+  await setupTo(p7, 'Rooms and map');
   await p7.getByRole('button', { name: 'Change map layout…' }).click();
   await p7.locator('input[name="layout-pick"][value="scale"]').check();
   await p7.getByRole('button', { name: 'Use this layout' }).click();
@@ -269,7 +277,7 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   await p8.goto(APP);
   await p8.getByRole('button', { name: 'Or try the example school (made-up people)' }).click();
   await p8.evaluate(() => localStorage.removeItem('lifehouse_timetabler_ui'));
-  await p8.getByRole('button', { name: 'Setup' }).click();
+  await setupTo(p8, 'Rooms and map');
   await p8.getByRole('button', { name: 'Change map layout…' }).click();
   await p8.locator('input[name="layout-pick"][value="scale"]').check();
   await p8.getByRole('button', { name: 'Use this layout' }).click();
@@ -347,11 +355,12 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   console.log('Staff photos, lead staff, the school’s own pictures and lesson types');
   const picFile = path.join(TMP, 'pic.png');
   fs.writeFileSync(picFile, Buffer.from(await p10.evaluate(() => { const c = document.createElement('canvas'); c.width = 300; c.height = 200; const g = c.getContext('2d'); g.fillStyle = '#c33'; g.fillRect(0, 0, 300, 200); return c.toDataURL('image/png').split(',')[1]; }), 'base64'));
-  await p10.getByRole('button', { name: 'Setup' }).click();
+  await setupTo(p10, 'Staff');
   await p10.getByRole('checkbox', { name: 'Abi leads lessons' }).check();
   const [fc1] = await Promise.all([p10.waitForEvent('filechooser'), p10.getByRole('button', { name: 'Add a photo of Abi' }).click()]);
   await fc1.setFiles(picFile);
   await p10.waitForSelector('.photo-btn img');
+  await p10.locator('.setup-nav button', { hasText: 'Subjects' }).click();
   const [fc2] = await Promise.all([p10.waitForEvent('filechooser'), p10.getByRole('button', { name: 'Choose a picture for Animal care' }).click()]);
   await fc2.setFiles(picFile);
   await p10.getByRole('button', { name: 'Change the picture for Animal care' }).waitFor();
@@ -379,7 +388,7 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   check(await p10.locator('.sheet.pupil img.pt-photo').count() >= 1, 'and they are still there after a reload');
 
   console.log('The school day');
-  await p10.getByRole('button', { name: 'Setup' }).click();
+  await setupTo(p10, 'School day');
   await p10.getByRole('button', { name: 'Add a row (break, lunch…)' }).click();
   const newRow = p10.locator('input[aria-label="Name of the  row"]');
   await newRow.fill('Assembly');
@@ -392,6 +401,75 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   await sheet.waitForTimeout(1800);
   check(await sheet.locator('.dg-band', { hasText: 'Assembly' }).count() === 1, 'and shows on the second screen');
   await ctx10.close();
+
+  console.log('Groups');
+  const ctx11 = await browser.newContext({ viewport: { width: 1600, height: 1000 } });
+  const p11 = await ctx11.newPage();
+  const err11 = [];
+  p11.on('pageerror', (e) => err11.push(e.message));
+  await p11.goto(APP);
+  await p11.getByRole('button', { name: 'Or try the example school (made-up people)' }).click();
+  const dragBox = async (from, to) => {
+    const a = await from.boundingBox(), z = await to.boundingBox();
+    await p11.mouse.move(a.x + a.width / 2, a.y + a.height / 2);
+    await p11.mouse.down();
+    for (let i = 1; i <= 8; i++) await p11.mouse.move(a.x + a.width / 2 + (z.x + z.width / 2 - a.x - a.width / 2) * i / 8, a.y + a.height / 2 + (z.y + z.height / 2 - a.y - a.height / 2) * i / 8);
+    await p11.mouse.up();
+    await p11.waitForTimeout(150);
+  };
+  // Setup: make a group by clicking names
+  await setupTo(p11, 'Groups');
+  check(await p11.locator('.gcard').count() === 6, 'the example has its set groups');
+  await p11.getByRole('button', { name: 'Add a group' }).click();
+  const card = p11.locator('.gcard').last();
+  await card.locator('input[aria-label="Group name"]').fill('Spelling group');
+  await card.locator('input[aria-label$=" lesson"]').fill('Spelling');
+  await p11.waitForTimeout(100);
+  await setupTo(p11, 'Groups');
+  const card2 = p11.locator('.gcard').last();
+  await card2.locator('button[title="Add AB to Spelling group"]').click();
+  await p11.locator('.gcard').last().locator('button[title="Add CD to Spelling group"]').click();
+  check(await p11.locator('.gcard').last().locator('.chip[aria-pressed="true"]').count() === 2, 'members chosen by clicking their names');
+  // Plan: drag a group onto a room
+  await p11.getByRole('button', { name: 'Plan', exact: true }).click();
+  await p11.getByRole('button', { name: 'Clear period' }).click();
+  await p11.locator('dialog .btn.primary').click();
+  const lit1 = p11.locator('.groups-zone .gchip', { hasText: 'Literacy set 1' });
+  await dragBox(lit1, p11.locator('.room[data-area="A1"] .room-people'));
+  check(await p11.locator('.room[data-area="A1"] .chip').count() === 6, 'dragging a group moves everyone in it (' + await p11.locator('.room[data-area="A1"] .chip').count() + ')');
+  check(await p11.inputValue('#lesson-A1') === 'Literacy', 'and the room gets the group’s lesson');
+  check(await p11.locator('.groups-zone .gchip', { hasText: 'Literacy set 1' }).locator('.gchip-at').innerText() === '✓ Learning Space 3', 'the group shows where it is');
+  await p11.locator('.groups-zone .gchip', { hasText: 'Literacy set 2' }).click();
+  check(await p11.locator('.chip.sel').count() >= 6, 'tapping a group picks everyone up');
+  await p11.locator('.room[data-area="A15"]').click({ position: { x: 30, y: 60 } });
+  check(await p11.locator('.room[data-area="A15"] .chip').count() === 6, 'then tapping a room puts them there');
+  // The Groups screen
+  await p11.getByRole('button', { name: 'Groups', exact: true }).first().click();
+  check(await p11.locator('.seg button.on').innerText() === 'Literacy' && await p11.locator('table.gweek thead th').count() === 6, 'the Groups screen: literacy first, a column per day');
+  check(await p11.locator('td[data-cell="Mon|P1"] .gchip', { hasText: 'Literacy set 1' }).count() === 1, 'shows where groups already are');
+  await dragBox(p11.locator('.gw-tray .gchip', { hasText: 'Literacy set 1' }), p11.locator('td[data-cell="Tue|P2"]'));
+  check(await p11.locator('td[data-cell="Tue|P2"] .gchip', { hasText: 'Literacy set 1' }).count() === 1 && /2\/2/.test(await p11.locator('.gw-tray .gchip', { hasText: 'Literacy set 1' }).innerText()), 'drag a group onto the week; it counts towards its lessons');
+  await dragBox(p11.locator('td[data-cell="Tue|P2"] .gchip', { hasText: 'Literacy set 1' }), p11.locator('td[data-cell="Thu|P3"]'));
+  check(await p11.locator('td[data-cell="Tue|P2"] .gchip').count() === 0 && await p11.locator('td[data-cell="Thu|P3"] .gchip', { hasText: 'Literacy set 1' }).count() === 1, 'drag it to another lesson to move it');
+  await dragBox(p11.locator('td[data-cell="Thu|P3"] .gchip', { hasText: 'Literacy set 1' }), p11.locator('.gw-tray'));
+  check(await p11.locator('td[data-cell="Thu|P3"] .gchip').count() === 0, 'or back to the list to take it out');
+  await p11.locator('.seg button', { hasText: 'Numeracy' }).click();
+  await dragBox(p11.locator('.gw-tray .gchip', { hasText: 'Numeracy set 1' }), p11.locator('td[data-cell="Mon|P1"]'));
+  check(await p11.locator('dialog').innerText().then((t) => /Clash/.test(t) && /AB is also in Literacy set 1/.test(t)), 'asks before splitting another group');
+  await p11.getByRole('button', { name: 'Move them anyway' }).click();
+  await p11.locator('.seg button', { hasText: 'Literacy' }).click();
+  check(/Literacy set 1: AB elsewhere/.test((await p11.locator('td[data-cell="Mon|P1"] .gw-split').allInnerTexts()).join(' ')), 'the split group is flagged');
+  await p11.locator('.seg button', { hasText: 'D&D' }).click();
+  await p11.locator('.gw-tray .gchip', { hasText: 'D&D' }).click();
+  await p11.locator('td[data-cell="Fri|P4"]').click();
+  check(await p11.locator('dialog').innerText().then((t) => /Which room for D&D/.test(t)), 'tap a group then a lesson; with no usual room it asks which');
+  await p11.locator('dialog input[name="gw-room"]').nth(2).check();
+  await p11.getByRole('button', { name: 'Put it there' }).click();
+  check(await p11.locator('td[data-cell="Fri|P4"] .gchip', { hasText: 'D&D' }).count() === 1, 'and puts it there');
+  await p11.getByRole('button', { name: 'Week', exact: true }).click();
+  check(await p11.getByText(/Literacy set 1 has [01] of 2 lessons this week/).count() === 1, 'the Week view lists groups short of their lessons');
+  check(err11.length === 0, 'no errors' + (err11.length ? ': ' + err11.join(' | ') : ''));
+  await ctx11.close();
 
   console.log('Map style: Navy plan');
   const ctx9 = await browser.newContext({ viewport: { width: 1920, height: 1080 } });
@@ -510,13 +588,13 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   await p4.locator('.rename-pop').fill('Tool shed');
   await p4.getByRole('button', { name: 'Done' }).click();
   check(await p4.locator('.editbar').count() === 0, 'Done works straight after renaming');
-  await p4.getByRole('button', { name: 'Setup' }).click();
+  await setupTo(p4, 'Plan and files');
   await p4.getByRole('button', { name: 'Load the example…' }).click();
   await p4.getByRole('button', { name: 'Load example' }).click();
   check(await p4.locator('.room[data-area]').count() === 22 && await p4.locator('.room .room-name', { hasText: 'Tool shed' }).count() === 1, 'example school keeps the rooms on screen');
 
   console.log('Staff-only spaces');
-  await p4.getByRole('button', { name: 'Setup' }).click();
+  await setupTo(p4, 'Rooms and map');
   await p4.locator('select[aria-label="Small Room type"]').selectOption('staff');
   await p4.getByRole('button', { name: 'Plan', exact: true }).click();
   await p4.locator('.map-tools .seg button', { hasText: 'Room use' }).click();
