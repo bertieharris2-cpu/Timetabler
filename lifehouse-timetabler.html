@@ -593,17 +593,32 @@ table.tt { width: 100%; border-collapse: collapse; table-layout: fixed; font-siz
 .setup-pair.tight { grid-template-columns: 1fr 1fr; }
 .group-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; align-items: start; }
 .gcard.editing { grid-column: 1 / -1; border-color: var(--accent); }
-.pupil-page { border-color: var(--accent); box-shadow: inset 3px 0 0 var(--accent); }
-.needs-table { max-width: 640px; }
-.need-off td { color: var(--muted); }
-.need-status { font-size: 12px; font-weight: 700; padding: 1px 6px; }
-.need-status.ok { background: var(--ok-bg); color: var(--ok); }
-.need-status.short { background: var(--warn-bg); color: var(--warn); }
-.need-add { display: flex; gap: 6px; align-items: center; }
-.need-add .txt:first-child { max-width: 220px; }
-.need-btn { border: 1px solid var(--line-strong); background: var(--surface); padding: 2px 8px; font-size: 12px; font-weight: 600; white-space: nowrap; }
-.need-btn.ok { color: var(--ok); border-color: var(--ok); }
-.need-btn.short { color: var(--warn); border-color: var(--warn); background: var(--warn-bg); }
+.need-add { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.need-add .txt:first-child { max-width: 260px; }
+.need-cols { display: flex; flex-wrap: wrap; gap: 6px; }
+.need-col { display: inline-flex; align-items: center; gap: 2px; }
+.need-col .txt { width: 130px; }
+.need-head { text-align: center !important; font-size: 10.5px !important; line-height: 1.15; white-space: normal; min-width: 62px; vertical-align: bottom !important; }
+.need-head span { display: block; margin-bottom: 3px; }
+.need-all { font-size: 11px; padding: 1px 2px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--muted); }
+.need-cell { white-space: nowrap; text-align: center; }
+.need-seg { display: inline-flex; border: 1px solid var(--line-strong); }
+.need-seg button { width: 20px; height: 22px; padding: 0; border: 0; background: var(--surface); color: var(--muted); font-size: 12px; font-weight: 700; }
+.need-seg button + button { border-left: 1px solid var(--line); }
+.need-seg button.on { background: var(--accent); color: var(--accent-ink); }
+.need-seg button.on.zero { background: var(--surface-2); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line-strong); }
+.need-mark { display: inline-block; min-width: 26px; margin-left: 3px; font-size: 10.5px; font-weight: 700; padding: 0 3px; }
+.need-mark.ok { color: var(--ok); }
+.need-mark.short { background: var(--warn-bg); color: var(--warn); }
+.reduced-edit { border: 1px solid var(--accent); padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; }
+.reduced-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.reduced-head .btn { margin-left: auto; }
+.reduced-grid { border-collapse: collapse; }
+.reduced-grid th, .reduced-grid td { border: 1px solid var(--line); padding: 3px; text-align: center; font-size: 12.5px; }
+.reduced-grid tbody th { text-align: left; padding: 3px 8px; }
+.reduced-cell { width: 84px; height: 30px; border: 0; background: var(--ok-bg); color: var(--ok); font-weight: 700; }
+.reduced-cell.out { background: repeating-linear-gradient(45deg, var(--surface-2) 0 6px, var(--free) 6px 12px); color: var(--muted); font-weight: 600; }
+.reduced-sum { font-size: 12.5px; color: var(--muted); }
 .gcard.compact { gap: 4px; background: var(--surface); }
 .gc-head { display: flex; align-items: center; gap: 6px; }
 .gc-head b { flex: 1; font-size: 14px; }
@@ -1040,7 +1055,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     return {
       app: APP_ID, version: FILE_VERSION, name: '', school: 'Lifehouse',
       periods,
-      areas: clone(DEFAULT_AREAS), people: [], slots: {}, outlines: clone(LAYOUTS.school.outlines), specials: clone(DEFAULT_SPECIALS), dayRows: cleanDayRows(null, periods), symbols: {}, subjectTypes: {}, groups: [], needs: [],
+      areas: clone(DEFAULT_AREAS), people: [], slots: {}, outlines: clone(LAYOUTS.school.outlines), specials: clone(DEFAULT_SPECIALS), dayRows: cleanDayRows(null, periods), symbols: {}, subjectTypes: {}, groups: [], needs: DEFAULT_NEEDS.map((subject) => ({ subject, perWeek: 0 })),
       map: { imageId: null, w: 0, h: 0, fade: 1 },
       meta: { created: nowIso(), changedAt: null, backedUpAt: null }
     };
@@ -1061,7 +1076,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     });
     if (!out.periods.length) out.periods = base.periods;
     out.dayRows = cleanDayRows(p.dayRows, out.periods);
-    out.needs = cleanNeeds(p.needs, 1);
+    out.needs = Array.isArray(p.needs) && p.needs.length ? cleanNeeds(p.needs) : DEFAULT_NEEDS.map((subject) => ({ subject, perWeek: 0 }));
 
     const seenA = new Set();
     out.areas = (Array.isArray(p.areas) ? p.areas : base.areas).filter((a) => a && str(a.id) && !seenA.has(str(a.id)) && seenA.add(str(a.id))).map((a) => {
@@ -1114,7 +1129,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       role: x.role === 'staff' ? 'staff' : 'student',
       ppa: Math.max(0, Math.round(num(x.ppa, 0))),
       // A pupil's own changes to the lessons every pupil needs: a different number (0 = not needed), or extra lessons.
-      needs: x.role === 'staff' ? [] : cleanNeeds(x.needs, 0),
+      needs: x.role === 'staff' ? [] : cleanNeeds(x.needs),
       // Staff who lead lessons are the ones named on pupil timetables; support staff are left off.
       lead: x.role === 'staff' && !!x.lead,
       photoId: typeof x.photo === 'string' && x.photo.startsWith('data:image/') ? rememberImage(x.photo) : x.photoId && images.has(x.photoId) ? x.photoId : null
@@ -1191,10 +1206,12 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     out.forEach((r) => { if (!r.id) { while (seen.has('D' + n)) n++; r.id = 'D' + n; seen.add(r.id); } });
     return out;
   }
-  // Lessons needed each week, as [{ subject, perWeek }], one per subject.
-  function cleanNeeds(list, min) {
+  // The main subjects every pupil is checked against: each pupil needs none, one or two a week (never three).
+  const DEFAULT_NEEDS = ['Numeracy', 'Literacy', 'Humanities', 'Biology', 'Science', 'Therapy', 'Expressive arts', 'DT', 'PE', 'Intervention'];
+  // Lessons needed each week, as [{ subject, perWeek }], one per subject, 0 to 2 a week.
+  function cleanNeeds(list) {
     const seen = new Set();
-    return (Array.isArray(list) ? list : []).filter((n) => n && str(n.subject)).map((n) => ({ subject: str(n.subject), perWeek: clamp(Math.round(num(n.perWeek, 1)), min, 20) }))
+    return (Array.isArray(list) ? list : []).filter((n) => n && str(n.subject)).map((n) => ({ subject: str(n.subject), perWeek: clamp(Math.round(num(n.perWeek, 0)), 0, 2) }))
       .filter((n) => { const k = n.subject.toLowerCase(); if (seen.has(k)) return false; seen.add(k); return true; });
   }
   // "8.30am", "1.10pm", "13:10" as minutes since midnight, for putting the day's rows in order.
@@ -2396,7 +2413,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
         h('summary', null, 'Things to check (' + issues.length + ')'),
         h('div', { class: 'issue-list' }, issues.map((i) => h('button', {
           type: 'button', class: 'check ' + i.level,
-          onclick: () => { if (i.key) { const [d, p] = i.key.split('|'); goSlot(d, p, 'plan'); setTimeout(() => flashZone(i.zone), 50); } else { if (i.pid) { ui.setupTab = 'pupils'; pupilOpen = i.pid; } go('setup'); } }
+          onclick: () => { if (i.key) { const [d, p] = i.key.split('|'); goSlot(d, p, 'plan'); setTimeout(() => flashZone(i.zone), 50); } else { if (i.pid) ui.setupTab = 'pupils'; go('setup'); } }
         }, h('span', null, i.key ? h('b', null, slotLabel(i.key)) : null, i.text))))) : null,
       ui.weekMode === 'room' ? weekByRoom(keys) : weekByPerson(keys)
     ));
@@ -2961,7 +2978,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     const tab = SETUP_SECTIONS.some(([id]) => id === ui.setupTab) ? ui.setupTab : 'pupils';
     const counts = { pupils: pupils().length, staff: staff().length, groups: project.groups.length, rooms: project.areas.length };
     const body = {
-      pupils: () => [pupilOpen && person(pupilOpen) ? pupilPage(person(pupilOpen)) : null, needsCard(), peopleCard('student')],
+      pupils: () => [peopleCard('student'), reducedCard(), needsCard()],
       staff: () => [peopleCard('staff')],
       groups: () => [groupsCard()],
       subjects: () => [symbolsCard()],
@@ -2977,45 +2994,82 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
             label, counts[id] != null ? h('span', { class: 'n' }, counts[id]) : null))),
         h('div', { class: 'setup-main' }, body))));
   }
-  // Lessons every pupil needs each week; each pupil's page can change these for them.
-  let pupilOpen = null;
+  // The subjects pupils are checked against: the columns of the Pupils table.
   function needsCard() {
     const subjects = [...new Set(subjectsInUse().filter((x) => !x.band).map((x) => x.name))].sort();
-    const setN = (i, fn, merge) => mutate((p) => { fn(p.needs[i]); }, merge ? { merge: 'need' + merge + '|' + i, render: false } : {});
+    const add = h('input', { class: 'txt sm', list: 'need-subjects', placeholder: 'e.g. Music', 'aria-label': 'Add a subject to check' });
     return h('section', { class: 'card' },
-      h('h3', null, 'Lessons every pupil needs', h('span', { class: 'n' }, 'each week')),
-      h('p', { class: 'hint' }, 'The lessons most pupils must have. Change them for one pupil on their page (click their name below). The Week view warns when a pupil is short. A lesson counts if its name contains the subject, so “Science – Biology” counts for Biology.'),
+      h('h3', null, 'Subjects to check', h('span', { class: 'n' }, 'the columns in the Pupils table')),
+      h('p', { class: 'hint' }, 'Each pupil needs none, one or two of these a week; set it with the switches in the Pupils table. The Week view warns when a pupil is short. A lesson counts if its name contains the subject, so “Science – Biology” counts for Biology.'),
       h('datalist', { id: 'need-subjects' }, subjects.map((x) => h('option', { value: x }))),
-      project.needs.length ? h('table', { class: 'edit-table needs-table' }, h('thead', null, h('tr', null, h('th', null, 'Lesson'), h('th', null, 'Times a week'), h('th', null, ''))),
-        h('tbody', null, project.needs.map((n, i) => h('tr', null,
-          h('td', null, h('input', { class: 'txt sm', value: n.subject, list: 'need-subjects', 'aria-label': 'Lesson every pupil needs', oninput: (e) => setN(i, (x) => { x.subject = str(e.target.value) || x.subject; }, 's') })),
-          h('td', null, h('input', { class: 'txt sm', type: 'number', min: '1', max: '20', value: String(n.perWeek), style: { width: '70px' }, 'aria-label': n.subject + ' times a week', oninput: (e) => setN(i, (x) => { x.perWeek = clamp(Math.round(+e.target.value || 1), 1, 20); }, 'n') })),
-          h('td', null, h('button', { type: 'button', class: 'x-btn', 'aria-label': 'Remove ' + n.subject, onclick: () => mutate((p) => { p.needs.splice(i, 1); }) }, '×')))))) : null,
-      h('div', null, h('button', { type: 'button', class: 'btn small', onclick: () => mutate((p) => { p.needs.push({ subject: 'New lesson', perWeek: 1 }); }) }, 'Add a lesson')));
+      h('div', { class: 'need-cols' }, project.needs.map((n, i) => h('span', { class: 'need-col' },
+        h('input', { class: 'txt sm', value: n.subject, list: 'need-subjects', 'aria-label': 'Subject to check', oninput: (e) => mutate((p) => { p.needs[i].subject = str(e.target.value) || p.needs[i].subject; }, { merge: 'needs|' + i, render: false }), onchange: () => render() }),
+        h('button', { type: 'button', class: 'x-btn', 'aria-label': 'Stop checking ' + n.subject, onclick: () => mutate((p) => { p.needs.splice(i, 1); }) }, '×')))),
+      h('div', { class: 'row need-add' }, add, h('button', { type: 'button', class: 'btn small', onclick: () => { const v = str(add.value); if (v) mutate((p) => { if (!p.needs.some((n) => subjectKey(n.subject) === subjectKey(v))) p.needs.push({ subject: v, perWeek: 0 }); }); } }, 'Add a subject')));
   }
-  // A pupil's page: their lessons needed this week, against what's planned.
-  function pupilPage(p) {
-    const list = needsOf(p);
-    const add = h('input', { class: 'txt sm', list: 'need-subjects', placeholder: 'e.g. Biology', 'aria-label': 'Add a lesson for ' + p.name });
-    const addN = h('input', { class: 'txt sm', type: 'number', min: '1', max: '20', value: '1', style: { width: '64px' }, 'aria-label': 'Times a week' });
-    const doAdd = () => { const v = str(add.value); if (v) setPupilNeed(p.id, v, clamp(Math.round(+addN.value || 1), 1, 20)); };
-    return h('section', { class: 'card pupil-page' },
-      h('h3', null, p.full ? p.full + ' (' + p.name + ')' : p.name, h('span', { class: 'n' }, 'lessons needed each week'),
-        h('button', { type: 'button', class: 'btn small', style: { marginLeft: 'auto' }, onclick: () => { pupilOpen = null; render(); } }, 'Close')),
-      list.length ? h('table', { class: 'edit-table needs-table' },
-        h('thead', null, h('tr', null, h('th', null, 'Lesson'), h('th', null, 'Times a week'), h('th', null, 'Planned'), h('th', null, ''))),
-        h('tbody', null, list.map((n) => {
-          const has = lessonsOf(p, n.subject), off = n.perWeek === 0;
-          return h('tr', { class: off ? 'need-off' : '' },
-            h('td', null, n.subject, n.own ? h('span', { class: 'hint' }, ' · just for ' + p.name) : n.perWeek !== n.school ? h('span', { class: 'hint' }, ' · changed for ' + p.name) : null),
-            h('td', null, off ? h('span', { class: 'hint' }, 'Not needed') : h('input', { class: 'txt sm', type: 'number', min: '1', max: '20', value: String(n.perWeek), style: { width: '64px' }, 'aria-label': n.subject + ' for ' + p.name,
-              onchange: (e) => setPupilNeed(p.id, n.subject, clamp(Math.round(+e.target.value || 1), 1, 20)) })),
-            h('td', null, off ? '' : h('span', { class: 'need-status ' + (has >= n.perWeek ? 'ok' : 'short') }, (has >= n.perWeek ? '✓ ' : '! ') + has + ' of ' + n.perWeek)),
-            h('td', null, n.own ? h('button', { type: 'button', class: 'x-btn', 'aria-label': 'Remove ' + n.subject + ' for ' + p.name, onclick: () => setPupilNeed(p.id, n.subject, null) }, '×')
-              : off ? h('button', { type: 'button', class: 'link-btn', onclick: () => setPupilNeed(p.id, n.subject, null) }, 'Needs it')
-                : h('button', { type: 'button', class: 'link-btn', onclick: () => setPupilNeed(p.id, n.subject, 0) }, 'Not for ' + p.name)));
-        }))) : h('p', { class: 'hint' }, 'No lessons listed yet.'),
-      h('div', { class: 'row need-add' }, add, addN, h('button', { type: 'button', class: 'btn small', onclick: doAdd }, 'Add for ' + p.name)));
+  // A subject column's heading, with a quick way to set everyone at once (most pupils are the same).
+  function needHead(n) {
+    return h('th', { class: 'need-head' }, h('span', null, n.subject),
+      h('select', { class: 'need-all', 'aria-label': 'Set everyone for ' + n.subject, onchange: (e) => { const v = +e.target.value; if (e.target.value !== '') mutate((p) => { const k = subjectKey(n.subject); p.needs.forEach((m) => { if (subjectKey(m.subject) === k) m.perWeek = v; }); p.people.forEach((x) => { if (x.role !== 'staff') x.needs = (x.needs || []).filter((m) => subjectKey(m.subject) !== k); }); }); } },
+        h('option', { value: '' }, 'All…'), h('option', { value: '0' }, 'All –'), h('option', { value: '1' }, 'All 1'), h('option', { value: '2' }, 'All 2')));
+  }
+  // A pupil's switch for one subject: –, 1 or 2 a week, with what's planned beside it.
+  function needSwitch(p, n) {
+    const has = n.perWeek ? lessonsOf(p, n.subject) : 0;
+    return h('td', { class: 'need-cell' },
+      h('span', { class: 'need-seg', role: 'radiogroup', 'aria-label': p.name + ' ' + n.subject }, [0, 1, 2].map((v) =>
+        h('button', { type: 'button', class: (n.perWeek === v ? 'on' : '') + (v ? '' : ' zero'), role: 'radio', 'aria-checked': n.perWeek === v ? 'true' : 'false', 'aria-label': p.name + ' ' + n.subject + ': ' + (v ? v + ' a week' : 'not needed'),
+          onclick: () => setPupilNeed(p.id, n.subject, v) }, v ? String(v) : '–'))),
+      n.perWeek ? h('span', { class: 'need-mark ' + (has >= n.perWeek ? 'ok' : 'short'), title: has + ' of ' + n.perWeek + ' planned this week' }, has >= n.perWeek ? '✓' : has + '/' + n.perWeek) : null);
+  }
+  // Reduced timetables: most pupils are in all day; these are the ones who aren't, period by period.
+  let reducedOpen = null;
+  const isOutAt = (pid, day, per) => slotOf(slotKey(day, per)).at[pid] === OUT;
+  const reducedPupils = () => pupils().filter((p) => DAYS.some((d) => project.periods.some((per) => isOutAt(p.id, d.id, per.id))));
+  function reducedSummary(p) {
+    const label = (per) => (project.dayRows.find((r) => r.period === per.id) || {}).label || per.label;
+    return DAYS.map((d) => {
+      const out = project.periods.filter((per) => isOutAt(p.id, d.id, per.id));
+      if (!out.length) return null;
+      return d.id + ': ' + (out.length === project.periods.length ? 'not in' : 'not in ' + out.map(label).join(', '));
+    }).filter(Boolean).join(' · ');
+  }
+  function setOut(pid, cells, out) {
+    mutate(() => {
+      cells.forEach(([day, per]) => {
+        const s = slotOf(slotKey(day, per), true);
+        if (out) s.at[pid] = OUT; else if (s.at[pid] === OUT) delete s.at[pid];
+      });
+    });
+  }
+  function reducedCard() {
+    const list = reducedPupils();
+    const open = reducedOpen && person(reducedOpen);
+    const others = pupils().filter((p) => !list.includes(p));
+    const pick = h('select', { class: 'txt sm', 'aria-label': 'Pupil with a reduced timetable' }, h('option', { value: '' }, 'Choose a pupil…'), others.map((p) => h('option', { value: p.id }, p.full ? p.full + ' (' + p.name + ')' : p.name)));
+    const label = (per) => (project.dayRows.find((r) => r.period === per.id) || {}).label || per.label;
+    const editor = (p) => h('div', { class: 'reduced-edit' },
+      h('div', { class: 'reduced-head' }, h('b', null, p.full ? p.full + ' (' + p.name + ')' : p.name), h('span', { class: 'hint' }, 'Click a lesson to mark it in or not in. Click a day to change the whole day.'),
+        h('button', { type: 'button', class: 'btn small primary', onclick: () => { reducedOpen = null; render(); } }, 'Done')),
+      h('table', { class: 'reduced-grid' },
+        h('thead', null, h('tr', null, h('th', null, ''), DAYS.map((d) => {
+          const allOut = project.periods.every((per) => isOutAt(p.id, d.id, per.id));
+          return h('th', null, h('button', { type: 'button', class: 'link-btn', 'aria-label': (allOut ? 'Mark ' + p.name + ' in all ' : 'Mark ' + p.name + ' not in all ') + d.name, onclick: () => setOut(p.id, project.periods.map((per) => [d.id, per.id]), !allOut) }, d.name));
+        }))),
+        h('tbody', null, project.periods.map((per) => h('tr', null, h('th', null, label(per)), DAYS.map((d) => {
+          const out = isOutAt(p.id, d.id, per.id);
+          return h('td', null, h('button', { type: 'button', class: 'reduced-cell' + (out ? ' out' : ''), 'aria-pressed': out ? 'true' : 'false', 'aria-label': p.name + ' ' + d.name + ' ' + label(per) + ': ' + (out ? 'not in' : 'in'),
+            onclick: () => setOut(p.id, [[d.id, per.id]], !out) }, out ? 'Not in' : 'In'));
+        }))))));
+    return h('section', { class: 'card' },
+      h('h3', null, 'Reduced timetables', h('span', { class: 'n' }, list.length ? String(list.length) : 'none')),
+      h('p', { class: 'hint' }, 'Pupils are in for every lesson unless they’re listed here. For a one-off, drag them to “Not in this period” on the map instead.'),
+      open ? editor(open) : null,
+      list.filter((p) => p !== open).length ? h('table', { class: 'edit-table' }, h('tbody', null, list.filter((p) => p !== open).map((p) => h('tr', null,
+        h('td', null, h('b', null, p.name)), h('td', { class: 'reduced-sum' }, reducedSummary(p)),
+        h('td', { class: 'num' }, h('button', { type: 'button', class: 'btn small', 'aria-label': 'Change ' + p.name + '’s timetable', onclick: () => { reducedOpen = p.id; render(); } }, 'Change'),
+          h('button', { type: 'button', class: 'link-btn sym-reset', onclick: () => setOut(p.id, DAYS.flatMap((d) => project.periods.map((per) => [d.id, per.id])), false) }, 'Full time again')))))) : null,
+      h('div', { class: 'row need-add' }, pick, h('button', { type: 'button', class: 'btn small', onclick: () => { if (pick.value) { reducedOpen = pick.value; render(); } } }, 'Add a reduced timetable')));
   }
   function planCard() {
     return h('section', { class: 'card' },
@@ -3139,7 +3193,8 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
         onchange: (e) => { if (!str(e.target.value)) e.target.value = p.name; } })),
       h('td', null, h('input', { class: 'txt sm', value: p.full, placeholder: 'optional', 'aria-label': 'Full name for printouts',
         oninput: (e) => mutate((proj) => { const x = proj.people.find((q) => q.id === p.id); if (x) x.full = e.target.value; }, { merge: 'pfull|' + p.id, render: false }) })),
-      h('td', null, h('span', { class: 'days-in', role: 'group', 'aria-label': p.name + ' days in' }, DAYS.map((d) => {
+      role === 'student' ? needsOf(p).filter((n) => !n.own).map((n) => needSwitch(p, n)) : null,
+      role === 'student' ? null : h('td', null, h('span', { class: 'days-in', role: 'group', 'aria-label': p.name + ' days in' }, DAYS.map((d) => {
         const stt = dayState(p.id, d.id);
         return h('button', { type: 'button', class: stt, title: d.name + ': ' + (stt === 'in' ? 'in' : stt === 'out' ? 'not in' : 'in for some periods') + '. Click to change.', 'aria-label': d.name + ' ' + stt, onclick: () => toggleDay(p, d.id) }, d.id[0]);
       }))),
@@ -3151,11 +3206,6 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
         h('button', { type: 'button', class: 'photo-btn', title: p.photoId ? 'Change ' + p.name + '’s photo' : 'Add a photo of ' + p.name, 'aria-label': p.photoId ? 'Change ' + p.name + '’s photo' : 'Add a photo of ' + p.name, onclick: () => choosePhoto(p.id) },
           p.photoId && images.has(p.photoId) ? h('img', { src: images.get(p.photoId), alt: '' }) : '+'),
         p.photoId ? h('button', { type: 'button', class: 'link-btn photo-del', 'aria-label': 'Remove ' + p.name + '’s photo', onclick: () => mutate((proj) => { const x = proj.people.find((q) => q.id === p.id); if (x) x.photoId = null; }) }, 'Remove') : null) : null,
-      role === 'staff' ? null : h('td', null, (() => {
-        const sh = needsOf(p).some((n) => n.perWeek > 0) ? shortNeeds(p) : null;
-        return h('button', { type: 'button', class: 'need-btn ' + (sh == null ? '' : sh.length ? 'short' : 'ok'), 'aria-label': 'Open ' + p.name + '’s page', title: sh && sh.length ? 'Short of ' + sh.map((n) => n.subject).join(', ') : 'Lessons ' + p.name + ' needs',
-          onclick: () => { pupilOpen = p.id; render(); const v = $('#view'); if (v) v.scrollTop = 0; } }, sh == null ? 'Page' : sh.length ? '! ' + sh.length + ' short' : '✓ All');
-      })()),
       h('td', null, h('button', { type: 'button', class: 'x-btn', title: 'Remove ' + p.name, 'aria-label': 'Remove ' + p.name, onclick: () => removePersonDialog(p) }, '×'))));
     const ta = h('textarea', { class: 'txt', id: 'add-' + role, rows: '2', placeholder: role === 'staff' ? 'e.g. Jo, Priya, Alex' : 'e.g. AB, CD, EFG' });
     const add = () => {
@@ -3169,14 +3219,14 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     return h('section', { class: 'card' },
       h('h3', null, label, h('span', { class: 'n' }, list.length ? String(list.length) : 'none yet')),
       list.length ? h('div', { class: 'table-box' }, h('table', { class: 'edit-table' },
-        h('thead', null, h('tr', null, h('th', { title: 'What shows on the map: initials or first names' }, 'On the map'), h('th', null, 'Full name'), h('th', null, 'In on'), role === 'staff' ? h('th', { title: 'PPA periods needed each week' }, 'PPA') : null,
-          role === 'staff' ? h('th', { title: 'Named on pupil timetables. Leave unticked for support staff.' }, 'Leads') : null, role === 'staff' ? h('th', null, 'Photo') : null, role === 'staff' ? null : h('th', { title: 'Lessons needed each week' }, 'Needs'), h('th', null, ''))),
+        h('thead', null, h('tr', null, h('th', { title: 'What shows on the map: initials or first names' }, 'On the map'), h('th', null, 'Full name'), role === 'student' ? project.needs.map((n) => needHead(n)) : h('th', null, 'In on'), role === 'staff' ? h('th', { title: 'PPA periods needed each week' }, 'PPA') : null,
+          role === 'staff' ? h('th', { title: 'Named on pupil timetables. Leave unticked for support staff.' }, 'Leads') : null, role === 'staff' ? h('th', null, 'Photo') : null, h('th', null, ''))),
         h('tbody', null, rows))) : null,
       h('div', { class: 'add-box' },
         h('label', { class: 'field', for: 'add-' + role }, 'Add ' + label.toLowerCase() + (role === 'staff' ? '' : ' (initials or first names)')),
         ta,
         h('div', { class: 'row' }, h('button', { type: 'button', class: 'btn small primary', onclick: add }, 'Add'), h('span', { class: 'hint' }, 'Separate names with commas, spaces or new lines.'))),
-      role === 'staff' ? h('p', { class: 'hint' }, 'PPA is the number of periods a week each person needs; the Week view warns when someone is short. Tick “Leads” for staff who lead lessons: pupil timetables name them and leave support staff off (a room with nobody ticked shows everyone in it). Photos show on picture timetables. They stay on this computer and in your backup files.') : h('p', { class: 'hint' }, 'Days: click a letter to mark someone as not in that day (part-time). For one period only, drag them to “Not in this period” on the map.'));
+      role === 'staff' ? h('p', { class: 'hint' }, 'PPA is the number of periods a week each person needs; the Week view warns when someone is short. Tick “Leads” for staff who lead lessons: pupil timetables name them and leave support staff off (a room with nobody ticked shows everyone in it). Photos show on picture timetables. They stay on this computer and in your backup files.') : h('p', { class: 'hint' }, 'The switches set how many of each subject a pupil needs a week: –, 1 or 2. “All…” at the top of a column sets everyone. A tick means it’s planned; a number like 0/1 means it isn’t yet.'));
   }
   function removePersonDialog(p) {
     confirmBox('Remove ' + p.name + '?', p.name + ' will be taken off the list and out of every period.', 'Remove', () => {
@@ -3365,9 +3415,9 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
   }
   // A likely lesson for a room, from its name, for the example school.
   function guessLesson(name) {
-    const rules = [[/literacy/i, ['Phonics', 'Reading', 'Literacy', 'Story time']], [/science/i, 'Science'], [/village hall kitchen|kitchen/i, 'Cooking'], [/\bdt\b/i, 'DT'],
-      [/polytunnel|garden/i, 'Gardening'], [/animal/i, 'Animal care'], [/wood/i, 'Forest school'], [/stable/i, 'Horse riding'], [/hall/i, 'PE'], [/conference/i, 'Careers'],
-      [/brook/i, ['Numeracy', 'Literacy', 'Numeracy', 'PSHE']], [/learning space/i, ['English', 'Maths', 'Topic', 'Reading']], [/small room/i, '1:1 work'], [/pod/i, 'Small group']];
+    const rules = [[/literacy/i, ['Phonics', 'Literacy', 'Literacy', 'Story time']], [/science/i, ['Science', 'Biology', 'Science', 'Biology']], [/village hall kitchen|kitchen/i, 'Cooking'], [/\bdt\b/i, 'DT'],
+      [/polytunnel|garden/i, 'Gardening'], [/animal/i, 'Animal care'], [/wood/i, 'Forest school'], [/stable/i, 'Horse riding'], [/hall/i, 'PE'], [/conference/i, 'Expressive arts'],
+      [/brook/i, ['Numeracy', 'Literacy', 'Numeracy', 'Therapy']], [/learning space/i, ['Literacy', 'Numeracy', 'Humanities', 'Literacy']], [/small room/i, 'Intervention'], [/pod/i, 'Therapy']];
     for (const [re, l] of rules) if (re.test(name)) return l;
     return 'Group work';
   }
