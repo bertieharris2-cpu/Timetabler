@@ -28,7 +28,7 @@ It is one HTML file. It needs no internet, no installing and no server, and it n
 5. **Check.** Each period in the strip shows ✓ when everyone is placed, a number for pupils not placed yet, and ! for a room with pupils but no staff. **Week** shows the whole week by room (which rooms are free when) or by person (each person's week in one row), with a list of things to check.
 6. **Print.** **Timetables** makes one A4 landscape page per pupil, member of staff or room, plus a whole-school sheet for each day. To email them, print to PDF.
 
-The map starts in the **roomy layout**: the school's rooms in the same arrangement as the floor plan, each big enough for a list of names. **Setup → Change map layout** switches to the **to-scale** layout on the floor plan drawing and back; names, room types and everyone's places stay put. The off-site place called "Local village" can be renamed in Setup; the name stays on your computer.
+The map starts in the **school layout**: the floor plan's buildings and rooms in the same places, with the empty space taken out (the Village Hall sits beside the main building) and rooms widened so a list of names fits. **Setup → Change map layout** switches to the **exact-size** drawing and back; names, room types and everyone's places stay put. The off-site place called "Local village" can be renamed in Setup; the name stays on your computer. The tray of names sits in a band above the map so the map uses the full width of the screen.
 
 **Full screen** (top right, or press <kbd>F</kbd>) hides the browser's bars and tightens the app around the map. <kbd>Esc</kbd> or <kbd>F</kbd> leaves it.
 
