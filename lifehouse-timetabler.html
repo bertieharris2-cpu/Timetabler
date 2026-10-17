@@ -262,15 +262,22 @@ body.dragging, body.dragging * { cursor: grabbing !important; user-select: none 
 .map.has-plan .outline { background: transparent; }
 .outline-name { position: absolute; left: 8px; bottom: 5px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
 .plan.editing .outline { pointer-events: auto; cursor: move; touch-action: none; border-style: dashed; border-color: var(--warn); }
-.outline-rename { position: absolute; left: 6px; bottom: 6px; width: min(180px, calc(100% - 40px)); font-size: 11px; font-weight: 700; padding: 2px 5px; border: 1px solid var(--line-strong); border-radius: 4px; background: var(--surface); cursor: text; }
-.fade-ctl { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; }
+.outline.label { border: 0; background: transparent; display: flex; align-items: center; justify-content: center; }
+.label-text { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .09em; color: var(--muted); text-align: center; line-height: 1.15; }
+.map.has-plan .label-text { color: var(--paper-muted); text-shadow: 0 0 3px var(--paper), 0 0 3px var(--paper); }
+.map.has-plan .outline-name { color: var(--paper-muted); }
+.plan.editing .outline.label { border: 1px dashed var(--warn); border-radius: 4px; }
+.outline.label .fade-ctl { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; }
 .fade-ctl input { width: 90px; }
 
 /* Layout editing */
 .plan.editing .room { cursor: move; touch-action: none; user-select: none; }
-.plan.editing .room-head { padding-right: 24px; }
-.room-rename { width: 100%; font-size: 11px; font-weight: 700; padding: 2px 4px; border: 1px solid var(--line-strong); border-radius: 4px; background: var(--surface); cursor: text; }
-.room-del { position: absolute; top: 3px; right: 3px; width: 18px; height: 18px; display: grid; place-items: center; padding: 0; border-radius: 4px; border: 1px solid var(--bad); background: var(--surface); color: var(--bad); font-size: 13px; line-height: 1; }
+.plan.editing .room-head { padding-right: 5px; }
+.rename-pop { position: absolute; left: 3px; top: 3px; z-index: 30; width: max(100% - 6px, 160px); font-size: 12px; font-weight: 700; padding: 4px 7px; border: 2px solid var(--accent); border-radius: 6px; background: var(--surface); color: var(--ink); box-shadow: 0 6px 16px rgba(0, 0, 0, .2); cursor: text; }
+.plan.editing .room-name, .plan.editing .label-text, .plan.editing .outline-name { cursor: text; }
+.label-text.empty, .outline-name.empty { opacity: .55; font-style: italic; }
+.outline.label .room-del { bottom: auto; left: auto; top: -9px; right: -9px; width: 16px; height: 16px; font-size: 12px; }
+.room-del { position: absolute; bottom: 3px; left: 3px; width: 18px; height: 18px; display: grid; place-items: center; padding: 0; border-radius: 4px; border: 1px solid var(--bad); background: var(--surface); color: var(--bad); font-size: 13px; line-height: 1; }
 .resize { position: absolute; right: 0; bottom: 0; width: 16px; height: 16px; cursor: nwse-resize; touch-action: none;
   background: linear-gradient(135deg, transparent 50%, var(--warn) 50%); border-bottom-right-radius: 7px; }
 .plan.editing .room { outline: 1px dashed var(--warn); }
@@ -599,7 +606,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     const seenO = new Set();
     out.outlines = (Array.isArray(p.outlines) ? p.outlines : []).filter((o) => o && str(o.id) && !seenO.has(str(o.id)) && seenO.add(str(o.id))).map((o) => {
       const w = clamp(num(o.w, 20), 3, 100), hh = clamp(num(o.h, 20), 3, 100);
-      return { id: str(o.id), name: str(o.name), x: clamp(num(o.x, 0), 0, 100 - w), y: clamp(num(o.y, 0), 0, 100 - hh), w, h: hh };
+      return { id: str(o.id), kind: o.kind === 'label' ? 'label' : 'box', name: str(o.name), x: clamp(num(o.x, 0), 0, 100 - w), y: clamp(num(o.y, 0), 0, 100 - hh), w, h: hh };
     });
     // The floor plan picture is kept outside the plan's data (see rememberImage) so undo stays light.
     const m0 = p.map || {};
@@ -1147,14 +1154,15 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       h('div', { class: 'slotbar' }, renderStrip(), renderSlotActions()),
       editLayout ? h('div', { class: 'editbar' },
         h('b', null, 'Editing the layout.'),
-        h('span', null, 'Drag a room to move it, drag its corner to resize it, or type a new name.'),
+        h('span', null, 'Drag a room or label to move it, and drag its corner to resize it. Double-click a name to rename it.'),
         h('span', { style: { flex: '1' } }),
         h('button', { type: 'button', class: 'btn small', onclick: () => $('#image-open').click() }, project.map.imageId ? 'Change floor plan picture…' : 'Floor plan picture…'),
         project.map.imageId ? h('label', { class: 'fade-ctl' }, 'Picture',
           h('input', { type: 'range', id: 'plan-fade', min: '0.1', max: '1', step: '0.05', value: String(project.map.fade), 'aria-label': 'How strongly the floor plan picture shows',
             oninput: (e) => { const v = +e.target.value; mutate((p) => { p.map.fade = v; }, { merge: 'fade', render: false }); const img = $('.plan-img'); if (img) img.style.opacity = v; } })) : null,
         project.map.imageId ? h('button', { type: 'button', class: 'btn small', onclick: removePicture }, 'Remove picture') : null,
-        h('button', { type: 'button', class: 'btn small', onclick: addOutline }, 'Add a building outline'),
+        h('button', { type: 'button', class: 'btn small', onclick: () => addOutline('label') }, 'Add a label'),
+        h('button', { type: 'button', class: 'btn small', onclick: () => addOutline('box') }, 'Add a building outline'),
         h('button', { type: 'button', class: 'btn small', onclick: addRoom }, 'Add a room'),
         h('button', { type: 'button', class: 'btn small primary', onclick: () => { editLayout = false; render(); } }, 'Done')) : null,
       h('div', { class: 'plan' + (editLayout ? ' editing' : '') }, ui.mapMode === 'use' && !editLayout ? renderUseTray() : renderTray(s, st), renderMap(s, st))
@@ -1331,7 +1339,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     },
       h('div', { class: 'room-head' },
         editLayout
-          ? h('input', { class: 'room-rename', value: a.name, 'aria-label': 'Room name', oninput: (e) => renameArea(a.id, e.target.value) })
+          ? h('span', { class: 'room-name', title: a.name + '. Double-click to rename.', ondblclick: () => startRename(a.id) }, a.name)
           : h('span', { class: 'room-name', title: a.name + (a.cap ? ' (room for ' + a.cap + ' pupils)' : '') }, a.name)),
       editLayout ? null : h('input', { class: 'room-lesson', id: 'lesson-' + a.id, value: title, placeholder: 'Lesson', 'aria-label': 'Lesson in ' + a.name, oninput: (e) => setTitle(a.id, e.target.value) }),
       h('div', { class: 'room-people' }, st2.map((p) => chip(p)), pu.map((p) => chip(p))),
@@ -1366,29 +1374,54 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
         });
       }))) : null);
   }
+  // Building outlines are boxes with a name; labels are just words placed on the map.
   function renderOutline(o) {
-    return h('div', { class: 'outline', 'data-outline': o.id, style: { left: o.x + '%', top: o.y + '%', width: o.w + '%', height: o.h + '%' } },
+    const label = o.kind === 'label';
+    return h('div', { class: 'outline' + (label ? ' label' : ''), 'data-outline': o.id, style: { left: o.x + '%', top: o.y + '%', width: o.w + '%', height: o.h + '%' } },
       editLayout
-        ? [h('input', { class: 'outline-rename', value: o.name, placeholder: 'Name, e.g. Main building', 'aria-label': 'Building or area name', oninput: (e) => renameOutline(o.id, e.target.value) }),
+        ? [h('span', { class: (label ? 'label-text' : 'outline-name') + (o.name ? '' : ' empty'), title: 'Double-click to rename', ondblclick: () => startRename(o.id) }, o.name || (label ? 'Label' : 'Outline')),
           h('span', { class: 'resize', 'data-resize': o.id, title: 'Drag to resize' }),
-          h('button', { type: 'button', class: 'room-del', title: 'Remove this outline', 'aria-label': 'Remove this outline', onclick: () => removeOutline(o.id) }, '×')]
-        : o.name ? h('span', { class: 'outline-name' }, o.name) : null);
+          h('button', { type: 'button', class: 'room-del', title: label ? 'Remove this label' : 'Remove this outline', 'aria-label': label ? 'Remove this label' : 'Remove this outline', onclick: () => removeOutline(o.id) }, '×')]
+        : o.name ? h('span', { class: label ? 'label-text' : 'outline-name' }, o.name) : null);
+  }
+  // A pop-out box for renaming a room, label or outline while arranging the map.
+  function startRename(id) {
+    const box = $('[data-area="' + id + '"]') || $('[data-outline="' + id + '"]');
+    if (!box) return;
+    const isArea = !!box.dataset.area;
+    const item = isArea ? areaById.get(id) : project.outlines.find((o) => o.id === id);
+    if (!item) return;
+    const inp = h('input', { class: 'rename-pop', value: item.name, 'aria-label': 'New name',
+      oninput: (e) => (isArea ? renameArea : renameOutline)(id, e.target.value),
+      onkeydown: (e) => { if (e.key === 'Enter' || e.key === 'Escape') { e.preventDefault(); inp.blur(); } },
+      onblur: () => {
+        inp.remove();
+        const now = isArea ? areaById.get(id) : project.outlines.find((o) => o.id === id);
+        const span = box.querySelector('.room-name, .label-text, .outline-name');
+        if (now && span) {
+          span.textContent = now.name || (isArea ? '' : now.kind === 'label' ? 'Label' : 'Outline');
+          span.classList.toggle('empty', !now.name && !isArea);
+        }
+      } });
+    box.append(inp);
+    inp.focus();
+    inp.select();
   }
   function renameOutline(id, name) {
     mutate((p) => { const o = p.outlines.find((x) => x.id === id); if (o) o.name = name; }, { merge: 'oname|' + id, render: false });
   }
-  function addOutline() {
+  function addOutline(kind) {
+    const label = kind === 'label';
     let newId;
     mutate((p) => {
       const taken = new Set(p.outlines.map((o) => o.id));
       let n = p.outlines.length + 1;
       while (taken.has('B' + n)) n++;
       newId = 'B' + n;
-      p.outlines.push({ id: newId, name: '', x: 35, y: 30, w: 25, h: 35 });
+      p.outlines.push(label ? { id: newId, kind: 'label', name: '', x: 40, y: 45, w: 16, h: 6 } : { id: newId, kind: 'box', name: '', x: 35, y: 30, w: 25, h: 35 });
     });
-    const inp = $('[data-outline="' + newId + '"] .outline-rename');
-    if (inp) inp.focus();
-    toast('Outline added. Drag it over a building or outdoor area, and drag its corner to fit.');
+    startRename(newId);
+    toast(label ? 'Label added. Type the words, then drag it into place.' : 'Outline added. Drag it over a building or outdoor area, and drag its corner to fit.');
   }
   function removeOutline(id) {
     mutate((p) => { p.outlines = p.outlines.filter((o) => o.id !== id); });
@@ -1451,10 +1484,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       newId = 'A' + n;
       p.areas.push({ id: newId, name: 'New room', x, y, w: 8, h: 16, cap: null });
     });
-    if (ui.view === 'plan') {
-      const inp = $('[data-area="' + newId + '"] .room-rename');
-      if (inp) { inp.focus(); inp.select(); }
-    }
+    if (ui.view === 'plan') startRename(newId);
     toast('Room added. Drag it into place and give it a name.');
   }
   function removeAreaDialog(a) {
@@ -1867,7 +1897,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
           h('div', { style: { display: 'flex', gap: '6px', flexWrap: 'wrap' } }, h('button', { type: 'button', class: 'btn small', onclick: exportAllocations }, 'Rows per period'), h('button', { type: 'button', class: 'btn small', onclick: exportGrid }, 'Week grid'))),
         h('div', { class: 'file-act' }, h('b', null, 'Start a new half-term'), h('p', null, 'Keep the rooms and people. Start from this timetable, or from an empty one.'), h('button', { type: 'button', class: 'btn small', onclick: newTermDialog }, 'New half-term…')),
         old ? h('div', { class: 'file-act' }, h('b', null, 'Earlier version found'), h('p', null, 'The old map saved a plan on this computer. Bring in its rooms, people and P1–P4 (into Monday).'), h('button', { type: 'button', class: 'btn small', onclick: () => offerOld(old) }, 'Bring it in…')) : null,
-        h('div', { class: 'file-act' }, h('b', null, 'Example school'), h('p', null, 'Made-up pupils and staff with a filled-in week, for trying things out or showing someone. Replaces what is on screen.'), h('button', { type: 'button', class: 'btn small', onclick: loadExample }, 'Load the example…')),
+        h('div', { class: 'file-act' }, h('b', null, 'Example school'), h('p', null, 'Made-up pupils and staff with a filled-in week on your rooms and map, for trying things out or showing someone. Replaces the people and timetable on screen.'), h('button', { type: 'button', class: 'btn small', onclick: loadExample }, 'Load the example…')),
         h('div', { class: 'file-act' }, h('b', null, 'Start again'), h('p', null, 'Clears everything, including people, and puts back the original room layout.'), h('button', { type: 'button', class: 'btn small danger', onclick: resetDialog }, 'Clear everything…'))));
   }
   function newTermDialog() {
@@ -1901,8 +1931,13 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
   }
 
   // ---------- Example school (made-up people) ----------
-  function exampleProject() {
+  function exampleProject(layout) {
     const p = blankProject();
+    if (layout && layout.areas.some((a) => a.teach)) {
+      p.areas = clone(layout.areas);
+      p.outlines = clone(layout.outlines);
+      p.map = clone(layout.map);
+    }
     p.name = 'Example school (made-up people)';
     p.periods = [['P1', '9:30–10:30'], ['P2', '10:45–11:45'], ['P3', '12:30–1:30'], ['P4', '1:45–2:45']].map(([id, time]) => ({ id, label: id, time }));
     const pupilNames = ['AB', 'CD', 'DR', 'FT', 'GW', 'HM', 'JP', 'KB', 'LR', 'MO', 'NP', 'OT', 'PJ', 'RS', 'SB', 'TW', 'VH', 'WP', 'YA', 'ZK', 'BM'];
@@ -1936,7 +1971,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       const groups = [];
       while (kids.length) { const n = Math.min(kids.length, [1, 2, 2, 3, 3, 4][Math.floor(rnd() * 6)]); groups.push(kids.splice(0, n)); }
       // Choose a room for each group, favouring the busier rooms.
-      const pool = Object.keys(weight).map((id) => ({ id, w: weight[id] * (id === 'A9' && pi >= 2 ? 2 : 1) }));
+      const pool = p.areas.filter((a) => a.teach).map((a) => ({ id: a.id, w: (weight[a.id] || 3) * (a.id === 'A9' && pi >= 2 ? 2 : 1) }));
       const rooms = [];
       while (rooms.length < groups.length && pool.length) {
         const total = pool.reduce((t, r) => t + r.w, 0);
@@ -1951,13 +1986,12 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       groups.forEach((g, gi) => {
         const room = offsite && gi === 0 ? OFF : rooms[gi];
         if (room === OFF) s.titles[OFF] = 'Swimming';
-        else { const l = lessons[room]; s.titles[room] = Array.isArray(l) ? l[pi] : l; }
+        else { const l = lessons[room] || (/pod/i.test((p.areas.find((a) => a.id === room) || {}).name) ? 'Small group' : 'Group work'); s.titles[room] = Array.isArray(l) ? l[pi] : l; }
         g.forEach((id) => { s.at[id] = room; });
         const staffCount = day === 'Fri' && per === 'P4' && gi === 0 ? 0 : g.length >= 3 ? 2 : 1;
         for (let k = 0; k < staffCount && adults.length; k++) s.at[adults.shift()] = room;
       });
-      if (adults.length) s.at[adults.shift()] = 'A19';
-      if (adults.length) s.at[adults.shift()] = 'A20';
+      p.areas.filter((a) => !a.teach).slice(0, 2).forEach((a) => { if (adults.length) s.at[adults.shift()] = a.id; });
       // Anyone left helps the largest groups.
       const big = groups.map((g, gi) => ({ room: offsite && gi === 0 ? OFF : rooms[gi], n: g.length })).sort((a, b) => b.n - a.n);
       let bi = 0;
@@ -1968,13 +2002,13 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
   }
   function loadExample() {
     const go2 = () => {
-      mutate(() => sanitize(exampleProject()));
+      mutate(() => sanitize(exampleProject(project)));
       ui.day = 'Mon'; ui.period = project.periods[0].id; ui.view = 'plan';
       saveUI(); render();
       toast('Example school loaded. Everyone in it is made up.');
     };
     if (project.people.length || Object.keys(project.slots).length) {
-      confirmBox('Load the example school?', 'This replaces what is on screen now with made-up pupils, staff and a filled-in timetable. Save a backup first if you want to keep your plan. You can undo straight after.', 'Load example', go2);
+      confirmBox('Load the example school?', 'This keeps your rooms and map, and replaces the people and timetable with made-up pupils, staff and a filled-in week. Save a backup first if you want to keep your plan. You can undo straight after.', 'Load example', go2);
     } else go2();
   }
 

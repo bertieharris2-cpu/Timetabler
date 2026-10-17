@@ -183,7 +183,10 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   await page.mouse.up();
   const after = await room.boundingBox();
   check(Math.round(after.x - before.x) === -60 && Math.round(after.y - before.y) === 40, 'Science moved 60px left, 40px down');
-  await page.locator('.room[data-area="A15"] .room-rename').fill('Science Lab');
+  await page.locator('.room[data-area="A15"] .room-name').dblclick();
+  await page.locator('.rename-pop').fill('Science Lab');
+  await page.keyboard.press('Enter');
+  check(await page.locator('.rename-pop').count() === 0 && await page.locator('.room[data-area="A15"] .room-name').innerText() === 'Science Lab', 'double-click a room name to rename it');
   await page.getByRole('button', { name: 'Done' }).click();
   check(await page.locator('.room[data-area="A15"] .room-name').innerText() === 'Science Lab', 'room renamed');
 
@@ -258,6 +261,18 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   check(await p4.locator('table.week thead th', { hasText: 'Pupils in' }).count() === 1, 'week by room has a pupils-in column');
   await shot(p4, '16-week-room-use');
 
+  console.log('Example school keeps the loaded layout');
+  await p4.getByRole('button', { name: 'Plan', exact: true }).click();
+  await p4.getByRole('button', { name: 'Edit layout' }).click();
+  await p4.getByRole('button', { name: 'Add a room' }).click();
+  await p4.locator('.rename-pop').fill('Polytunnel');
+  await p4.getByRole('button', { name: 'Done' }).click();
+  check(await p4.locator('.editbar').count() === 0, 'Done works straight after renaming');
+  await p4.getByRole('button', { name: 'Setup' }).click();
+  await p4.getByRole('button', { name: 'Load the example…' }).click();
+  await p4.getByRole('button', { name: 'Load example' }).click();
+  check(await p4.locator('.room').count() === 23 && await p4.locator('.room .room-name', { hasText: 'Polytunnel' }).count() === 1, 'example school keeps the rooms on screen');
+
   console.log('Staff-only spaces');
   await p4.getByRole('button', { name: 'Setup' }).click();
   await p4.locator('input[aria-label="Pond room is a space for pupils"], input[aria-label="Little room is a space for pupils"]').first().uncheck();
@@ -275,24 +290,27 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   const mb = await p4.locator('#map').boundingBox();
   check(Math.abs(mb.width / mb.height - 2) < 0.02, 'map takes the picture’s shape (' + (mb.width / mb.height).toFixed(2) + ')');
   await p4.getByRole('button', { name: 'Add a building outline' }).click();
-  await p4.locator('.outline-rename').fill('Main building');
+  await p4.locator('.rename-pop').fill('Main building');
+  await p4.getByRole('button', { name: 'Add a label' }).click();
+  await p4.locator('.rename-pop').fill('Yard');
+  check(await p4.locator('.outline.label').count() === 1, 'label added');
   await shot(p4, '17-floor-plan-edit');
   await p4.getByRole('button', { name: 'Done' }).click();
   check(await p4.locator('.outline-name').innerText() === 'MAIN BUILDING' || await p4.locator('.outline-name').innerText() === 'Main building', 'outline named');
   await p4.waitForTimeout(400);
   await p4.reload();
-  check(await p4.locator('.plan-img').count() === 1 && await p4.locator('.outline').count() === 1, 'picture and outline kept after reload');
+  check(await p4.locator('.plan-img').count() === 1 && await p4.locator('.outline').count() === 2 && await p4.locator('.label-text').innerText() === 'YARD', 'picture, outline and label kept after reload');
   const [dl4] = await Promise.all([p4.waitForEvent('download'), p4.getByRole('button', { name: 'Save backup' }).click()]);
   const b4 = path.join(TMP, 'b4.json');
   await dl4.saveAs(b4);
   const j4 = JSON.parse(fs.readFileSync(b4, 'utf8'));
-  check(/^data:image\/jpeg;base64,/.test(j4.map.image) && j4.map.w === 800 && j4.outlines.length === 1, 'backup carries the picture and outline');
+  check(/^data:image\/jpeg;base64,/.test(j4.map.image) && j4.map.w === 800 && j4.outlines.length === 2, 'backup carries the picture, outline and label');
   await p4.getByRole('button', { name: 'Edit layout' }).click();
   await p4.getByRole('button', { name: 'Add a room' }).click();
-  check(await p4.locator('.room').count() === 23, 'room added on top of the picture');
+  check(await p4.locator('.room').count() === 24, 'room added on top of the picture');
   await p4.getByRole('button', { name: 'Done' }).click();
   await p4.keyboard.press('Control+z');
-  check(await p4.locator('.room').count() === 22 && await p4.locator('.plan-img').count() === 1, 'undo removes the room and keeps the picture');
+  check(await p4.locator('.room').count() === 23 && await p4.locator('.plan-img').count() === 1, 'undo removes the room and keeps the picture');
   check(err4.length === 0, 'no errors in the console' + (err4.length ? ': ' + err4.join(' | ') : ''));
   await ctx4.close();
 

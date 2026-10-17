@@ -15,7 +15,7 @@ It is one HTML file. It needs no internet, no installing and no server, and it n
 ## Using it
 
 1. **Open** `lifehouse-timetabler.html` in Chrome or Edge.
-2. **Add people** once. To look around first, choose **Try the example school**: made-up pupils and staff with a filled-in week. In **Setup**, paste pupils' initials and staff names, or use **Open a file…** to load a people list (a CSV with `name` and `role` columns, such as the old `people.csv`). Mark part-time people as not in on the days they don't come.
+2. **Add people** once. To look around first, choose **Try the example school**: made-up pupils and staff with a filled-in week, on whatever rooms and map are loaded. In **Setup**, paste pupils' initials and staff names, or use **Open a file…** to load a people list (a CSV with `name` and `role` columns, such as the old `people.csv`). Mark part-time people as not in on the days they don't come.
 3. **Plan.** Pick a day and period from the strip at the top, then drag names onto the map.
    - Tap several names, then tap a room, to move a group together. Tap a room's numbers to pick up everyone in it.
    - Type the lesson into the box under the room's name. Each room has its own lesson for each period.
@@ -27,7 +27,7 @@ It is one HTML file. It needs no internet, no installing and no server, and it n
 5. **Check.** Each period in the strip shows ✓ when everyone is placed, a number for pupils not placed yet, and ! for a room with pupils but no staff. **Week** shows the whole week by room (which rooms are free when) or by person (each person's week in one row), with a list of things to check.
 6. **Print.** **Timetables** makes one A4 landscape page per pupil, member of staff or room, plus a whole-school sheet for each day. To email them, print to PDF.
 
-**Edit layout** (bottom right of the map) moves, resizes, renames, adds and removes rooms. To make the map look like the school, add a **floor plan picture** (a photo of the fire evacuation plan works well) and drag the rooms onto it, or draw **building outlines** behind the rooms. **Setup** also sets period names and times, and optional limits on how many pupils a room takes. You can also set how many PPA periods each member of staff needs, and the Week view warns when someone is short.
+**Edit layout** (bottom right of the map) moves, resizes, renames, adds and removes rooms. To make the map look like the school, add a **floor plan picture** (a drawn site plan, or a photo of the fire evacuation plan) and drag the rooms onto it, draw **building outlines** behind the rooms, and place **labels** such as "West building" or "Yard". Double-click any name on the map to rename it. If you redraw the picture later, keep it the same shape and the rooms stay where they are. **Setup** also sets period names and times, and optional limits on how many pupils a room takes. You can also set how many PPA periods each member of staff needs, and the Week view warns when someone is short.
 
 ## Saving and backups
 
