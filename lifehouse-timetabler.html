@@ -16,6 +16,7 @@
   --line: #D4DBE2;
   --line-strong: #B5C0CB;
   --grid: #E1E6EB;
+  --outline-bg: #E3E8EE;
   --accent: #1E4E8C;
   --accent-ink: #FFFFFF;
   --accent-soft: #E1EBF7;
@@ -48,7 +49,7 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --ground: #11161C; --surface: #19202A; --surface-2: #1F2732; --free: #161C24;
-    --ink: #E5EAF0; --muted: #96A2AE; --line: #2D3845; --line-strong: #3E4B5A; --grid: #1C242D;
+    --ink: #E5EAF0; --muted: #96A2AE; --line: #2D3845; --line-strong: #3E4B5A; --grid: #1C242D; --outline-bg: #161D25;
     --accent: #84ABE6; --accent-ink: #0D1520; --accent-soft: #1E2E44;
     --pupil: #A3B8F4; --pupil-bg: #22305A; --pupil-line: #34477C;
     --staff: #84D6BA; --staff-bg: #153B31; --staff-line: #22584A;
@@ -61,7 +62,7 @@
 }
 :root[data-theme="dark"] {
   --ground: #11161C; --surface: #19202A; --surface-2: #1F2732; --free: #161C24;
-  --ink: #E5EAF0; --muted: #96A2AE; --line: #2D3845; --line-strong: #3E4B5A; --grid: #1C242D;
+  --ink: #E5EAF0; --muted: #96A2AE; --line: #2D3845; --line-strong: #3E4B5A; --grid: #1C242D; --outline-bg: #161D25;
   --accent: #84ABE6; --accent-ink: #0D1520; --accent-soft: #1E2E44;
   --pupil: #A3B8F4; --pupil-bg: #22305A; --pupil-line: #34477C;
   --staff: #84D6BA; --staff-bg: #153B31; --staff-line: #22584A;
@@ -224,6 +225,46 @@ body.dragging, body.dragging * { cursor: grabbing !important; user-select: none 
 .drop-ok { outline: 3px solid var(--accent) !important; outline-offset: -2px; }
 .room.drop-ok, .zone.drop-ok .zone-body { background: var(--accent-soft) !important; }
 .drop-no { outline: 3px solid var(--bad) !important; outline-offset: -2px; }
+
+/* Free rooms, room use */
+.room-pills { display: flex; flex-wrap: wrap; gap: 4px; }
+.room-pill { border: 1px dashed var(--line-strong); background: var(--free); color: var(--ink); border-radius: 6px; padding: 2px 7px; font-size: 11.5px; font-weight: 600; }
+.room-pill:hover { border-color: var(--accent); border-style: solid; }
+.map-tools .seg { box-shadow: var(--shadow); background: var(--surface); }
+.room.use { overflow: hidden; }
+.room.use::before { content: ""; position: absolute; inset: 0; background: var(--accent); opacity: calc(var(--use) * .32); pointer-events: none; }
+.room.use > * { position: relative; }
+.room.use.unused { border: 2px dashed var(--warn); background: var(--warn-bg); box-shadow: none; }
+.room.use.staffonly { background: var(--free); border-style: dashed; box-shadow: none; color: var(--muted); }
+.use-num { padding: 0 6px; font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.use-num b { font-size: 15px; color: var(--ink); }
+.room.use.unused .use-num { color: var(--warn); font-weight: 700; }
+.use-grid { display: grid; gap: 2px; padding: 5px 6px 6px; margin-top: auto; max-width: 96px; }
+.use-cell { aspect-ratio: 1; min-width: 0; padding: 0; border: 1px solid var(--line-strong); border-radius: 2px; background: var(--surface); }
+.use-cell.on { background: var(--accent); border-color: var(--accent); }
+.use-cell.now { outline: 2px solid var(--ink); outline-offset: 0; }
+.use-list { display: flex; flex-direction: column; gap: 2px; }
+.use-row { display: grid; grid-template-columns: minmax(0, 1fr) 56px 22px; align-items: center; gap: 6px; border: 0; background: transparent; padding: 3px 4px; border-radius: 5px; text-align: left; font-size: 12.5px; }
+.use-row:hover { background: var(--surface-2); }
+.use-row.none .use-name, .use-row.none .use-n { color: var(--warn); font-weight: 700; }
+.use-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.use-n { text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); }
+.use-bar { display: inline-block; height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; vertical-align: middle; }
+.use-row .use-bar { width: 100%; }
+.use-bar i { display: block; height: 100%; background: var(--accent); }
+.use-td .use-bar { width: 40px; margin-right: 6px; }
+.week td.tot.muted { color: var(--muted); }
+
+/* Floor plan picture and building outlines */
+.map.has-plan { min-width: 0; min-height: 0; margin: 0 auto; background-image: none; background-color: var(--paper); }
+.plan-img { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; user-select: none; }
+.outline { position: absolute; border: 2px solid var(--line-strong); border-radius: 6px; background: var(--outline-bg); pointer-events: none; }
+.map.has-plan .outline { background: transparent; }
+.outline-name { position: absolute; left: 8px; bottom: 5px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.plan.editing .outline { pointer-events: auto; cursor: move; touch-action: none; border-style: dashed; border-color: var(--warn); }
+.outline-rename { position: absolute; left: 6px; bottom: 6px; width: min(180px, calc(100% - 40px)); font-size: 11px; font-weight: 700; padding: 2px 5px; border: 1px solid var(--line-strong); border-radius: 4px; background: var(--surface); cursor: text; }
+.fade-ctl { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; }
+.fade-ctl input { width: 90px; }
 
 /* Layout editing */
 .plan.editing .room { cursor: move; touch-action: none; user-select: none; }
@@ -389,6 +430,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
 </div>
 <div class="toasts" id="toasts" aria-live="polite"></div>
 <input type="file" id="file-open" accept=".json,.csv,application/json,text/csv" hidden>
+<input type="file" id="image-open" accept="image/*" hidden>
 
 <script>
 (function () {
@@ -432,7 +474,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     ['A20', 'Reception', 79.54, 73.49, 6.53, 25],
     ['A21', 'East Room', 81.99, 46.98, 7.18, 22.25],
     ['A22', 'Brook Room', 80.46, 16.47, 9.69, 26.97]
-  ].map(([id, name, x, y, w, h]) => ({ id, name, x, y, w, h, cap: null }));
+  ].map(([id, name, x, y, w, h]) => ({ id, name, x, y, w, h, cap: null, teach: id !== 'A19' && id !== 'A20' }));
 
   // ---------- Small helpers ----------
   const $ = (sel, root = document) => root.querySelector(sel);
@@ -487,12 +529,28 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
 
   // ---------- State ----------
   let project = null;
-  const ui = Object.assign({ view: 'plan', day: 'Mon', period: null, zoom: 1, weekMode: 'room', printWhat: 'student', printWho: 'all', printTimes: true }, loadUI());
+  const ui = Object.assign({ view: 'plan', day: 'Mon', period: null, zoom: 1, weekMode: 'room', mapMode: 'people', printWhat: 'student', printWho: 'all', printTimes: true }, loadUI());
   const sel = new Set();
   let editLayout = false;
   let undoStack = [], redoStack = [];
   let lastMerge = null, lastMergeAt = 0;
-  let peopleById = new Map(), areaById = new Map(), statusCache = new Map();
+  let peopleById = new Map(), areaById = new Map(), statusCache = new Map(), useCache = new Map();
+  const images = new Map();
+
+  function rememberImage(dataUrl) {
+    let hash = 5381;
+    for (let i = 0; i < dataUrl.length; i += 7) hash = ((hash * 33) ^ dataUrl.charCodeAt(i)) >>> 0;
+    const id = 'img' + dataUrl.length.toString(36) + hash.toString(36);
+    images.set(id, dataUrl);
+    return id;
+  }
+  // The plan as it is saved and backed up, with the floor plan picture put back in.
+  function exportProject() {
+    const out = Object.assign({}, project);
+    const m = project.map;
+    out.map = { image: m.imageId ? images.get(m.imageId) || null : null, w: m.w, h: m.h, fade: m.fade };
+    return out;
+  }
   let storageOk = true, lastSavedAt = null, saveTimer = null;
   let mapScroll = { left: 0, top: 0 };
 
@@ -507,7 +565,8 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     return {
       app: APP_ID, version: FILE_VERSION, name: '', school: 'Lifehouse',
       periods: [1, 2, 3, 4].map((n) => ({ id: 'P' + n, label: 'P' + n, time: '' })),
-      areas: clone(DEFAULT_AREAS), people: [], slots: {},
+      areas: clone(DEFAULT_AREAS), people: [], slots: {}, outlines: [],
+      map: { imageId: null, w: 0, h: 0, fade: 0.55 },
       meta: { created: nowIso(), changedAt: null, backedUpAt: null }
     };
   }
@@ -533,9 +592,23 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       return {
         id: str(a.id), name: str(a.name) || 'Room',
         x: clamp(num(a.x, 5), 0, 100 - w), y: clamp(num(a.y, 5), 0, 100 - hh), w, h: hh,
-        cap: +a.cap > 0 ? Math.round(+a.cap) : null
+        cap: +a.cap > 0 ? Math.round(+a.cap) : null, teach: a.teach !== false
       };
     });
+
+    const seenO = new Set();
+    out.outlines = (Array.isArray(p.outlines) ? p.outlines : []).filter((o) => o && str(o.id) && !seenO.has(str(o.id)) && seenO.add(str(o.id))).map((o) => {
+      const w = clamp(num(o.w, 20), 3, 100), hh = clamp(num(o.h, 20), 3, 100);
+      return { id: str(o.id), name: str(o.name), x: clamp(num(o.x, 0), 0, 100 - w), y: clamp(num(o.y, 0), 0, 100 - hh), w, h: hh };
+    });
+    // The floor plan picture is kept outside the plan's data (see rememberImage) so undo stays light.
+    const m0 = p.map || {};
+    let imageId = null;
+    if (typeof m0.image === 'string' && m0.image.startsWith('data:image/')) imageId = rememberImage(m0.image);
+    else if (m0.imageId && images.has(m0.imageId)) imageId = m0.imageId;
+    out.map = imageId && +m0.w > 0 && +m0.h > 0
+      ? { imageId, w: +m0.w, h: +m0.h, fade: clamp(num(m0.fade, 0.55), 0.1, 1) }
+      : { imageId: null, w: 0, h: 0, fade: 0.55 };
 
     const seenPeople = new Set();
     out.people = (Array.isArray(p.people) ? p.people : []).filter((x) => x && str(x.id) && str(x.name) && !seenPeople.has(str(x.id)) && seenPeople.add(str(x.id))).map((x) => ({
@@ -658,6 +731,15 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     for (const d of DAYS) for (const p of project.periods) keys.push(slotKey(d.id, p.id));
     return keys;
   }
+  // The periods in the week when a room has pupils in it.
+  function roomUse(areaId) {
+    if (useCache.has(areaId)) return useCache.get(areaId);
+    const keys = allSlotKeys();
+    const used = new Set(keys.filter((k) => { const s = slotOf(k); return project.people.some((p) => isPupil(p) && s.at[p.id] === areaId); }));
+    const u = { used, n: used.size, total: keys.length };
+    useCache.set(areaId, u);
+    return u;
+  }
   function ppaCount(pid) {
     return allSlotKeys().filter((k) => slotOf(k).at[pid] === PPA).length;
   }
@@ -750,7 +832,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     clearTimeout(saveTimer);
     saveTimer = null;
     try {
-      localStorage.setItem(STORE_KEY, JSON.stringify(project));
+      localStorage.setItem(STORE_KEY, JSON.stringify(exportProject()));
       storageOk = true;
       lastSavedAt = new Date();
     } catch (e) {
@@ -790,7 +872,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     const d = stamp.getFullYear() + '-' + String(stamp.getMonth() + 1).padStart(2, '0') + '-' + String(stamp.getDate()).padStart(2, '0') + ' ' + String(stamp.getHours()).padStart(2, '0') + String(stamp.getMinutes()).padStart(2, '0');
     project.meta.backedUpAt = nowIso();
     const name = fileSafe((project.school || 'School') + ' timetable backup - ' + (project.name || 'plan') + ' - ' + d) + '.json';
-    download(name, JSON.stringify(project, null, 1), 'application/json');
+    download(name, JSON.stringify(exportProject(), null, 1), 'application/json');
     saveNow();
     renderTopbar();
     toast('Backup saved as “' + name + '”. Keep it somewhere safe, like a shared drive.');
@@ -808,6 +890,12 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     reader.readAsText(f);
   });
   function openFilePicker() { fileInput.click(); }
+  const imageInput = $('#image-open');
+  imageInput.addEventListener('change', () => {
+    const f = imageInput.files && imageInput.files[0];
+    imageInput.value = '';
+    if (f) loadPicture(f);
+  });
 
   function openText(text, filename) {
     const t = text.replace(/^﻿/, '').trim();
@@ -972,6 +1060,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     peopleById = new Map(project.people.map((p) => [p.id, p]));
     areaById = new Map(project.areas.map((a) => [a.id, a]));
     statusCache = new Map();
+    useCache = new Map();
     if (!project.periods.some((p) => p.id === ui.period)) ui.period = project.periods[0].id;
     if (!DAYS.some((d) => d.id === ui.day)) ui.day = 'Mon';
     for (const id of [...sel]) if (!peopleById.has(id)) sel.delete(id);
@@ -991,6 +1080,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     else if (ui.view === 'week') renderWeek(view);
     else if (ui.view === 'print') renderPrint(view);
     else renderSetup(view);
+    sizeMap();
     view.scrollTop = st;
     const w2 = $('#mapwrap');
     if (w2) { w2.scrollLeft = mapScroll.left; w2.scrollTop = mapScroll.top; }
@@ -1059,9 +1149,15 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
         h('b', null, 'Editing the layout.'),
         h('span', null, 'Drag a room to move it, drag its corner to resize it, or type a new name.'),
         h('span', { style: { flex: '1' } }),
+        h('button', { type: 'button', class: 'btn small', onclick: () => $('#image-open').click() }, project.map.imageId ? 'Change floor plan picture…' : 'Floor plan picture…'),
+        project.map.imageId ? h('label', { class: 'fade-ctl' }, 'Picture',
+          h('input', { type: 'range', id: 'plan-fade', min: '0.1', max: '1', step: '0.05', value: String(project.map.fade), 'aria-label': 'How strongly the floor plan picture shows',
+            oninput: (e) => { const v = +e.target.value; mutate((p) => { p.map.fade = v; }, { merge: 'fade', render: false }); const img = $('.plan-img'); if (img) img.style.opacity = v; } })) : null,
+        project.map.imageId ? h('button', { type: 'button', class: 'btn small', onclick: removePicture }, 'Remove picture') : null,
+        h('button', { type: 'button', class: 'btn small', onclick: addOutline }, 'Add a building outline'),
         h('button', { type: 'button', class: 'btn small', onclick: addRoom }, 'Add a room'),
         h('button', { type: 'button', class: 'btn small primary', onclick: () => { editLayout = false; render(); } }, 'Done')) : null,
-      h('div', { class: 'plan' + (editLayout ? ' editing' : '') }, renderTray(s, st), renderMap(s, st))
+      h('div', { class: 'plan' + (editLayout ? ' editing' : '') }, ui.mapMode === 'use' && !editLayout ? renderUseTray() : renderTray(s, st), renderMap(s, st))
     ].filter(Boolean));
   }
 
@@ -1122,7 +1218,8 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
         h('span', null, 'Type or paste their names in Setup, or open a people list (CSV) or a backup file.'),
         h('div', { class: 'row' },
           h('button', { type: 'button', class: 'btn small primary', onclick: () => go('setup') }, 'Add people'),
-          h('button', { type: 'button', class: 'btn small', onclick: openFilePicker }, 'Open a file…'))) : null,
+          h('button', { type: 'button', class: 'btn small', onclick: openFilePicker }, 'Open a file…')),
+        h('button', { type: 'button', class: 'link-btn', onclick: loadExample }, 'Or try the example school (made-up people)')) : null,
       h('section', { class: 'zone', 'data-zone': NONE }, h('div', { class: 'zone-head' }, 'Not placed yet', h('span', { class: 'n' }, unplaced.length || '')), unplacedBody),
       checks,
       h('section', { class: 'zone off', 'data-zone': OFF },
@@ -1135,23 +1232,75 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       h('section', { class: 'zone', 'data-zone': OUT },
         h('div', { class: 'zone-head' }, 'Not in this period', h('span', { class: 'n' }, out.length || '')),
         h('div', { class: 'zone-body', 'data-empty': 'Absent or part-time' }, out.map((p) => chip(p, true)))),
+      freeRoomsBox(s),
       h('p', { class: 'hint' }, 'Drag names onto the map. Or tap several names, then tap a room to move them together. Tap a room’s numbers to pick up everyone in it. ', h('kbd', null, '←'), ' ', h('kbd', null, '→'), ' change period, ', h('kbd', null, 'Ctrl'), '+', h('kbd', null, 'Z'), ' undoes.')
     );
   }
 
+  function freeRoomsBox(s) {
+    if (!project.people.length) return null;
+    const free = project.areas.filter((a) => a.teach && !str(s.titles[a.id]) && !project.people.some((p) => s.at[p.id] === a.id))
+      .sort((a, b) => a.name.localeCompare(b.name));
+    return h('section', { class: 'zone free-rooms' },
+      h('div', { class: 'zone-head' }, 'Free rooms', h('span', { class: 'n' }, free.length || '')),
+      free.length
+        ? h('div', { class: 'room-pills' }, free.map((a) => h('button', { type: 'button', class: 'room-pill', title: 'Show ' + a.name + ' on the map', onclick: () => flashZone(a.id) }, a.name)))
+        : h('p', { class: 'hint', style: { margin: 0 } }, 'Every room is in use this period.'));
+  }
+
+  function renderUseTray() {
+    const total = allSlotKeys().length;
+    const teach = project.areas.filter((a) => a.teach).map((a) => ({ a, u: roomUse(a.id) })).sort((x, y) => x.u.n - y.u.n || x.a.name.localeCompare(y.a.name));
+    const staffOnly = project.areas.filter((a) => !a.teach);
+    const usedSlots = teach.reduce((n, r) => n + r.u.n, 0);
+    const pct = teach.length ? Math.round((usedSlots / (teach.length * total)) * 100) : 0;
+    const never = teach.filter((r) => !r.u.n).length;
+    return h('aside', { class: 'tray', 'aria-label': 'How much each room is used' },
+      h('div', { class: 'slot-name' }, h('b', null, 'Room use this week'), h('span', null, 'Periods with pupils in, out of ' + total)),
+      h('div', { class: 'summary' },
+        h('span', { class: 'pill' }, pct + '% of room time used'),
+        never ? h('span', { class: 'pill warn' }, plural(never, 'room') + ' never used') : null),
+      h('section', { class: 'zone' },
+        h('div', { class: 'zone-head' }, 'Least used first'),
+        h('div', { class: 'use-list' }, teach.map((r) => h('button', { type: 'button', class: 'use-row' + (r.u.n ? '' : ' none'), onclick: () => flashZone(r.a.id), title: 'Show ' + r.a.name + ' on the map' },
+          h('span', { class: 'use-name' }, r.a.name),
+          h('span', { class: 'use-bar' }, h('i', { style: { width: Math.round((r.u.n / total) * 100) + '%' } })),
+          h('span', { class: 'use-n' }, r.u.n))))),
+      staffOnly.length ? h('p', { class: 'hint' }, 'Staff spaces, not counted: ' + staffOnly.map((a) => a.name).join(', ') + '. Change this in Setup.') : null,
+      h('p', { class: 'hint' }, 'Darker rooms are busier. The little grid in each room is its week: a row per day, a square per period. Click a square to plan that period.'));
+  }
+
   function renderMap(s, st) {
-    const map = h('div', { class: 'map', id: 'map', style: { width: ui.zoom * 100 + '%', height: ui.zoom * 100 + '%' } },
-      project.areas.map((a) => renderRoom(a, s, st)));
+    const m = project.map;
+    const map = h('div', { class: 'map' + (m.imageId ? ' has-plan' : ''), id: 'map' },
+      m.imageId ? h('img', { class: 'plan-img', src: images.get(m.imageId), alt: '', draggable: 'false', style: { opacity: m.fade } }) : null,
+      project.outlines.map(renderOutline),
+      project.areas.map((a) => (ui.mapMode === 'use' && !editLayout ? renderRoomUse(a) : renderRoom(a, s, st))));
     const zi = ZOOMS.indexOf(ui.zoom);
     return h('div', { class: 'mapcol' },
       h('div', { class: 'mapwrap', id: 'mapwrap' }, map),
       h('div', { class: 'map-tools' },
+        editLayout ? null : h('div', { class: 'seg', role: 'group', 'aria-label': 'What the map shows' },
+          [['people', 'People'], ['use', 'Room use']].map(([id, label]) => h('button', { type: 'button', class: ui.mapMode === id ? 'on' : '', 'aria-pressed': ui.mapMode === id ? 'true' : 'false', onclick: () => { ui.mapMode = id; sel.clear(); saveUI(); render(); } }, label))),
         h('button', { type: 'button', class: 'btn small' + (editLayout ? ' primary' : ''), onclick: () => { editLayout = !editLayout; sel.clear(); render(); } }, editLayout ? 'Finish layout' : 'Edit layout'),
         h('div', { class: 'zoom', role: 'group', 'aria-label': 'Zoom the map' },
           h('button', { type: 'button', 'aria-label': 'Zoom out', disabled: zi <= 0, onclick: () => setZoom(-1) }, '−'),
           h('span', null, Math.round(ui.zoom * 100) + '%'),
           h('button', { type: 'button', 'aria-label': 'Zoom in', disabled: zi >= ZOOMS.length - 1, onclick: () => setZoom(1) }, '+'))));
   }
+  // With a floor plan picture the map keeps the picture's shape; without one it fills the space.
+  function sizeMap() {
+    const wrap = $('#mapwrap'), map = $('#map');
+    if (!wrap || !map) return;
+    const m = project.map;
+    if (!m.imageId) { map.style.width = ui.zoom * 100 + '%'; map.style.height = ui.zoom * 100 + '%'; return; }
+    const fit = Math.min((wrap.clientWidth - 2) / m.w, (wrap.clientHeight - 2) / m.h);
+    map.style.width = Math.round(m.w * fit * ui.zoom) + 'px';
+    map.style.height = Math.round(m.h * fit * ui.zoom) + 'px';
+  }
+  let resizeTimer = null;
+  window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(sizeMap, 80); });
+
   function setZoom(dir) {
     const i = clamp(ZOOMS.indexOf(ui.zoom) + dir, 0, ZOOMS.length - 1);
     const wrap = $('#mapwrap');
@@ -1196,8 +1345,86 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       ] : null
     );
   }
+  function renderRoomUse(a) {
+    const u = roomUse(a.id);
+    const cur = curKey();
+    return h('div', {
+      class: 'room use' + (a.teach ? (u.n ? '' : ' unused') : ' staffonly'), 'data-area': a.id, 'data-zone-show': a.id,
+      style: { left: a.x + '%', top: a.y + '%', width: a.w + '%', height: a.h + '%', '--use': a.teach ? u.n / u.total : 0 }
+    },
+      h('div', { class: 'room-head' }, h('span', { class: 'room-name', title: a.name }, a.name)),
+      h('div', { class: 'use-num' }, a.teach ? (u.n ? [h('b', null, u.n), ' of ' + u.total] : 'Not used') : 'Staff space'),
+      a.teach ? h('div', { class: 'use-grid', style: { gridTemplateColumns: 'repeat(' + project.periods.length + ', 1fr)' } }, DAYS.map((d) => project.periods.map((per) => {
+        const k = slotKey(d.id, per.id);
+        const s = slotOf(k);
+        const t = s.titles[a.id];
+        return h('button', {
+          type: 'button', class: 'use-cell' + (u.used.has(k) ? ' on' : '') + (k === cur ? ' now' : ''),
+          title: d.name + ' ' + per.label + ': ' + (u.used.has(k) ? (t ? t + ', ' : '') + plural(peopleAt(s, a.id).filter(isPupil).length, 'pupil') : 'free'),
+          'aria-label': d.name + ' ' + per.label,
+          onclick: () => { ui.mapMode = 'people'; goSlot(d.id, per.id); setTimeout(() => flashZone(a.id), 30); }
+        });
+      }))) : null);
+  }
+  function renderOutline(o) {
+    return h('div', { class: 'outline', 'data-outline': o.id, style: { left: o.x + '%', top: o.y + '%', width: o.w + '%', height: o.h + '%' } },
+      editLayout
+        ? [h('input', { class: 'outline-rename', value: o.name, placeholder: 'Name, e.g. Main building', 'aria-label': 'Building or area name', oninput: (e) => renameOutline(o.id, e.target.value) }),
+          h('span', { class: 'resize', 'data-resize': o.id, title: 'Drag to resize' }),
+          h('button', { type: 'button', class: 'room-del', title: 'Remove this outline', 'aria-label': 'Remove this outline', onclick: () => removeOutline(o.id) }, '×')]
+        : o.name ? h('span', { class: 'outline-name' }, o.name) : null);
+  }
+  function renameOutline(id, name) {
+    mutate((p) => { const o = p.outlines.find((x) => x.id === id); if (o) o.name = name; }, { merge: 'oname|' + id, render: false });
+  }
+  function addOutline() {
+    let newId;
+    mutate((p) => {
+      const taken = new Set(p.outlines.map((o) => o.id));
+      let n = p.outlines.length + 1;
+      while (taken.has('B' + n)) n++;
+      newId = 'B' + n;
+      p.outlines.push({ id: newId, name: '', x: 35, y: 30, w: 25, h: 35 });
+    });
+    const inp = $('[data-outline="' + newId + '"] .outline-rename');
+    if (inp) inp.focus();
+    toast('Outline added. Drag it over a building or outdoor area, and drag its corner to fit.');
+  }
+  function removeOutline(id) {
+    mutate((p) => { p.outlines = p.outlines.filter((o) => o.id !== id); });
+    toast('Outline removed', { label: 'Undo', run: undo });
+  }
+  // Shrinks the picture so it fits comfortably in the browser's storage.
+  function loadPicture(file) {
+    if (!/^image\//.test(file.type)) { toast('Choose a picture file, such as a photo or a scan of the floor plan.'); return; }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const scale = Math.min(1, 1600 / Math.max(img.naturalWidth, img.naturalHeight));
+        const w = Math.max(1, Math.round(img.naturalWidth * scale)), hh = Math.max(1, Math.round(img.naturalHeight * scale));
+        const c = document.createElement('canvas');
+        c.width = w; c.height = hh;
+        const g = c.getContext('2d');
+        g.fillStyle = '#ffffff';
+        g.fillRect(0, 0, w, hh);
+        g.drawImage(img, 0, 0, w, hh);
+        const id = rememberImage(c.toDataURL('image/jpeg', 0.82));
+        mutate((p) => { p.map = { imageId: id, w, h: hh, fade: p.map.fade || 0.55 }; });
+        toast('Floor plan added. Drag each room onto its place on the picture.');
+      };
+      img.onerror = () => toast('That picture could not be opened. Try a JPG or PNG.');
+      img.src = String(reader.result);
+    };
+    reader.readAsDataURL(file);
+  }
+  function removePicture() {
+    mutate((p) => { p.map = { imageId: null, w: 0, h: 0, fade: p.map.fade }; });
+    toast('Picture removed', { label: 'Undo', run: undo });
+  }
+
   function flashZone(zone) {
-    const target = $('[data-zone="' + zone + '"]');
+    const target = $('[data-zone="' + zone + '"]') || $('[data-zone-show="' + zone + '"]');
     if (!target) return;
     target.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
     target.classList.remove('flash');
@@ -1310,6 +1537,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       if (n < p.ppa) issues.push({ level: 'warn', key: null, text: p.name + ' has ' + n + ' of ' + p.ppa + ' PPA periods' });
     });
 
+    const neverUsed = project.people.length ? project.areas.filter((a) => a.teach && !roomUse(a.id).n).length : 0;
     root.append(h('div', { class: 'page' },
       h('div', { class: 'page-head' },
         h('h2', null, 'The week'),
@@ -1317,7 +1545,8 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
           h('button', { type: 'button', class: ui.weekMode === id ? 'on' : '', 'aria-pressed': ui.weekMode === id ? 'true' : 'false', onclick: () => { ui.weekMode = id; saveUI(); render(); } }, label))),
         h('div', { class: 'summary' },
           h('span', { class: 'pill ' + (done === keys.length ? 'ok' : '') }, done + ' of ' + keys.length + ' periods complete'),
-          issues.length ? h('span', { class: 'pill warn' }, plural(issues.length, 'thing') + ' to check') : h('span', { class: 'pill ok' }, 'Nothing to check')),
+          issues.length ? h('span', { class: 'pill warn' }, plural(issues.length, 'thing') + ' to check') : h('span', { class: 'pill ok' }, 'Nothing to check'),
+          neverUsed ? h('button', { type: 'button', class: 'pill warn', onclick: () => { ui.mapMode = 'use'; go('plan'); }, title: 'See room use on the map' }, plural(neverUsed, 'room') + ' never used') : null),
         h('span', { class: 'hint' }, 'Click any cell to open that period on the map.')),
       issues.length ? h('details', { class: 'issues', open: issues.length <= 8 ? true : null },
         h('summary', null, 'Things to check (' + issues.length + ')'),
@@ -1339,7 +1568,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
   function weekByRoom(keys) {
     const places = project.areas.map((a) => ({ id: a.id, name: a.name })).sort((a, b) => a.name.localeCompare(b.name))
       .concat([{ id: OFF, name: 'Off-site' }, { id: PPA, name: 'PPA' }]);
-    const rows = places.map((pl) => h('tr', null, h('th', { title: pl.name }, pl.name), keys.map((k) => {
+    const rows = places.map((pl) => h('tr', null, h('th', { title: pl.name }, pl.name), useCell(pl), keys.map((k) => {
       const s = slotOf(k);
       const here = peopleAt(s, pl.id);
       const t = pl.id === PPA ? '' : s.titles[pl.id] || '';
@@ -1350,11 +1579,20 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
         here.some(isStaff) ? h('span', { class: 'c-staff' }, names(here.filter(isStaff))) : null,
         here.some(isPupil) ? h('span', { class: 'c-pupils' }, names(here.filter(isPupil))) : null);
     })));
-    return h('div', { class: 'table-scroll' }, h('table', { class: 'week' }, weekHead(keys, 'Room'), h('tbody', null, rows)),
+    const head = weekHead(keys, 'Room');
+    head.firstChild.firstChild.after(h('th', { title: 'Periods in the week with pupils in this room' }, h('span', { class: 'd' }, ''), 'Pupils in'));
+    return h('div', { class: 'table-scroll' }, h('table', { class: 'week' }, head, h('tbody', null, rows)),
       h('p', { class: 'hint', style: { padding: '8px 10px', margin: 0 } }, h('span', { class: 'legend' },
         h('span', null, h('i', { style: { background: 'var(--free)' } }), 'Free'),
         h('span', { class: 'c-staff' }, 'Staff names'),
         h('span', { class: 'c-pupils' }, 'Pupils'))));
+  }
+  function useCell(pl) {
+    const a = areaById.get(pl.id);
+    if (!a) return h('td', { class: 'tot' }, '');
+    if (!a.teach) return h('td', { class: 'tot muted' }, 'staff');
+    const u = roomUse(a.id);
+    return h('td', { class: 'tot use-td' + (u.n ? '' : ' short') }, h('span', { class: 'use-bar' }, h('i', { style: { width: Math.round((u.n / u.total) * 100) + '%' } })), u.n + '/' + u.total);
   }
   function weekByPerson(keys) {
     const group = (label, list) => {
@@ -1580,10 +1818,10 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     return h('section', { class: 'card' },
       h('h3', null, label, h('span', { class: 'n' }, list.length ? String(list.length) : 'none yet')),
       list.length ? h('div', { class: 'table-box' }, h('table', { class: 'edit-table' },
-        h('thead', null, h('tr', null, h('th', null, role === 'staff' ? 'Name' : 'Initials'), h('th', null, 'Full name'), h('th', null, 'In on'), role === 'staff' ? h('th', { title: 'PPA periods needed each week' }, 'PPA') : null, h('th', null, ''))),
+        h('thead', null, h('tr', null, h('th', { title: 'What shows on the map: initials or first names' }, 'On the map'), h('th', null, 'Full name'), h('th', null, 'In on'), role === 'staff' ? h('th', { title: 'PPA periods needed each week' }, 'PPA') : null, h('th', null, ''))),
         h('tbody', null, rows))) : null,
       h('div', { class: 'add-box' },
-        h('label', { class: 'field', for: 'add-' + role }, 'Add ' + label.toLowerCase()),
+        h('label', { class: 'field', for: 'add-' + role }, 'Add ' + label.toLowerCase() + (role === 'staff' ? '' : ' (initials or first names)')),
         ta,
         h('div', { class: 'row' }, h('button', { type: 'button', class: 'btn small primary', onclick: add }, 'Add'), h('span', { class: 'hint' }, 'Separate names with commas, spaces or new lines.'))),
       role === 'staff' ? h('p', { class: 'hint' }, 'PPA is the number of periods a week each person needs. The Week view warns when someone is short.') : h('p', { class: 'hint' }, 'Days: click a letter to mark someone as not in that day (part-time). For one period only, drag them to “Not in this period” on the map.'));
@@ -1603,17 +1841,19 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       h('td', null, h('input', { class: 'txt sm', value: a.name, 'aria-label': 'Room name', oninput: (e) => renameArea(a.id, e.target.value) })),
       h('td', null, h('input', { class: 'txt sm', type: 'number', min: '0', max: '99', value: a.cap ? String(a.cap) : '', placeholder: '–', style: { width: '58px' }, 'aria-label': a.name + ' room for how many pupils',
         oninput: (e) => mutate((p) => { const x = p.areas.find((q) => q.id === a.id); if (x) x.cap = +e.target.value > 0 ? Math.round(+e.target.value) : null; }, { merge: 'cap|' + a.id, render: false }) })),
+      h('td', null, h('input', { type: 'checkbox', checked: a.teach, 'aria-label': a.name + ' is a space for pupils',
+        onchange: (e) => mutate((p) => { const x = p.areas.find((q) => q.id === a.id); if (x) x.teach = e.target.checked; }) })),
       h('td', { class: 'num' }, uses[a.id] ? plural(uses[a.id], 'placement') : 'unused'),
       h('td', null, h('button', { type: 'button', class: 'x-btn', title: 'Remove ' + a.name, 'aria-label': 'Remove ' + a.name, onclick: () => removeAreaDialog(a) }, '×'))));
     return h('section', { class: 'card' },
       h('h3', null, 'Rooms and spaces', h('span', { class: 'n' }, String(project.areas.length))),
       h('div', { class: 'table-box' }, h('table', { class: 'edit-table' },
-        h('thead', null, h('tr', null, h('th', null, 'Name'), h('th', { title: 'Most pupils this room can take. Leave blank for no limit.' }, 'Room for'), h('th', null, 'Used'), h('th', null, ''))),
+        h('thead', null, h('tr', null, h('th', null, 'Name'), h('th', { title: 'Most pupils this room can take. Leave blank for no limit.' }, 'Room for'), h('th', { title: 'Untick staff-only spaces such as the office. They are left out of room use.' }, 'Pupils'), h('th', null, 'Used'), h('th', null, ''))),
         h('tbody', null, rows))),
       h('div', { class: 'row', style: { display: 'flex', gap: '8px', flexWrap: 'wrap' } },
         h('button', { type: 'button', class: 'btn small', onclick: () => { ui.view = 'plan'; editLayout = true; saveUI(); render(); } }, 'Arrange rooms on the map'),
         h('button', { type: 'button', class: 'btn small', onclick: () => { ui.view = 'plan'; editLayout = true; saveUI(); render(); addRoom(); } }, 'Add a room')),
-      h('p', { class: 'hint' }, '“Room for” is optional. When set, the map warns if more pupils than that are placed there.'));
+      h('p', { class: 'hint' }, '“Room for” is optional. When set, the map warns if more pupils than that are placed there. Untick “Pupils” for staff-only spaces such as the office, so they are not counted as spare rooms.'));
   }
   function filesCard() {
     const old = findOld();
@@ -1627,6 +1867,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
           h('div', { style: { display: 'flex', gap: '6px', flexWrap: 'wrap' } }, h('button', { type: 'button', class: 'btn small', onclick: exportAllocations }, 'Rows per period'), h('button', { type: 'button', class: 'btn small', onclick: exportGrid }, 'Week grid'))),
         h('div', { class: 'file-act' }, h('b', null, 'Start a new half-term'), h('p', null, 'Keep the rooms and people. Start from this timetable, or from an empty one.'), h('button', { type: 'button', class: 'btn small', onclick: newTermDialog }, 'New half-term…')),
         old ? h('div', { class: 'file-act' }, h('b', null, 'Earlier version found'), h('p', null, 'The old map saved a plan on this computer. Bring in its rooms, people and P1–P4 (into Monday).'), h('button', { type: 'button', class: 'btn small', onclick: () => offerOld(old) }, 'Bring it in…')) : null,
+        h('div', { class: 'file-act' }, h('b', null, 'Example school'), h('p', null, 'Made-up pupils and staff with a filled-in week, for trying things out or showing someone. Replaces what is on screen.'), h('button', { type: 'button', class: 'btn small', onclick: loadExample }, 'Load the example…')),
         h('div', { class: 'file-act' }, h('b', null, 'Start again'), h('p', null, 'Clears everything, including people, and puts back the original room layout.'), h('button', { type: 'button', class: 'btn small danger', onclick: resetDialog }, 'Clear everything…'))));
   }
   function newTermDialog() {
@@ -1657,6 +1898,84 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       mutate(() => blankProject());
       toast('Cleared. The original room layout is back.', { label: 'Undo', run: undo });
     }, true);
+  }
+
+  // ---------- Example school (made-up people) ----------
+  function exampleProject() {
+    const p = blankProject();
+    p.name = 'Example school (made-up people)';
+    p.periods = [['P1', '9:30–10:30'], ['P2', '10:45–11:45'], ['P3', '12:30–1:30'], ['P4', '1:45–2:45']].map(([id, time]) => ({ id, label: id, time }));
+    const pupilNames = ['AB', 'CD', 'DR', 'FT', 'GW', 'HM', 'JP', 'KB', 'LR', 'MO', 'NP', 'OT', 'PJ', 'RS', 'SB', 'TW', 'VH', 'WP', 'YA', 'ZK', 'BM'];
+    const staffNames = ['Abi', 'Ben', 'Carys', 'Dev', 'Ellie', 'Finn', 'Gwen', 'Harri', 'Isla', 'Jamal', 'Kat', 'Leon', 'Mo', 'Nia', 'Oscar', 'Pip', 'Rhys', 'Sian', 'Theo', 'Una', 'Will', 'Yas', 'Zac'];
+    const ppaNeeds = { Abi: 2, Ben: 2, Carys: 1, Dev: 1, Ellie: 2, Finn: 1 };
+    pupilNames.forEach((n, i) => p.people.push({ id: 'S' + String(i + 1).padStart(2, '0'), name: n, full: '', role: 'student', ppa: 0 }));
+    staffNames.forEach((n, i) => p.people.push({ id: 'T' + String(i + 1).padStart(2, '0'), name: n, full: '', role: 'staff', ppa: ppaNeeds[n] || 0 }));
+    const lessons = {
+      A1: ['Maths', 'Maths', 'Topic', 'Reading'], A2: 'Art', A3: ['English', 'Maths', 'Topic', 'Life skills'], A4: ['Maths', 'English', 'Humanities', 'Games'],
+      A5: 'Gardening', A6: 'Cooking', A7: 'Food tech', A8: 'Horse care', A9: 'Forest school', A10: 'Careers', A11: ['Phonics', 'Reading', 'Literacy', 'Story time'],
+      A12: 'PE', A13: 'Music', A14: 'DT', A15: 'Science', A16: '1:1 work', A17: 'Animal care', A18: 'Regulation', A21: 'Sensory', A22: ['Numeracy', 'Literacy', 'Numeracy', 'PSHE']
+    };
+    // How often each room tends to be chosen: some rooms are left quiet on purpose so "Room use" has something to show.
+    const weight = { A1: 8, A2: 5, A3: 8, A4: 7, A5: 3, A6: 4, A7: 1, A8: 3, A9: 4, A10: 0.5, A11: 9, A12: 5, A13: 1.5, A14: 4, A15: 5, A16: 3, A17: 3, A18: 2, A21: 4, A22: 8 };
+    let seed = 20261017;
+    const rnd = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+    const shuffle = (arr) => { for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; };
+    const ppaDone = {};
+    const keys = [];
+    DAYS.forEach((d) => p.periods.forEach((per, pi) => keys.push([d.id, per.id, pi])));
+    for (const [day, per, pi] of keys) {
+      const s = { titles: {}, at: {} };
+      const out = new Set();
+      if (day === 'Fri') out.add('T20');
+      if (day === 'Wed' && pi >= 2) out.add('S20');
+      out.forEach((id) => { s.at[id] = OUT; });
+      let kids = shuffle(p.people.filter((x) => x.role === 'student' && !out.has(x.id)).map((x) => x.id));
+      let adults = shuffle(p.people.filter((x) => x.role === 'staff' && !out.has(x.id)).map((x) => x.id));
+      if (day === 'Fri' && per === 'P4') kids = kids.slice(3);
+      // Split the pupils into groups of 1 to 4.
+      const groups = [];
+      while (kids.length) { const n = Math.min(kids.length, [1, 2, 2, 3, 3, 4][Math.floor(rnd() * 6)]); groups.push(kids.splice(0, n)); }
+      // Choose a room for each group, favouring the busier rooms.
+      const pool = Object.keys(weight).map((id) => ({ id, w: weight[id] * (id === 'A9' && pi >= 2 ? 2 : 1) }));
+      const rooms = [];
+      while (rooms.length < groups.length && pool.length) {
+        const total = pool.reduce((t, r) => t + r.w, 0);
+        let pick = rnd() * total, i = 0;
+        while (pick > pool[i].w) { pick -= pool[i].w; i++; }
+        rooms.push(pool.splice(i, 1)[0].id);
+      }
+      // One member of staff who still needs PPA gets it, now and then.
+      const needs = adults.filter((id) => { const x = p.people.find((q) => q.id === id); return x.ppa && (ppaDone[id] || 0) < (x.name === 'Ellie' ? 1 : x.ppa); });
+      if (needs.length && rnd() < 0.55) { const id = needs[0]; s.at[id] = PPA; ppaDone[id] = (ppaDone[id] || 0) + 1; adults = adults.filter((a) => a !== id); }
+      const offsite = day === 'Thu' && pi >= 2;
+      groups.forEach((g, gi) => {
+        const room = offsite && gi === 0 ? OFF : rooms[gi];
+        if (room === OFF) s.titles[OFF] = 'Swimming';
+        else { const l = lessons[room]; s.titles[room] = Array.isArray(l) ? l[pi] : l; }
+        g.forEach((id) => { s.at[id] = room; });
+        const staffCount = day === 'Fri' && per === 'P4' && gi === 0 ? 0 : g.length >= 3 ? 2 : 1;
+        for (let k = 0; k < staffCount && adults.length; k++) s.at[adults.shift()] = room;
+      });
+      if (adults.length) s.at[adults.shift()] = 'A19';
+      if (adults.length) s.at[adults.shift()] = 'A20';
+      // Anyone left helps the largest groups.
+      const big = groups.map((g, gi) => ({ room: offsite && gi === 0 ? OFF : rooms[gi], n: g.length })).sort((a, b) => b.n - a.n);
+      let bi = 0;
+      while (adults.length && big.length) { s.at[adults.shift()] = big[bi % big.length].room; bi++; }
+      p.slots[day + '|' + per] = s;
+    }
+    return p;
+  }
+  function loadExample() {
+    const go2 = () => {
+      mutate(() => sanitize(exampleProject()));
+      ui.day = 'Mon'; ui.period = project.periods[0].id; ui.view = 'plan';
+      saveUI(); render();
+      toast('Example school loaded. Everyone in it is made up.');
+    };
+    if (project.people.length || Object.keys(project.slots).length) {
+      confirmBox('Load the example school?', 'This replaces what is on screen now with made-up pupils, staff and a filled-in timetable. Save a backup first if you want to keep your plan. You can undo straight after.', 'Load example', go2);
+    } else go2();
   }
 
   // ---------- Earlier versions on this computer ----------
@@ -1697,10 +2016,10 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     const base = { x0: e.clientX, y0: e.clientY, id: e.pointerId };
     if (editLayout) {
       const handle = e.target.closest('[data-resize]');
-      const room = e.target.closest('.room');
+      const room = e.target.closest('.room, .outline');
       if (!room || (!handle && e.target.closest('input, button'))) return;
       const map = $('#map');
-      const a = areaById.get(room.dataset.area);
+      const a = room.dataset.area ? areaById.get(room.dataset.area) : project.outlines.find((o) => o.id === room.dataset.outline);
       if (!a || !map) return;
       e.preventDefault();
       pushUndo();
@@ -1774,16 +2093,18 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       z.classList.toggle('drop-ok', !bad);
     }
   }
+  // Scrolls the map or the tray while a name is dragged near their edges.
   function autoScroll(x, y) {
-    const wrap = $('#mapwrap');
-    if (!wrap) return;
-    const r = wrap.getBoundingClientRect();
-    if (x < r.left || x > r.right || y < r.top || y > r.bottom) return;
-    const edge = 36, step = 14;
-    if (x < r.left + edge) wrap.scrollLeft -= step;
-    else if (x > r.right - edge) wrap.scrollLeft += step;
-    if (y < r.top + edge) wrap.scrollTop -= step;
-    else if (y > r.bottom - edge) wrap.scrollTop += step;
+    for (const box of [$('#mapwrap'), $('.tray')]) {
+      if (!box) continue;
+      const r = box.getBoundingClientRect();
+      if (x < r.left || x > r.right || y < r.top - 20 || y > r.bottom + 20) continue;
+      const edge = 40, step = 14;
+      if (x < r.left + edge) box.scrollLeft -= step;
+      else if (x > r.right - edge) box.scrollLeft += step;
+      if (y < r.top + edge) box.scrollTop -= step;
+      else if (y > r.bottom - edge) box.scrollTop += step;
+    }
   }
   function toggleSelected(id) {
     if (sel.has(id)) sel.delete(id); else sel.add(id);

@@ -25,6 +25,8 @@ async function center(loc) {
   return { x: b.x + b.width / 2, y: b.y + b.height / 2 };
 }
 async function dragTo(page, from, to, offsetY = 0) {
+  await to.scrollIntoViewIfNeeded();
+  await from.scrollIntoViewIfNeeded();
   const a = await center(from);
   const b = await center(to);
   await page.mouse.move(a.x, a.y);
@@ -223,6 +225,76 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   await p3.locator('.room[data-area="A9"]').tap({ position: { x: 20, y: 60 } });
   check(await chipIn(p3, 'A9', 'EF').count() === 1, 'tap a name, tap the Woods');
   await ctx3.close();
+
+  console.log('Example school, free rooms and room use');
+  const ctx4 = await browser.newContext({ viewport: { width: 1366, height: 768 }, acceptDownloads: true });
+  const p4 = await ctx4.newPage();
+  const err4 = [];
+  p4.on('pageerror', (e) => err4.push(e.message));
+  await p4.goto(APP);
+  const roomNames = await p4.locator('.room .room-name').allInnerTexts();
+  check(!roomNames.some((n) => /’s|'s/.test(n)), 'no room is named after a member of staff');
+  check(await p4.locator('.room[data-area="A19"]').count() === 1, 'Office is on the map');
+  await p4.getByRole('button', { name: 'Or try the example school (made-up people)' }).click();
+  check(await p4.locator('.chip.pupil').count() >= 18 && await p4.locator('.chip.staff').count() >= 20, 'example pupils and staff placed on Monday P1');
+  check(await p4.locator('.strip-btn.done').count() >= 15, 'most example periods complete (' + await p4.locator('.strip-btn.done').count() + ')');
+  check(await p4.locator('.strip-btn[aria-label^="Friday P4"]').evaluate((b) => b.classList.contains('todo') || b.classList.contains('alert')), 'Friday P4 left unfinished to show the checks');
+  const freePills = await p4.locator('.free-rooms .room-pill').count();
+  const freeOnMap = await p4.locator('.room.free').count();
+  check(freePills > 0 && freePills === freeOnMap - 0 - (await p4.locator('.room.free[data-area="A19"], .room.free[data-area="A20"]').count()), 'free rooms listed match the map (' + freePills + ')');
+  await shot(p4, '14-example-plan');
+  await p4.locator('.map-tools .seg button', { hasText: 'Room use' }).click();
+  check(await p4.locator('.room.use').count() === 22, 'room use view shows every room');
+  check(await p4.locator('.room.use.staffonly').count() === 2, 'Office and Reception count as staff spaces');
+  check(await p4.locator('.room.use.unused').count() + await p4.locator('.use-row').count() > 0, 'least-used list in the tray');
+  const firstRow = await p4.locator('.use-row .use-n').first().innerText();
+  const lastRow = await p4.locator('.use-row .use-n').last().innerText();
+  check(+firstRow <= +lastRow, 'least used first (' + firstRow + ' … ' + lastRow + ')');
+  await shot(p4, '15-room-use');
+  await p4.locator('.room[data-area="A11"] .use-cell').nth(5).click();
+  check(await p4.locator('.slot-name b').innerText() === 'Tuesday · P2' && await p4.locator('.room.use').count() === 0, 'clicking a square opens that period with people');
+  await p4.getByRole('button', { name: 'Week', exact: true }).click();
+  await p4.getByRole('button', { name: 'By room' }).click();
+  check(await p4.locator('table.week thead th', { hasText: 'Pupils in' }).count() === 1, 'week by room has a pupils-in column');
+  await shot(p4, '16-week-room-use');
+
+  console.log('Staff-only spaces');
+  await p4.getByRole('button', { name: 'Setup' }).click();
+  await p4.locator('input[aria-label="Pond room is a space for pupils"], input[aria-label="Little room is a space for pupils"]').first().uncheck();
+  await p4.getByRole('button', { name: 'Plan', exact: true }).click();
+  await p4.locator('.map-tools .seg button', { hasText: 'Room use' }).click();
+  check(await p4.locator('.room.use.staffonly').count() === 3, 'Little room now a staff space');
+
+  console.log('Floor plan picture and building outlines');
+  const png = await p4.evaluate(() => { const c = document.createElement('canvas'); c.width = 800; c.height = 400; const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, 800, 400); g.strokeStyle = '#333'; g.lineWidth = 6; g.strokeRect(20, 20, 360, 360); g.strokeRect(420, 20, 360, 360); return c.toDataURL('image/png').split(',')[1]; });
+  const pngPath = path.join(TMP, 'plan.png');
+  fs.writeFileSync(pngPath, Buffer.from(png, 'base64'));
+  await p4.getByRole('button', { name: 'Edit layout' }).click();
+  await p4.setInputFiles('#image-open', pngPath);
+  await p4.waitForSelector('.plan-img');
+  const mb = await p4.locator('#map').boundingBox();
+  check(Math.abs(mb.width / mb.height - 2) < 0.02, 'map takes the picture’s shape (' + (mb.width / mb.height).toFixed(2) + ')');
+  await p4.getByRole('button', { name: 'Add a building outline' }).click();
+  await p4.locator('.outline-rename').fill('Main building');
+  await shot(p4, '17-floor-plan-edit');
+  await p4.getByRole('button', { name: 'Done' }).click();
+  check(await p4.locator('.outline-name').innerText() === 'MAIN BUILDING' || await p4.locator('.outline-name').innerText() === 'Main building', 'outline named');
+  await p4.waitForTimeout(400);
+  await p4.reload();
+  check(await p4.locator('.plan-img').count() === 1 && await p4.locator('.outline').count() === 1, 'picture and outline kept after reload');
+  const [dl4] = await Promise.all([p4.waitForEvent('download'), p4.getByRole('button', { name: 'Save backup' }).click()]);
+  const b4 = path.join(TMP, 'b4.json');
+  await dl4.saveAs(b4);
+  const j4 = JSON.parse(fs.readFileSync(b4, 'utf8'));
+  check(/^data:image\/jpeg;base64,/.test(j4.map.image) && j4.map.w === 800 && j4.outlines.length === 1, 'backup carries the picture and outline');
+  await p4.getByRole('button', { name: 'Edit layout' }).click();
+  await p4.getByRole('button', { name: 'Add a room' }).click();
+  check(await p4.locator('.room').count() === 23, 'room added on top of the picture');
+  await p4.getByRole('button', { name: 'Done' }).click();
+  await p4.keyboard.press('Control+z');
+  check(await p4.locator('.room').count() === 22 && await p4.locator('.plan-img').count() === 1, 'undo removes the room and keeps the picture');
+  check(err4.length === 0, 'no errors in the console' + (err4.length ? ': ' + err4.join(' | ') : ''));
+  await ctx4.close();
 
   if (SHOTS) {
     console.log('Screenshots');
