@@ -48,7 +48,10 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   await page.goto(APP);
 
   console.log('First open');
-  check(await page.locator('.room').count() === 22, '22 rooms from the saved layout');
+  check(await page.locator('.room[data-area]').count() === 23, '23 places from the saved layout, including an off-site place');
+  check(await page.locator('.room.special').count() === 2, 'PPA and Cover boxes on the map');
+  const radii = await page.evaluate(() => [...document.querySelectorAll('button, .room, .chip, .zone, .strip-btn, input')].map((el) => getComputedStyle(el).borderTopLeftRadius).filter((r) => r !== '0px'));
+  check(radii.length === 0, 'no rounded corners anywhere');
   check(await page.locator('.start-card').isVisible(), 'asks for pupils and staff');
   check(await page.locator('.strip-btn').count() === 20, '5 days x 4 periods in the strip');
 
@@ -79,6 +82,8 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   check(await chipIn(page, 'NONE', 'GH').count() === 1, 'pupil refused by PPA');
   await dragTo(page, chipIn(page, 'NONE', 'Blake'), page.locator('[data-zone="PPA"]'));
   check(await chipIn(page, 'PPA', 'Blake').count() === 1, 'Blake into PPA');
+  await dragTo(page, chipIn(page, 'NONE', 'GH'), page.locator('[data-zone="COVER"]'));
+  check(await chipIn(page, 'NONE', 'GH').count() === 1, 'pupil refused by Cover');
   await dragTo(page, chipIn(page, 'NONE', 'Casey'), roomPeople(page, 'A12'));
   await dragTo(page, chipIn(page, 'NONE', 'GH'), roomPeople(page, 'A12'));
   check(await page.locator('.strip-btn.active.done').count() === 1, 'Mon P1 complete');
@@ -146,7 +151,7 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
 
   console.log('Week view');
   await page.getByRole('button', { name: 'Week', exact: true }).click();
-  check(await page.locator('table.week tbody tr').count() === 24, 'a row for each room plus off-site and PPA');
+  check(await page.locator('table.week tbody tr').count() === 25, 'a row for each place plus PPA and Cover');
   check(await page.getByText('Alex has 0 of 2 PPA periods').count() === 1, 'PPA shortfall listed');
   await shot(page, '02-week-room');
   await page.getByRole('button', { name: 'By person' }).click();
@@ -193,6 +198,28 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   check(errors.length === 0, 'no errors in the console' + (errors.length ? ': ' + errors.join(' | ') : ''));
   await ctx.close();
 
+  console.log('Off-site places');
+  const ctx5 = await browser.newContext({ viewport: { width: 1366, height: 768 } });
+  const p5 = await ctx5.newPage();
+  await p5.addInitScript(() => {
+    if (localStorage.getItem('lifehouse_timetabler_v2')) return;
+    localStorage.setItem('lifehouse_timetabler_v2', JSON.stringify({ app: 'lifehouse-timetabler', version: 2, name: 'old', people: [{ id: 'S01', name: 'AB', role: 'student' }, { id: 'T01', name: 'Alex', role: 'staff' }],
+      areas: [{ id: 'A1', name: 'Hall', x: 10, y: 10, w: 20, h: 20 }], slots: { 'Mon|P1': { titles: { OFF: 'Swimming' }, at: { S01: 'OFF', T01: 'OFF' } } } }));
+  });
+  await p5.goto(APP);
+  const offRoom = p5.locator('.room.offsite');
+  check(await offRoom.count() === 1 && await offRoom.locator('.room-name').innerText() === 'Other off-site', 'old Off-site placements move to an "Other off-site" place');
+  check(await offRoom.locator('.chip').count() === 2 && await offRoom.locator('.room-lesson').inputValue() === 'Swimming', 'with the people and the activity');
+  await p5.getByRole('button', { name: 'Edit layout' }).click();
+  await p5.getByRole('button', { name: 'Add an off-site place' }).click();
+  await p5.locator('.rename-pop').fill('Leisure centre');
+  await p5.keyboard.press('Enter');
+  await p5.getByRole('button', { name: 'Done' }).click();
+  check(await p5.locator('.room.offsite').count() === 2 && await p5.locator('.room.offsite .room-name', { hasText: 'Leisure centre' }).count() === 1, 'new off-site place added and named');
+  await p5.getByRole('button', { name: 'Week', exact: true }).click();
+  check(await p5.locator('table.week tbody th', { hasText: 'Leisure centre (off-site)' }).count() === 1, 'off-site places listed in the week by room');
+  await ctx5.close();
+
   console.log('Bringing in the earlier version’s save');
   const old = {
     people: [{ id: 'S01', name: 'AB', role: 'student' }, { id: 'T01', name: 'Alex', role: 'staff' }],
@@ -206,7 +233,7 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   await p2.goto(APP);
   check(await p2.locator('dialog[open]').innerText().then((t) => t.includes('Bring in your earlier map')), 'offers to bring in the old save');
   await p2.getByRole('button', { name: 'Bring it in' }).click();
-  check(await p2.locator('.room').count() === 2 && await p2.inputValue('#lesson-A1') === 'Drama', 'old rooms and lesson name on Monday P1');
+  check(await p2.locator('.room[data-area]').count() === 2 && await p2.inputValue('#lesson-A1') === 'Drama', 'old rooms and lesson name on Monday P1');
   check(await chipIn(p2, 'A1', 'AB').count() === 1, 'old placement on Monday P1');
   await ctx2.close();
 
@@ -243,11 +270,12 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   check(await p4.locator('.strip-btn.done').count() >= 15, 'most example periods complete (' + await p4.locator('.strip-btn.done').count() + ')');
   check(await p4.locator('.strip-btn[aria-label^="Friday P4"]').evaluate((b) => b.classList.contains('todo') || b.classList.contains('alert')), 'Friday P4 left unfinished to show the checks');
   const freePills = await p4.locator('.free-rooms .room-pill').count();
-  const freeOnMap = await p4.locator('.room.free').count();
-  check(freePills > 0 && freePills === freeOnMap - 0 - (await p4.locator('.room.free[data-area="A19"], .room.free[data-area="A20"]').count()), 'free rooms listed match the map (' + freePills + ')');
+  const freeOnMap = await p4.locator('.room.free[data-area]:not(.offsite):not(.staffspace)').count();
+  check(freePills > 0 && freePills === freeOnMap, 'free rooms listed match the map (' + freePills + ')');
   await shot(p4, '14-example-plan');
   await p4.locator('.map-tools .seg button', { hasText: 'Room use' }).click();
-  check(await p4.locator('.room.use').count() === 22, 'room use view shows every room');
+  check(await p4.locator('.room.use').count() === 23, 'room use view shows every room');
+  check(await p4.locator('.room.use.offsite').count() === 3, 'off-site places shown separately in room use');
   check(await p4.locator('.room.use.staffonly').count() === 2, 'Office and Reception count as staff spaces');
   check(await p4.locator('.room.use.unused').count() + await p4.locator('.use-row').count() > 0, 'least-used list in the tray');
   const firstRow = await p4.locator('.use-row .use-n').first().innerText();
@@ -271,11 +299,11 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   await p4.getByRole('button', { name: 'Setup' }).click();
   await p4.getByRole('button', { name: 'Load the example…' }).click();
   await p4.getByRole('button', { name: 'Load example' }).click();
-  check(await p4.locator('.room').count() === 23 && await p4.locator('.room .room-name', { hasText: 'Polytunnel' }).count() === 1, 'example school keeps the rooms on screen');
+  check(await p4.locator('.room[data-area]').count() === 24 && await p4.locator('.room .room-name', { hasText: 'Polytunnel' }).count() === 1, 'example school keeps the rooms on screen');
 
   console.log('Staff-only spaces');
   await p4.getByRole('button', { name: 'Setup' }).click();
-  await p4.locator('input[aria-label="Pond room is a space for pupils"], input[aria-label="Little room is a space for pupils"]').first().uncheck();
+  await p4.locator('select[aria-label="Little room type"]').selectOption('staff');
   await p4.getByRole('button', { name: 'Plan', exact: true }).click();
   await p4.locator('.map-tools .seg button', { hasText: 'Room use' }).click();
   check(await p4.locator('.room.use.staffonly').count() === 3, 'Little room now a staff space');
@@ -307,10 +335,10 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   check(/^data:image\/jpeg;base64,/.test(j4.map.image) && j4.map.w === 800 && j4.outlines.length === 2, 'backup carries the picture, outline and label');
   await p4.getByRole('button', { name: 'Edit layout' }).click();
   await p4.getByRole('button', { name: 'Add a room' }).click();
-  check(await p4.locator('.room').count() === 24, 'room added on top of the picture');
+  check(await p4.locator('.room[data-area]').count() === 25, 'room added on top of the picture');
   await p4.getByRole('button', { name: 'Done' }).click();
   await p4.keyboard.press('Control+z');
-  check(await p4.locator('.room').count() === 23 && await p4.locator('.plan-img').count() === 1, 'undo removes the room and keeps the picture');
+  check(await p4.locator('.room[data-area]').count() === 24 && await p4.locator('.plan-img').count() === 1, 'undo removes the room and keeps the picture');
   check(err4.length === 0, 'no errors in the console' + (err4.length ? ': ' + err4.join(' | ') : ''));
   await ctx4.close();
 

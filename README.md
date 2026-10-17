@@ -20,10 +20,11 @@ It is one HTML file. It needs no internet, no installing and no server, and it n
    - Tap several names, then tap a room, to move a group together. Tap a room's numbers to pick up everyone in it.
    - Type the lesson into the box under the room's name. Each room has its own lesson for each period.
    - **Free rooms** in the tray lists the rooms with nobody in them this period.
-   - Use **Off-site** for trips, **PPA** for staff PPA, and **Not in this period** for absence.
+   - **Off-site places** (such as the woods or the stables) sit on the map like rooms and take a lesson name. Add more with **Add an off-site place** in Setup or Edit layout.
+   - **PPA** and **Cover** are staff-only boxes on the map. Use **Not in this period** in the tray for absence.
    - **Copy period to…** and **Copy day to…** repeat a period or a whole day elsewhere in the week.
    - <kbd>←</kbd> <kbd>→</kbd> change period. <kbd>Ctrl</kbd>+<kbd>Z</kbd> undoes and <kbd>Ctrl</kbd>+<kbd>Y</kbd> redoes. <kbd>Esc</kbd> clears a selection.
-4. **Use every space.** Switch the map from **People** to **Room use** (bottom right). Each room is shaded by how much of the week it has pupils in, and shows a small grid of its week: a row per day, a square per period. The tray lists the rooms least used first. Click a square to plan that period. Office and Reception count as staff spaces; change which rooms count in Setup.
+4. **Use every space.** Switch the map from **People** to **Room use** (bottom right). Each room is shaded by how much of the week it has pupils in, and shows a small grid of its week: a row per day, a square per period. The tray lists the rooms least used first. Click a square to plan that period. Each place has a type in Setup: a learning space, a staff space (such as the office) or an off-site place. Only learning spaces count towards room use and free rooms.
 5. **Check.** Each period in the strip shows ✓ when everyone is placed, a number for pupils not placed yet, and ! for a room with pupils but no staff. **Week** shows the whole week by room (which rooms are free when) or by person (each person's week in one row), with a list of things to check.
 6. **Print.** **Timetables** makes one A4 landscape page per pupil, member of staff or room, plus a whole-school sheet for each day. To email them, print to PDF.
 
