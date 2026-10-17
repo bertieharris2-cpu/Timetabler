@@ -430,6 +430,10 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   await card2.locator('button[title="Add AB to Spelling group"]').click();
   await p11.locator('.gcard').last().locator('button[title="Add CD to Spelling group"]').click();
   check(await p11.locator('.gcard').last().locator('.chip[aria-pressed="true"]').count() === 2, 'members chosen by clicking their names');
+  await p11.locator('.gcard').last().getByRole('radio', { name: 'Teal' }).click();
+  check(await p11.locator('.gcard').last().getByRole('radio', { name: 'Teal' }).getAttribute('aria-checked') === 'true', 'each group has a colour');
+  await p11.locator('.gcard.editing').getByRole('button', { name: 'Done' }).click();
+  check(await p11.locator('.gcard.editing').count() === 0 && await p11.locator('.gcard.compact').count() === 7 && await p11.locator('.gcard.compact').last().locator('.gc-pupils li').allInnerTexts().then((t) => t.join(',') === 'AB,CD'), 'saved groups show as small cards with the pupils listed down them');
   // Plan: drag a group onto a room
   await p11.getByRole('button', { name: 'Plan', exact: true }).click();
   await p11.getByRole('button', { name: 'Clear period' }).click();
@@ -438,6 +442,7 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   await dragBox(lit1, p11.locator('.room[data-area="A1"] .room-people'));
   check(await p11.locator('.room[data-area="A1"] .chip').count() === 6, 'dragging a group moves everyone in it (' + await p11.locator('.room[data-area="A1"] .chip').count() + ')');
   check(await p11.inputValue('#lesson-A1') === 'Literacy', 'and the room gets the group’s lesson');
+  check((await p11.locator('.room[data-area="A1"] .room-group').allInnerTexts()).includes('Literacy set 1'), 'the room shows the group’s name in its colour');
   check(await p11.locator('.groups-zone .gchip', { hasText: 'Literacy set 1' }).locator('.gchip-at').innerText() === '✓ Learning Space 3', 'the group shows where it is');
   await p11.locator('.groups-zone .gchip', { hasText: 'Literacy set 2' }).click();
   check(await p11.locator('.chip.sel').count() >= 6, 'tapping a group picks everyone up');
@@ -468,6 +473,25 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   check(await p11.locator('td[data-cell="Fri|P4"] .gchip', { hasText: 'D&D' }).count() === 1, 'and puts it there');
   await p11.getByRole('button', { name: 'Week', exact: true }).click();
   check(await p11.getByText(/Literacy set 1 has [01] of 2 lessons this week/).count() === 1, 'the Week view lists groups short of their lessons');
+  console.log('What each pupil needs');
+  await setupTo(p11, 'Pupils');
+  await p11.getByRole('button', { name: 'Add a lesson' }).click();
+  await p11.locator('input[aria-label="Lesson every pupil needs"]').last().fill('Cooking');
+  await p11.waitForTimeout(100);
+  await setupTo(p11, 'Pupils');
+  check(await p11.locator('.need-btn.ok, .need-btn.short').count() === 21, 'every pupil’s row shows whether they have what they need');
+  await p11.getByRole('button', { name: 'Open KB’s page' }).click();
+  check(await p11.locator('.pupil-page h3').innerText().then((t) => /^KB/.test(t)) && await p11.locator('.pupil-page tbody tr').count() === 1, 'KB’s page lists the lessons every pupil needs');
+  await p11.locator('input[aria-label="Add a lesson for KB"]').fill('Biology');
+  await p11.getByRole('button', { name: 'Add for KB' }).click();
+  check(await p11.locator('.pupil-page tbody tr', { hasText: 'Biology' }).locator('.need-status.short').innerText() === '! 0 of 1', 'an extra lesson just for KB, with a warning when it isn’t planned');
+  await p11.locator('.pupil-page tbody tr', { hasText: 'Cooking' }).getByRole('button', { name: 'Not for KB' }).click();
+  check(await p11.locator('.pupil-page tbody tr.need-off', { hasText: 'Cooking' }).count() === 1, 'a whole-school lesson can be marked not needed for one pupil');
+  await p11.getByRole('button', { name: 'Week', exact: true }).click();
+  check(await p11.getByText('KB is short of Biology (0 of 1)').count() === 1, 'the Week view warns which pupils are short of what');
+  if (!(await p11.locator('details.issues').evaluate((d) => d.open))) await p11.locator('details.issues summary').click();
+  await p11.getByText('KB is short of Biology (0 of 1)').click();
+  check(await p11.locator('.pupil-page h3').innerText().then((t) => /^KB/.test(t)), 'clicking the warning opens KB’s page');
   check(err11.length === 0, 'no errors' + (err11.length ? ': ' + err11.join(' | ') : ''));
   await ctx11.close();
 
