@@ -497,11 +497,35 @@ table.ps { width: 100%; border-collapse: collapse; table-layout: fixed; font: 10
 .ps thead th.ps-title { text-align: left; font-size: 16px; }
 .ps tbody th { text-align: left; white-space: nowrap; width: 54px; }
 .ps tbody th.ps-label { width: 92px; white-space: normal; }
-.ps .ps-lesson td { height: 92px; text-align: center; }
+.ps .ps-lesson td { text-align: center; overflow: hidden; }
+.ps .ps-band th, .ps .ps-band td { height: 4.6mm; padding-block: 0; }
 .ps .ps-band td { font-weight: 700; }
 .ps .ds-loc { color: #00A050; }
 .ps .ds-with { color: #666; font-size: 9.5px; }
 .sheet.staffday { padding: 14px; }
+/* Pupil timetables: a narrow shaded time column, so it can't be mistaken for Monday. */
+.sheet.pupil { width: min(100%, 780px); padding: 22px 26px; }
+.sheet.pupil.pictures { width: min(100%, 1040px); }
+table.pt { width: 100%; border-collapse: collapse; table-layout: fixed; color: var(--paper-ink); font-size: 13px; }
+.pt th, .pt td { border: 1.5px solid var(--paper-ink); padding: 6px; text-align: center; vertical-align: middle; }
+.pt .pt-name { background: var(--band-lightblue); font-size: 22px; font-weight: 600; padding: 6px; color: #000; }
+.pt thead tr:nth-child(2) th { background: var(--paper-head); font-size: 14px; }
+.pt .pt-corner, .pt .pt-when { width: 15%; background: var(--paper-head); text-align: left; font-size: 12px; }
+.pt .pt-when b { display: block; font-size: 13px; }
+.pt .pt-when span { display: block; font-weight: 600; color: var(--paper-muted); }
+.pt .pt-band td { background: var(--paper-head); font-weight: 700; text-align: left; padding: 4px 8px; }
+.pt .pt-lesson td { height: 44mm; }
+.pt .pt-subject { display: block; font-weight: 700; font-size: 15px; line-height: 1.2; }
+.pt .pt-group { display: block; margin-top: 4px; font-style: italic; color: var(--paper-muted); }
+.pt .pt-teacher { display: block; margin-top: 8px; }
+.pt .na { color: var(--paper-muted); font-style: italic; }
+.pt .pt-ic { display: block; width: 52px; height: 52px; margin: 0 auto 6px; color: #000; stroke-width: 1.3; }
+.pt .pt-ic.small { display: inline-block; width: 18px; height: 18px; margin: 0 6px -4px 0; }
+.pictures .pt .pt-lesson td { height: 31mm; }
+.pictures .pt .pt-subject { font-size: 17px; }
+.pictures .pt .pt-teacher { margin-top: 3px; font-size: 12px; }
+.pictures .pt .pt-double .pt-ic { width: 72px; height: 72px; }
+.pt .pt-name, .pt .pt-band td, .pt thead th, .pt .pt-when { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 .ps .b-lightblue, .ps .b-blue, .ps .b-green { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 
 /* ---------- Timetables (print) ---------- */
@@ -595,6 +619,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
 @media print {
   @page { size: A4 landscape; margin: 10mm; }
   @page wide { size: A3 landscape; margin: 8mm; }
+  @page portrait { size: A4 portrait; margin: 12mm; }
   html, body { height: auto; background: #fff; color: #000; }
   .topbar, .page-head, .print-controls, .print-hint, .toasts { display: none !important; }
   .app, #view { display: block; height: auto; overflow: visible; }
@@ -602,7 +627,19 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
   .sheets { display: block; }
   .sheet { width: auto; box-shadow: none; padding: 0; break-after: page; page-break-after: always; break-inside: avoid; }
   .sheet:last-child { break-after: auto; page-break-after: auto; }
-  .sheet.staffday { page: wide; }
+  .sheet.staffday { page: wide; padding: 0; margin-bottom: 7mm; break-after: auto; page-break-after: auto; break-inside: avoid; }
+  .sheet.staffday table.ps { height: 100mm; font-size: 7.5px; line-height: 1.2; }
+  .sheet.staffday .ps th, .sheet.staffday .ps td { padding: 1px 2px; }
+  .sheet.staffday .ps thead th { font-size: 8.5px; }
+  .sheet.staffday .ps thead th.ps-title { font-size: 12px; }
+  .sheet.staffday .ps .ds-with { font-size: 7px; }
+  .pictures .pt .pt-lesson td { height: 22mm; padding: 2px 3px; }
+  .pictures .pt .pt-lesson .pt-ic { width: 40px; height: 40px; margin-bottom: 3px; }
+  .pictures .pt .pt-band td, .pictures .pt .pt-band th { padding: 1px 6px; font-size: 11px; }
+  .pictures .pt .pt-ic.small { width: 14px; height: 14px; margin-bottom: -3px; }
+  .pictures .pt .pt-name { font-size: 18px; padding: 3px; }
+  .pictures .pt thead tr:nth-child(2) th { padding: 3px; }
+  .sheet.pupil:not(.pictures) { page: portrait; }
   body.second .dsheet-screen { display: none !important; }
   body.second .ds-print { display: block !important; }
   .tt th, .tt td { border-color: #555; }
@@ -774,8 +811,35 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     home: '<path d="M2.5 8 8 3l5.5 5M4 7v7h8V7"/>',
     pin: '<path d="M8 14s4.5-4.2 4.5-7.5a4.5 4.5 0 0 0-9 0C3.5 9.8 8 14 8 14z"/><circle cx="8" cy="6.5" r="1.5"/>',
     person: '<circle cx="8" cy="5" r="2.5"/><path d="M3 14c0-2.8 2.2-5 5-5s5 2.2 5 5"/>',
-    clock: '<circle cx="8" cy="8" r="6"/><path d="M8 4.5V8l2.5 1.5"/>'
+    clock: '<circle cx="8" cy="8" r="6"/><path d="M8 4.5V8l2.5 1.5"/>',
+    // Lesson symbols for picture timetables
+    numbers: '<path d="M2.5 5.5 4.5 4v8M2.5 12h4M8.5 5.8a2 2 0 1 1 3.3 1.6L8.5 12h5"/>',
+    letters: '<path d="M1.5 13 5 3l3.5 10M2.8 9.5h4.4M14 8.5V13M14 10.8a2 2 0 1 0 0 .4"/>',
+    monitor: '<path d="M2 3h12v8H2zM6 14h4M8 11v3"/>',
+    ball: '<circle cx="8" cy="8" r="6"/><path d="M2 8h12M8 2c2.2 2 2.2 10 0 12M8 2c-2.2 2-2.2 10 0 12"/>',
+    waves: '<path d="M1.5 6c2-1.5 3-1.5 4.3 0s2.3 1.5 4.4 0 3-1.5 4.3 0M1.5 10.5c2-1.5 3-1.5 4.3 0s2.3 1.5 4.4 0 3-1.5 4.3 0"/>',
+    bee: '<ellipse cx="8" cy="10" rx="3" ry="3.8"/><path d="M5.2 9h5.6M5.2 11.5h5.6M7 6.3 5.5 3.5M9 6.3l1.5-2.8M5.3 8C3.5 6.5 1.5 7 2 8.7s2.8 1.2 3.4.6M10.7 8c1.8-1.5 3.8-1 3.3.7s-2.8 1.2-3.4.6"/>',
+    palette: '<path d="M8 2a6 6 0 1 0 0 12c1 0 1.5-.7 1.5-1.5S9 11 9 10.3c0-.8.7-1.3 1.5-1.3H12a2 2 0 0 0 2-2C14 4.3 11.3 2 8 2z"/><circle cx="5" cy="7.5" r=".9"/><circle cx="7.5" cy="5" r=".9"/><circle cx="10.6" cy="5.6" r=".9"/>',
+    note: '<path d="M6 12V3.5l7-1.5v8.5"/><circle cx="4.3" cy="12" r="1.8"/><circle cx="11.3" cy="10.5" r="1.8"/>',
+    heart: '<path d="M8 13.5S2 10 2 6a3 3 0 0 1 6-1 3 3 0 0 1 6 1c0 4-6 7.5-6 7.5z"/>',
+    cup: '<path d="M3 5.5h8v4.5a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3zM11 7h1.3a1.5 1.5 0 0 1 0 3H11M5.5 2v1.5M7.5 2v1.5M9.5 2v1.5"/>',
+    plate: '<circle cx="9.5" cy="8" r="4.5"/><circle cx="9.5" cy="8" r="2"/><path d="M2.5 2.5V14M1.5 2.5v3a1 1 0 0 0 2 0v-3"/>',
+    star: '<path d="M8 1.8l1.9 4 4.3.5-3.2 2.9.9 4.3L8 11.3l-3.9 2.2.9-4.3L1.8 6.3l4.3-.5z"/>',
+    dice: '<path d="M2.5 2.5h11v11h-11z"/><circle cx="5.5" cy="5.5" r="1"/><circle cx="8" cy="8" r="1"/><circle cx="10.5" cy="10.5" r="1"/>',
+    briefcase: '<path d="M2 5h12v8H2zM5.5 5V3h5v2M2 8.5h12"/>',
+    bus: '<path d="M3 2.5h10v9H3zM3 7.5h10M5 11.5v2M11 11.5v2"/><circle cx="5.5" cy="9.5" r=".7"/><circle cx="10.5" cy="9.5" r=".7"/>'
   };
+  // Which symbol a lesson gets on a picture timetable, from its name; otherwise the room's icon.
+  const LESSON_ICON_RULES = [[/d\s*&\s*d|dungeons|dice|board game/i, 'dice'], [/swim/i, 'waves'], [/\bpe\b|sport|gym|football|games/i, 'ball'], [/cook|food|bak/i, 'cook'],
+    [/\bbees?\b/i, 'bee'], [/garden|plant|grow/i, 'leaf'], [/animal|pet|farm/i, 'paw'], [/woodwork|tech|\bdt\b|design/i, 'tools'], [/wood|forest/i, 'tree'], [/horse|riding|stable/i, 'shoe'],
+    [/\bict\b|computer|computing|digital/i, 'monitor'], [/science/i, 'flask'], [/numeracy|math|number/i, 'numbers'], [/phonics|spelling|letter/i, 'letters'],
+    [/literacy|reading|english|story|writ|library/i, 'book'], [/\barts?\b|craft|paint|draw|creative/i, 'palette'], [/music|sing/i, 'note'], [/wellbeing|pshe|calm|mindful/i, 'heart'],
+    [/career|work experience|enterprise/i, 'briefcase'], [/out and about|community|trip|town|visit|travel/i, 'bus'], [/champion|reward|choice|golden/i, 'star'],
+    [/1:1|one to one/i, 'person'], [/group/i, 'meet'], [/break|snack/i, 'cup'], [/lunch|dinner/i, 'plate'], [/home/i, 'home'], [/arrive|arrival/i, 'door']];
+  function lessonIcon(subject, room, kind) {
+    for (const [re, k] of LESSON_ICON_RULES) if (re.test(subject)) return k;
+    return room ? iconName(room, kind) : 'star';
+  }
   const ICON_RULES = [[/kitchen|cook/i, 'cook'], [/\bpod\b/i, 'pod'], [/hall/i, 'hall'], [/literacy|learning|lounge|class|library/i, 'book'],
     [/conference|brook|meeting/i, 'meet'], [/science|lab/i, 'flask'], [/\bdt\b|design|workshop/i, 'tools'], [/garden|polytunnel|allotment|green/i, 'leaf'],
     [/animal|pet|farm/i, 'paw'], [/wood|forest/i, 'tree'], [/stable|horse|riding/i, 'shoe'], [/village|town|shop/i, 'home']];
@@ -2142,6 +2206,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     if (what === 'day') sheets = chosen.map((d) => daySheet(d));
     else if (wide) sheets = chosen.map((d) => staffDaySheet(d));
     else if (what === 'room') sheets = chosen.map((a) => roomSheet(a));
+    else if (what === 'student') sheets = chosen.map((p) => pupilSheet(p, ui.printPictures));
     else sheets = chosen.map((p) => personSheet(p));
 
     root.append(h('div', { class: 'page' },
@@ -2150,9 +2215,11 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
         h('div', { class: 'seg', role: 'group', 'aria-label': 'Which timetables' }, [['student', 'Pupils'], ['staff', 'Staff'], ['room', 'Rooms'], ['day', 'Days by room'], ['staffday', 'Days by staff']].map(([id, label]) =>
           h('button', { type: 'button', class: what === id ? 'on' : '', 'aria-pressed': what === id ? 'true' : 'false', onclick: () => { ui.printWhat = id; ui.printWho = 'all'; saveUI(); render(); } }, label))),
         h('label', null, 'Show', whoSelect),
+        what === 'student' ? h('div', { class: 'seg', role: 'group', 'aria-label': 'Words or pictures' }, [[false, 'Words'], [true, 'Pictures']].map(([v, label]) =>
+          h('button', { type: 'button', class: !!ui.printPictures === v ? 'on' : '', 'aria-pressed': !!ui.printPictures === v ? 'true' : 'false', onclick: () => { ui.printPictures = v; saveUI(); render(); } }, label))) : null,
         h('label', null, h('input', { type: 'checkbox', id: 'print-times', checked: ui.printTimes, onchange: (e) => { ui.printTimes = e.target.checked; saveUI(); render(); } }), 'Show times'),
         h('button', { type: 'button', class: 'btn primary', onclick: () => window.print(), disabled: !sheets.length }, 'Print ' + plural(sheets.length, 'page')),
-        h('span', { class: 'hint print-hint' }, (wide ? 'One A3 landscape page per day, a column for each member of staff.' : 'One A4 landscape page each.') + ' To email them, choose “Save as PDF” as the printer.')),
+        h('span', { class: 'hint print-hint' }, (wide ? 'Each day is a strip 10cm tall, two to an A3 landscape page.' : what === 'student' && !ui.printPictures ? 'One A4 portrait page each, to go in their books.' : 'One A4 landscape page each.') + ' To email them, choose “Save as PDF” as the printer.')),
       sheets.length ? h('div', { class: 'sheets' }, sheets) : h('p', { class: 'hint' }, 'Nobody to show yet. Add pupils and staff in Setup.')
     ));
   }
@@ -2189,6 +2256,47 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       foot = 'PPA: ' + plural(n, 'period') + (p.ppa ? ' (' + p.ppa + ' needed)' : '');
     }
     return sheetFrame('person', p.full ? p.full + ' (' + p.name + ')' : p.name, (isStaff(p) ? 'Staff timetable' : 'Pupil timetable') + (project.name ? ' · ' + project.name : ''), h('table', { class: 'tt' }, head, body), foot);
+  }
+  // ----- Pupil timetables: the ones that go in their books -----
+  // A pupil's lesson: the subject, how they're working (1:1, paired or a group, never who with), and the staff.
+  function groupWord(n) { return n === 1 ? '1:1' : n === 2 ? 'Paired' : n > 2 ? 'Group' : ''; }
+  function pupilLesson(p, s) {
+    const place = s.at[p.id];
+    if (place === OUT) return { kind: 'out', key: 'out' };
+    const a = place && areaById.get(place);
+    if (!a) return { kind: 'none', key: '' };
+    const here = peopleAt(s, place), staffHere = here.filter(isStaff);
+    const subject = str(s.titles[place]) || a.name;
+    return { kind: 'lesson', subject, room: a.name, roomKind: a.kind, group: groupWord(here.filter(isPupil).length), teachers: names(staffHere),
+      key: place + '|' + subject + '|' + staffHere.map((x) => x.id).join(',') };
+  }
+  // The week as a table of the school day's rows: a narrow time column, then Monday to Friday.
+  // The same lesson in periods next to each other is one tall box, like a double lesson on paper.
+  function pupilSheet(p, pictures) {
+    const rows = dayRows();
+    const cells = DAYS.map((d) => rows.map((r) => r.kind === 'period' ? pupilLesson(p, slotOf(slotKey(d.id, r.period))) : null));
+    const span = DAYS.map(() => rows.map(() => 1));
+    cells.forEach((col, di) => { for (let i = rows.length - 1; i > 0; i--) { const a = col[i - 1], b = col[i]; if (a && b && a.key && a.key === b.key) { span[di][i - 1] += span[di][i]; span[di][i] = 0; } } });
+    const sym = (k, cls) => roomIcon(k, cls || 'pt-ic');
+    const lessonCell = (c, n) => {
+      const attrs = n > 1 ? { rowspan: n, class: 'pt-double' } : null;
+      if (c.kind === 'out') return h('td', attrs, h('span', { class: 'na' }, 'Not in'));
+      if (c.kind !== 'lesson') return h('td', attrs, '');
+      return h('td', attrs,
+        pictures ? sym(lessonIcon(c.subject, c.room, c.roomKind)) : null,
+        h('span', { class: 'pt-subject' }, c.subject),
+        c.group ? h('span', { class: 'pt-group' }, c.group) : null,
+        c.teachers ? h('span', { class: 'pt-teacher' }, c.teachers) : null);
+    };
+    const head = h('thead', null,
+      h('tr', null, h('th', { colspan: DAYS.length + 1, class: 'pt-name' }, p.full || p.name)),
+      h('tr', null, h('th', { class: 'pt-corner' }, ui.printTimes ? 'Time' : ''), DAYS.map((d) => h('th', { scope: 'col' }, d.name))));
+    const body = h('tbody', null, rows.map((r, i) => {
+      const when = h('th', { scope: 'row', class: 'pt-when' }, ui.printTimes && r.time ? h('b', null, r.time) : null, r.kind === 'period' ? h('span', null, r.label) : null);
+      if (r.kind === 'band') return h('tr', { class: 'pt-band' }, when, h('td', { colspan: DAYS.length }, pictures ? sym(lessonIcon(r.label), 'pt-ic small') : null, r.label));
+      return h('tr', { class: 'pt-lesson' }, when, DAYS.map((d, di) => (span[di][i] ? lessonCell(cells[di][i], span[di][i]) : null)));
+    }));
+    return h('section', { class: 'sheet pupil' + (pictures ? ' pictures' : '') }, h('table', { class: 'pt' }, head, body));
   }
   function roomSheet(a) {
     const head = h('thead', null, h('tr', null, h('th', null, ''), DAYS.map((d) => h('th', { scope: 'col' }, d.name))));
@@ -2277,7 +2385,8 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     const body = h('tbody', null, rows.map((r) => {
       if (r.kind === 'band') return h('tr', { class: 'ps-band' }, h('th', { scope: 'row' }, r.time), h('td', { colspan: cols + 1, class: 'b-' + r.tone }, r.label));
       const s = slotFor(r);
-      return h('tr', { class: 'ps-lesson' }, h('th', { scope: 'row' }, r.time), h('th', { scope: 'row', class: 'ps-label' }, r.label),
+      const lessons = rows.filter((x) => x.kind === 'period').length, bands = rows.length - lessons;
+      return h('tr', { class: 'ps-lesson', style: { height: Math.max(10, (100 - 7 - bands * 4.6) / lessons).toFixed(1) + 'mm' } }, h('th', { scope: 'row' }, r.time), h('th', { scope: 'row', class: 'ps-label' }, r.label),
         list.map((p) => {
           const c = dayCellParts(p, s);
           if (!c.room) return h('td', null, c.text);

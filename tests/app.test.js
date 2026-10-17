@@ -163,7 +163,7 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   console.log('Timetables to print');
   await page.getByRole('button', { name: 'Timetables' }).click();
   check(await page.locator('.sheet').count() === 4, 'one page per pupil');
-  check(await page.locator('.sheet').first().locator('.t').first().innerText() === 'Maths', 'AB’s Monday P1 says Maths');
+  check(await page.locator('.sheet').first().locator('.pt-subject').first().innerText() === 'Maths', 'AB’s Monday P1 says Maths');
   await shot(page, '04-print-pupils');
   await page.emulateMedia({ media: 'print' });
   const pdf = await page.pdf({ format: 'A4', landscape: true, preferCSSPageSize: true });
@@ -320,6 +320,28 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   check(zip.slice(0, 2).toString() === 'PK' && /\.xlsx$/.test(xl.suggestedFilename()) && ['Monday', 'Friday', 'Learners Arrive'].every((w) => zip.includes(w)), 'Excel workbook with a tab per day');
   check(await sheet.evaluate(() => localStorage.getItem('lifehouse_timetabler_v2')) === await p10.evaluate(() => localStorage.getItem('lifehouse_timetabler_v2')), 'the second screen never changes the plan');
   check(err10.length === 0, 'no errors in either window' + (err10.length ? ': ' + err10.join(' | ') : ''));
+
+  console.log('Pupil timetables for their books');
+  await p10.getByRole('button', { name: 'Timetables' }).click();
+  await p10.locator('#print-who').selectOption({ label: 'KB' });
+  const kb = p10.locator('.sheet.pupil');
+  const kbText = await kb.innerText();
+  const others = ['AB', 'CD', 'DR', 'FT', 'GW', 'HM', 'JP', 'LR', 'MO', 'NP', 'OT', 'PJ', 'RS', 'SB', 'TW', 'VH', 'WP', 'YA', 'ZK', 'BM'];
+  check(!others.some((n) => new RegExp('\\b' + n + '\\b').test(kbText)), 'a pupil’s timetable never names the other pupils');
+  check(await kb.locator('.pt-group').count() > 0 && (await kb.locator('.pt-group').allInnerTexts()).every((t) => ['1:1', 'Paired', 'Group'].includes(t)), 'says 1:1, Paired or Group instead');
+  check(await kb.locator('.pt-teacher').count() > 0 && await kb.locator('.pt-name').innerText() === 'KB', 'subject, then the teacher, under the pupil’s name');
+  check(await kb.locator('thead th').nth(1).innerText() === 'Time' && await kb.locator('.pt-when').count() === 10, 'times sit in their own narrow column, not like a day');
+  await p10.getByRole('button', { name: 'Pictures' }).click();
+  check(await p10.locator('.sheet.pupil.pictures .pt-lesson .pt-ic').count() >= 15, 'the picture version has a symbol for each lesson');
+  await p10.emulateMedia({ media: 'print' });
+  const kbPdf = await p10.pdf({ preferCSSPageSize: true });
+  check((kbPdf.toString('latin1').match(/\/Type\s*\/Page[^s]/g) || []).length === 1, 'the picture timetable fits one A4 page');
+  await p10.emulateMedia({ media: 'screen' });
+  await p10.locator('.print-controls .seg button', { hasText: 'Days by staff' }).click();
+  await p10.emulateMedia({ media: 'print' });
+  const stripPdf = await p10.pdf({ preferCSSPageSize: true });
+  check((stripPdf.toString('latin1').match(/\/Type\s*\/Page[^s]/g) || []).length === 3, 'day sheets print as strips, two to an A3 page');
+  await p10.emulateMedia({ media: 'screen' });
 
   console.log('The school day');
   await p10.getByRole('button', { name: 'Setup' }).click();
