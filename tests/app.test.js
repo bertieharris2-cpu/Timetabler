@@ -538,6 +538,8 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   await p11.waitForTimeout(400);
   const saved = await p11.evaluate(() => JSON.parse(localStorage.getItem('lifehouse_timetabler_v2')));
   check(saved.slots['Wed|P3'].at.T03 === saved.slots['Wed|P3'].at.S06, 'the page’s teacher goes in with the group');
+  check(await p11.locator('.gw-tray .gw-item', { hasText: 'Literacy set 2' }).locator('.gw-members li.pupil').count() === 5
+    && await p11.locator('td[data-cell="Wed|P3"] .gw-placed', { hasText: 'Literacy set 2' }).locator('.gw-members li').count() === 6, 'the children are listed under each group, in the list and on the week');
   await dragBox(p11.locator('.gw-tray .ppa-chip'), p11.locator('td[data-cell="Thu|P4"]'));
   check(await p11.locator('td[data-cell="Thu|P4"] .ppa-chip').count() === 1, 'PPA dragged onto the week');
   await dragBox(p11.locator('td[data-cell="Thu|P4"] .ppa-chip'), p11.locator('.gw-tray'));

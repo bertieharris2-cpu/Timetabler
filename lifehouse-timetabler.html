@@ -771,6 +771,12 @@ table.gweek { width: 100%; border-collapse: collapse; table-layout: fixed; backg
 .gweek td { height: 118px; }
 .gweek td .gchip { margin: 0 4px 4px 0; }
 .gweek td.drop-ok { background: var(--accent-soft); outline: 3px solid var(--accent); outline-offset: -3px; }
+.gw-members { list-style: none; margin: 3px 0 2px; padding: 0 0 0 2px; display: flex; flex-direction: column; gap: 1px; font-size: 12.5px; line-height: 1.3; }
+.gw-members li { padding-left: 6px; border-left: 3px solid transparent; font-weight: 600; color: var(--pupil); }
+.gw-members li.staff { color: var(--staff); border-left-color: var(--staff); }
+.gw-members li.away { opacity: 0.45; text-decoration: line-through; }
+.gw-placed { margin-bottom: 4px; }
+.gw-placed .gw-members { font-size: 12px; }
 .gw-others { display: block; margin-top: 4px; font-size: 11.5px; color: var(--muted); }
 .lead-seg { flex-wrap: wrap; }
 .lead-controls { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; padding: 6px 10px; background: var(--surface); border: 1px solid var(--line); }
@@ -3970,7 +3976,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       h('div', { class: 'zone-head' }, 'Groups', h('span', { class: 'n' }, list.length)),
       list.length ? list.map((g) => {
         const n = groupLessons(g);
-        return h('div', { class: 'gw-item' }, gweekChip(g, null),
+        return h('div', { class: 'gw-item' }, gweekChip(g, null), groupMembers(g),
           h('span', { class: 'hint' }, g.perWeek ? n + ' of ' + g.perWeek + ' a week' : plural(n, 'lesson') + ' this week',
             ' · ' + (g.room ? (areaById.get(g.room) || {}).name : 'no usual room')));
       }) : h('p', { class: 'hint' }, 'No groups for these subjects yet.'),
@@ -3991,13 +3997,20 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
           const tNote = !tAt || tAt === PPA || mine.some((g) => groupPlace(g, s) === tAt) ? null
             : h('span', { class: 'gw-teacher' }, teacher.name + ': ' + (tAt === OUT ? 'not in' : placeName(tAt)));
           return h('td', { 'data-cell': key, 'aria-label': d.name + ' ' + per.label, tabindex: gwPicked ? '0' : null, onkeydown: (e) => { if ((e.key === 'Enter' || e.key === ' ') && gwPicked && e.target === e.currentTarget) { e.preventDefault(); dropPicked(key); } } },
-            mine.map((g) => gweekChip(g, key)),
+            mine.map((g) => h('div', { class: 'gw-placed' }, gweekChip(g, key), groupMembers(g, s))),
             tAt === PPA ? ppaChip(key) : null,
             tNote,
             split.map(({ g, sp }) => h('span', { class: 'gw-split', title: g.name + ' is split: ' + names(sp.away) + ' elsewhere' }, '! ' + g.name + ': ' + names(sp.away) + ' elsewhere')),
             others.length ? h('span', { class: 'gw-others', title: 'Other groups this lesson' }, 'Also: ' + others.map((g) => g.name).join(', ')) : null);
         })))));
     root.append(h('div', { class: 'page gw-page' }, head, controls, h('div', { class: 'gw-wrap' }, tray, h('div', { class: 'gw-grid' }, grid))));
+  }
+  // The people in a group, listed down under its chip: pupils, then staff. In a lesson, anyone not with the group then is faded.
+  function groupMembers(g, s) {
+    const at = s && groupPlace(g, s);
+    const ppl = g.members.map(person).filter(Boolean).sort((a, b) => isStaff(a) - isStaff(b));
+    return h('ul', { class: 'gw-members', 'aria-label': 'In ' + g.name }, ppl.map((x) =>
+      h('li', { class: (isStaff(x) ? 'staff' : 'pupil') + (at && s.at[x.id] !== at ? ' away' : ''), title: at && s.at[x.id] !== at ? x.name + ' is not with the group this lesson' : null }, x.name)));
   }
   // PPA for this page's teacher: in the list (key null) to drag onto the week, or in a lesson.
   let gwTeacher = null;
