@@ -193,7 +193,30 @@ body.fs .slot-name b { font-size: 15px; }
 /* ---------- Plan: tray + map ---------- */
 .plan { flex: 1; min-height: 420px; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 8px; padding: 0 16px 12px; }
 /* The tray is a band above the map, so the map has the screen's full width. */
-.tray { display: flex; flex-direction: row; align-items: stretch; gap: 8px; overflow-x: auto; overflow-y: hidden; max-height: 116px; padding-bottom: 2px; }
+.tray { position: relative; display: flex; flex-direction: row; align-items: stretch; gap: 8px; min-height: 90px; padding-bottom: 8px; }
+.tray > .tray-main { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; border: 1px solid var(--line); background: var(--surface); }
+.tray-tabs { display: flex; gap: 2px; padding: 3px 4px 0; border-bottom: 1px solid var(--line); background: var(--surface-2); flex: none; }
+.tray-tabs button { border: 0; border-bottom: 2px solid transparent; background: transparent; padding: 4px 10px 5px; font-size: 12.5px; font-weight: 600; color: var(--muted); display: inline-flex; gap: 6px; align-items: center; }
+.tray-tabs button:hover { color: var(--ink); }
+.tray-tabs button.on { color: var(--accent); border-bottom-color: var(--accent); background: var(--surface); }
+.tray-tabs .n { font-size: 11px; font-variant-numeric: tabular-nums; color: var(--muted); }
+.tray-body { flex: 1; min-height: 0; overflow: auto; padding: 6px; }
+.tray-groups { display: flex; gap: 8px; align-items: stretch; height: 100%; }
+.tgroup { flex: none; width: 168px; display: flex; flex-direction: column; gap: 4px; min-height: 0; border: 1px solid var(--line); border-top: 4px solid var(--gc); background: var(--surface-2); padding: 4px; }
+.tgroup > .gchip { flex: none; width: 100%; flex-wrap: wrap; white-space: normal; row-gap: 2px; }
+.tgroup-list { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; overflow: auto; min-height: 0; padding: 1px; }
+.tray-left { display: flex; gap: 8px; height: 100%; }
+.tray-left .zone, .tray-body > .zone { height: 100%; min-height: 0; }
+.tray-body .zone-body { flex: 1; min-height: 0; max-height: none; overflow: auto; }
+.tray-body .zone { width: auto; }
+.tray-empty { display: flex; gap: 10px; align-items: center; font-size: 13px; color: var(--muted); padding: 6px; }
+.tray-resize { position: absolute; left: 0; right: 0; bottom: 0; height: 7px; cursor: ns-resize; touch-action: none; }
+.tray-resize::after { content: ""; position: absolute; left: 50%; top: 2px; width: 48px; height: 3px; margin-left: -24px; background: var(--line-strong); }
+.tray-resize:hover::after { background: var(--accent); }
+.check-mini { align-self: flex-start; border: 0; padding: 2px 7px; font-size: 12px; font-weight: 700; }
+.check-mini.warn { background: var(--warn-bg); color: var(--warn); }
+.check-mini.bad { background: var(--bad-bg); color: var(--bad); }
+.check-mini.ok { background: var(--ok-bg); color: var(--ok); }
 .tray > * { flex: none; }
 .band-slot { width: 210px; display: flex; flex-direction: column; gap: 6px; }
 .tray .zone { width: 220px; padding: 5px 7px 6px; gap: 4px; }
@@ -249,7 +272,7 @@ body.fs .slot-name b { font-size: 15px; }
 .mapcol { position: relative; min-width: 0; min-height: 0; display: flex; }
 .mapwrap { flex: 1; overflow: auto; border: 1px solid var(--line); background-color: var(--map); }
 /* The map leaves room at the top for the building name tabs. */
-.map { position: relative; min-width: 860px; min-height: 480px; }
+.map { position: relative; min-width: 860px; min-height: 360px; }
 .map-tools { margin-left: auto; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .period-actions { display: flex; flex-wrap: wrap; gap: 4px; }
 .zoom { display: flex; align-items: center; gap: 2px; padding: 2px; background: var(--surface); border: 1px solid var(--line); }
@@ -641,7 +664,7 @@ table.tt { width: 100%; border-collapse: collapse; table-layout: fixed; font-siz
 .gcard.compact[style*="--gc"], .gcard.editing[style*="--gc"] { border-top: 4px solid var(--gc); }
 .swatch { width: 22px; height: 22px; padding: 0; border: 2px solid var(--surface); outline: 1px solid var(--line-strong); }
 .swatch.on { outline: 3px solid var(--ink); }
-.room-group { align-self: flex-start; margin: 1px 7px 0; padding: 0 6px 0 4px; border-left: 5px solid var(--gc); background: var(--surface-2); font-size: 11px; font-weight: 700; line-height: 17px; position: relative; }
+.room-group { cursor: grab; touch-action: none; user-select: none; border-top: 0; border-right: 0; border-bottom: 0; color: var(--ink); align-self: flex-start; margin: 1px 7px 0; padding: 0 6px 0 4px; border-left: 5px solid var(--gc); background: var(--surface-2); font-size: 11px; font-weight: 700; line-height: 17px; position: relative; }
 .gchip-ic { width: 14px; height: 14px; flex: none; }
 .gchip-n { font-size: 11px; font-weight: 600; color: var(--muted); }
 .gchip-week { font-size: 11px; font-weight: 700; padding: 0 4px; background: var(--ok-bg); color: var(--ok); font-variant-numeric: tabular-nums; }
@@ -1921,29 +1944,39 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     }, p.name);
   }
 
+  // The tray above the map: the period on the left, then one of three views, chosen by tabs:
+  // the groups (each with its members listed), who is left to place, and who is not in this period.
   function renderTray(s, st) {
     const per = periodOf(ui.period);
     const unplaced = project.people.filter((p) => !s.at[p.id]);
     const upPupils = unplaced.filter(isPupil), upStaff = unplaced.filter(isStaff);
     const out = peopleAt(s, OUT);
     const noPeople = !project.people.length;
-
-    const unplacedBody = h('div', { class: 'zone-body', 'data-empty': noPeople ? 'No one added yet' : 'Everyone is placed' },
-      upPupils.map((p) => chip(p)),
-      upPupils.length && upStaff.length ? h('span', { class: 'zone-sub' }, 'Staff') : null,
-      upStaff.map((p) => chip(p)));
-
-    let checks;
-    if (noPeople) checks = null;
-    else if (!st.started) checks = h('div', { class: 'checks' }, h('div', { class: 'check info' }, h('span', null, 'Nothing planned for this period yet.')));
-    else if (!st.issues.length) checks = h('div', { class: 'checks' }, h('div', { class: 'check ok' }, h('span', null, 'Every pupil is placed and every room with pupils has staff.')));
-    else checks = h('div', { class: 'checks' }, st.issues.map((i) => h('button', { type: 'button', class: 'check ' + i.level, onclick: () => flashZone(i.zone) }, h('span', null, i.text))));
-
+    const tabs = [['groups', 'Groups', project.groups.length], ['left', 'Left to place', unplaced.length], ['out', 'Not in', out.length]];
+    const tab = tabs.some(([id]) => id === ui.trayTab) ? ui.trayTab : project.groups.length ? 'groups' : 'left';
+    const issues = st.started ? st.issues : [];
     const howTo = 'Drag names onto the map. Or tap several names, then tap a room to move them together. Tap a room’s numbers to pick up everyone in it. Left and right arrow keys change period; Ctrl+Z undoes.';
-    return h('aside', { class: 'tray', 'aria-label': 'People and special places' },
+    const body = {
+      groups: () => project.groups.length ? h('div', { class: 'tray-groups' }, project.groups.map((g) => trayGroup(g, s)))
+        : h('div', { class: 'tray-empty' }, h('span', null, 'No groups yet. Set up the literacy and numeracy sets, D&D or the woods, then drag a whole group onto a room.'),
+          h('button', { type: 'button', class: 'btn small', onclick: () => { ui.setupTab = 'groups'; go('setup'); } }, 'Set up groups')),
+      left: () => h('div', { class: 'tray-left' },
+        h('section', { class: 'zone grow' + (upPupils.length ? ' unplaced' : ''), 'data-zone': NONE },
+          h('div', { class: 'zone-head' }, 'Pupils left', h('span', { class: 'n' }, upPupils.length || '')),
+          h('div', { class: 'zone-body', 'data-empty': noPeople ? 'No one added yet' : 'Every pupil is placed' }, upPupils.map((p) => chip(p)))),
+        h('section', { class: 'zone grow' + (upStaff.length ? ' unplaced' : ''), 'data-zone': NONE },
+          h('div', { class: 'zone-head' }, 'Staff left', h('span', { class: 'n' }, upStaff.length || '')),
+          h('div', { class: 'zone-body', 'data-empty': noPeople ? 'No one added yet' : 'All staff are placed' }, upStaff.map((p) => chip(p))))),
+      out: () => h('section', { class: 'zone grow', 'data-zone': OUT },
+        h('div', { class: 'zone-head' }, 'Not in this period', h('span', { class: 'n' }, out.length || '')),
+        h('div', { class: 'zone-body', 'data-empty': 'Drop anyone who is absent or not in this period here' }, out.map((p) => chip(p, true))))
+    }[tab]();
+    return h('aside', { class: 'tray', 'aria-label': 'Groups and people', style: { height: clamp(ui.trayH || Math.round(window.innerHeight * 0.21), 90, 460) + 'px' } },
       h('div', { class: 'band-slot' },
         h('div', { class: 'slot-name' }, h('div', { class: 'slot-title' }, h('b', null, dayName(ui.day) + ' · ' + per.label), h('span', { class: 'how-to', title: howTo, 'aria-label': howTo }, '?')), h('span', null, per.time || 'Set times in Setup')),
-        renderSlotActions()),
+        renderSlotActions(),
+        issues.length ? h('button', { type: 'button', class: 'check-mini ' + (issues.some((i) => i.level === 'bad') ? 'bad' : 'warn'), title: issues.map((i) => i.text).join('\n'), onclick: () => flashZone(issues[0].zone) },
+          plural(issues.length, 'thing') + ' to check') : st.started && !noPeople ? h('span', { class: 'check-mini ok' }, '✓ All placed') : null),
       noPeople ? h('div', { class: 'start-card' },
         h('b', null, 'Add your pupils and staff'),
         h('span', null, 'Type or paste their names in Setup, or open a people list (CSV) or a backup file.'),
@@ -1951,16 +1984,31 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
           h('button', { type: 'button', class: 'btn small primary', onclick: () => go('setup') }, 'Add people'),
           h('button', { type: 'button', class: 'btn small', onclick: openFilePicker }, 'Open a file…')),
         h('button', { type: 'button', class: 'link-btn', onclick: loadExample }, 'Or try the example school (made-up people)')) : null,
-      h('section', { class: 'zone grow' + (unplaced.length ? ' unplaced' : ''), 'data-zone': NONE }, h('div', { class: 'zone-head' }, 'Not placed yet', h('span', { class: 'n' }, unplaced.length || '')), unplacedBody),
-      project.groups.length ? groupsBox(s) : null,
-      checks ? h('section', { class: 'zone band-checks' }, h('div', { class: 'zone-head' }, 'This period'), checks) : null,
-      h('section', { class: 'zone', 'data-zone': OUT },
-        h('div', { class: 'zone-head' }, 'Not in this period', h('span', { class: 'n' }, out.length || '')),
-        h('div', { class: 'zone-body', 'data-empty': 'Absent or part-time' }, out.map((p) => chip(p, true)))),
-      freeRoomsBox(s)
-    );
+      h('div', { class: 'tray-main' },
+        h('div', { class: 'tray-tabs', role: 'tablist', 'aria-label': 'What the tray shows' }, tabs.map(([id, label, n]) =>
+          h('button', { type: 'button', role: 'tab', class: id === tab ? 'on' : '', 'aria-selected': id === tab ? 'true' : 'false', 'data-zone': id === 'out' ? OUT : id === 'left' ? NONE : null,
+            onclick: () => { ui.trayTab = id; saveUI(); render(); } }, label, n ? h('span', { class: 'n' }, n) : null))),
+        h('div', { class: 'tray-body' }, body)),
+      h('div', { class: 'tray-resize', title: 'Drag to make the tray taller or shorter', 'aria-hidden': 'true', onpointerdown: startTrayResize }));
   }
-
+  // Drag the bar under the tray to make it taller or shorter; the map takes the rest.
+  function startTrayResize(e) {
+    e.preventDefault();
+    const tray = e.target.closest('.tray');
+    const y0 = e.clientY, h0 = tray.getBoundingClientRect().height;
+    const move = (ev) => { ui.trayH = clamp(Math.round(h0 + ev.clientY - y0), 90, 460); tray.style.height = ui.trayH + 'px'; };
+    const up = () => { document.removeEventListener('pointermove', move); document.removeEventListener('pointerup', up); saveUI(); sizeMap(); };
+    document.addEventListener('pointermove', move);
+    document.addEventListener('pointerup', up);
+  }
+  // A group in the tray: its chip to drag the whole group, and its members listed down the card, each draggable on its own.
+  // Members already placed this period are faded, so it's clear who is left.
+  function trayGroup(g, s) {
+    const ppl = g.members.map(person).filter(Boolean).sort((a, b) => isStaff(a) - isStaff(b));
+    return h('div', { class: 'tgroup', style: { '--gc': groupColour(g) } },
+      groupChip(g, s),
+      h('div', { class: 'tgroup-list' }, ppl.map((p) => chip(p, !!s.at[p.id]))));
+  }
   // Groups in the tray: drag one onto a room to move everyone in it, or tap it to pick them all up.
   function groupChip(g, s) {
     const at = groupPlace(g, s), n = g.perWeek ? groupLessons(g) : 0;
@@ -1972,20 +2020,6 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       g.perWeek ? h('span', { class: 'gchip-week', 'aria-label': n + ' of ' + g.perWeek + ' lessons this week' }, n + '/' + g.perWeek) : null,
       a ? h('span', { class: 'gchip-at' }, '✓ ' + a.name) : null,
       sp ? h('span', { class: 'gchip-split' }, '! ' + names(sp.away) + ' elsewhere') : null);
-  }
-  function groupsBox(s) {
-    return h('section', { class: 'zone groups-zone' }, h('div', { class: 'zone-head' }, 'Groups', h('span', { class: 'n' }, project.groups.length)),
-      h('div', { class: 'group-list' }, project.groups.map((g) => groupChip(g, s))));
-  }
-  function freeRoomsBox(s) {
-    if (!project.people.length) return null;
-    const free = project.areas.filter((a) => a.kind === 'room' && !str(s.titles[a.id]) && !project.people.some((p) => s.at[p.id] === a.id))
-      .sort((a, b) => a.name.localeCompare(b.name));
-    return h('section', { class: 'zone free-rooms' },
-      h('div', { class: 'zone-head' }, 'Free rooms', h('span', { class: 'n' }, free.length || '')),
-      free.length
-        ? h('div', { class: 'room-pills' }, free.map((a) => h('button', { type: 'button', class: 'room-pill', title: 'Show ' + a.name + ' on the map', onclick: () => flashZone(a.id) }, a.name)))
-        : h('p', { class: 'hint', style: { margin: 0 } }, 'Every room is in use this period.'));
   }
 
   function renderUseTray() {
@@ -2137,7 +2171,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
         editLayout
           ? h('span', { class: 'room-name', title: a.name + '. Double-click to rename.', ondblclick: () => startRename(a.id) }, a.name)
           : h('span', { class: 'room-name', title: a.name + (a.cap ? ' (room for ' + a.cap + ' pupils)' : '') }, a.name)),
-      editLayout ? null : project.groups.filter((g) => groupPlace(g, s) === a.id).map((g) => h('span', { class: 'room-group', style: { '--gc': groupColour(g) }, title: g.name + ' is here' }, g.name)),
+      editLayout ? null : project.groups.filter((g) => groupPlace(g, s) === a.id).map((g) => h('button', { type: 'button', class: 'room-group', 'data-group': g.id, style: { '--gc': groupColour(g) }, title: g.name + ' is here. Drag back to the tray to take the group out.' }, g.name)),
       editLayout || a.kind === 'staff' ? null : h('input', { class: 'room-lesson', id: 'lesson-' + a.id, value: title, placeholder: 'Lesson', 'aria-label': 'Lesson in ' + a.name, oninput: (e) => setTitle(a.id, e.target.value) }),
       h('div', { class: 'room-people' }, st2.map((p) => chip(p)), pu.map((p) => chip(p))),
       !editLayout && here.length ? h('div', { class: 'room-foot' + (noStaff ? ' bad' : over ? ' warn' : '') },
@@ -3491,7 +3525,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     }
     const c = e.target.closest('.chip');
     if (c) { drag = Object.assign(base, { kind: 'chip', pid: c.dataset.pid, started: false }); return; }
-    const gc = e.target.closest('.gchip');
+    const gc = e.target.closest('.gchip, .room-group');
     if (gc) { drag = Object.assign(base, { kind: 'group', group: project.groups.find((g) => g.id === gc.dataset.group), started: false }); return; }
     const roomBtn = e.target.closest('[data-select-room]');
     if (roomBtn) { drag = Object.assign(base, { kind: 'tap', room: roomBtn.dataset.selectRoom }); return; }
@@ -3714,10 +3748,19 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
   // Takes the group out of a lesson: its members there go back to "not placed", and the room's lesson goes if it was the group's and the room is now empty.
   function takeGroupOut(g, key) {
     const s = slotOf(key, true);
-    const place = groupPlace(g, s);
+    const place = groupPlace(g, s) || (groupSplit(g, s) || {}).place;
     if (!place) return;
     g.members.forEach((id) => { if (s.at[id] === place) delete s.at[id]; });
     if (s.titles[place] === g.subject && !Object.values(s.at).includes(place)) delete s.titles[place];
+  }
+  // Takes a group out of the room it's in this period (dragged back to the tray).
+  function removeGroupHere(g) {
+    const key = curKey(), s = slotOf(key);
+    const place = groupPlace(g, s) || (groupSplit(g, s) || {}).place;
+    if (!place) return;
+    sel.clear();
+    mutate(() => takeGroupOut(g, key));
+    toast(g.name + ' taken out of ' + (areaById.get(place) || {}).name, { label: 'Undo', run: undo });
   }
   function pickUpGroup(g) {
     const ids = groupHere(g, slotOf(curKey()));
@@ -3757,6 +3800,8 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
         return;
       }
       const z = cancelled ? null : zoneFromPoint(e.clientX, e.clientY);
+      const under = cancelled ? null : document.elementFromPoint(e.clientX, e.clientY);
+      if (d.group && ((z && z.dataset.zone === NONE) || (!z && under && under.closest('.tray')))) { removeGroupHere(d.group); return; }
       if (z && d.group) placeGroup(d.group, z.dataset.zone);
       return;
     }
@@ -3786,7 +3831,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     if (ui.view !== 'plan' || editLayout || e.detail !== 0) return;
     const c = e.target.closest('.chip');
     if (c && !c.closest('.ghost')) { toggleSelected(c.dataset.pid); return; }
-    const gc = e.target.closest('.gchip');
+    const gc = e.target.closest('.gchip, .room-group');
     if (gc && !gc.closest('.ghost')) { const g = project.groups.find((x) => x.id === gc.dataset.group); if (g) pickUpGroup(g); return; }
     const roomBtn = e.target.closest('[data-select-room]');
     if (roomBtn) pickUpRoom(roomBtn.dataset.selectRoom);
