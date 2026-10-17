@@ -15,8 +15,8 @@
   --muted: #5A6775;
   --line: #D4DBE2;
   --line-strong: #B5C0CB;
-  --grid: #E1E6EB;
-  --outline-bg: #E3E8EE;
+  --map: #F4F6F9;
+  --outline-bg: #EBEFF4;
   --accent: #1E4E8C;
   --accent-ink: #FFFFFF;
   --accent-soft: #E1EBF7;
@@ -28,8 +28,21 @@
   --staff-line: #A4D8C6;
   --ppa: #77419F;
   --ppa-bg: #F1E8F8;
-  --off: #0A6684;
-  --off-bg: #DFF0F6;
+  --off: #A2560F;
+  --off-bg: #FDF3E7;
+  --off-line: #C9772B;
+  --out: #2F6B45;
+  --out-bg: #EFF7F1;
+  --out-line: #4F8D63;
+  --hall: #3A4654;
+  --tab-ink: #FFFFFF;
+  --top: #15233A;
+  --top-ink: #E8EEF6;
+  --top-muted: #A9B6C7;
+  --top-line: #2B3B55;
+  --top-tab: #24406B;
+  --save: #F2C66D;
+  --save-ink: #2A1E05;
   --ok: #1B7339;
   --ok-bg: #E0F3E6;
   --warn: #9A5300;
@@ -49,11 +62,13 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --ground: #11161C; --surface: #19202A; --surface-2: #1F2732; --free: #161C24;
-    --ink: #E5EAF0; --muted: #96A2AE; --line: #2D3845; --line-strong: #3E4B5A; --grid: #1C242D; --outline-bg: #161D25;
+    --ink: #E5EAF0; --muted: #96A2AE; --line: #2D3845; --line-strong: #3E4B5A; --map: #141A21; --outline-bg: #18202A;
     --accent: #84ABE6; --accent-ink: #0D1520; --accent-soft: #1E2E44;
     --pupil: #A3B8F4; --pupil-bg: #22305A; --pupil-line: #34477C;
     --staff: #84D6BA; --staff-bg: #153B31; --staff-line: #22584A;
-    --ppa: #CCA6EE; --ppa-bg: #33244A; --off: #80CBE4; --off-bg: #163646;
+    --ppa: #CCA6EE; --ppa-bg: #33244A; --off: #F0B47A; --off-bg: #33261A; --off-line: #B8743A;
+    --out: #8FD3A6; --out-bg: #16291D; --out-line: #4F8A63; --hall: #A9B4C1; --tab-ink: #0D1520;
+    --top: #0B1220; --top-ink: #E5EAF0; --top-muted: #96A2AE; --top-line: #26324A; --top-tab: #1E3150; --save: #E8B95A;
     --ok: #82D49D; --ok-bg: #173825; --warn: #F0B866; --warn-bg: #3F2D0F; --bad: #F09C8D; --bad-bg: #481E18;
     --tint-s: 30%; --tint-l: 24%;
     --shadow: 0 1px 2px rgba(0, 0, 0, .45);
@@ -62,11 +77,13 @@
 }
 :root[data-theme="dark"] {
   --ground: #11161C; --surface: #19202A; --surface-2: #1F2732; --free: #161C24;
-  --ink: #E5EAF0; --muted: #96A2AE; --line: #2D3845; --line-strong: #3E4B5A; --grid: #1C242D; --outline-bg: #161D25;
+  --ink: #E5EAF0; --muted: #96A2AE; --line: #2D3845; --line-strong: #3E4B5A; --map: #141A21; --outline-bg: #18202A;
   --accent: #84ABE6; --accent-ink: #0D1520; --accent-soft: #1E2E44;
   --pupil: #A3B8F4; --pupil-bg: #22305A; --pupil-line: #34477C;
   --staff: #84D6BA; --staff-bg: #153B31; --staff-line: #22584A;
-  --ppa: #CCA6EE; --ppa-bg: #33244A; --off: #80CBE4; --off-bg: #163646;
+  --ppa: #CCA6EE; --ppa-bg: #33244A; --off: #F0B47A; --off-bg: #33261A; --off-line: #B8743A;
+    --out: #8FD3A6; --out-bg: #16291D; --out-line: #4F8A63; --hall: #A9B4C1; --tab-ink: #0D1520;
+    --top: #0B1220; --top-ink: #E5EAF0; --top-muted: #96A2AE; --top-line: #26324A; --top-tab: #1E3150; --save: #E8B95A;
   --ok: #82D49D; --ok-bg: #173825; --warn: #F0B866; --warn-bg: #3F2D0F; --bad: #F09C8D; --bad-bg: #481E18;
   --tint-s: 30%; --tint-l: 24%;
   --shadow: 0 1px 2px rgba(0, 0, 0, .45);
@@ -88,20 +105,25 @@ h1, h2, h3 { text-wrap: balance; }
 #view { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: auto; }
 
 /* ---------- Top bar ---------- */
-.topbar { display: flex; align-items: center; gap: 12px 18px; flex-wrap: wrap; padding: 8px 16px; background: var(--surface); border-bottom: 1px solid var(--line); }
+.topbar { display: flex; align-items: center; gap: 12px 18px; flex-wrap: wrap; padding: 7px 16px; background: var(--top); color: var(--top-ink); }
 .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
-.brand-mark { width: 30px; height: 30px; color: var(--accent); flex: none; }
+.brand-mark { width: 30px; height: 30px; color: var(--top-ink); flex: none; }
 .brand-text { display: flex; flex-direction: column; line-height: 1.15; min-width: 0; }
 .brand-name { font-weight: 700; font-size: 15px; letter-spacing: -.01em; }
-.plan-name { border: 0; background: none; padding: 0; text-align: left; color: var(--muted); font-size: 12px; }
-.plan-name:hover { color: var(--accent); text-decoration: underline; }
-.tabs { display: flex; gap: 2px; padding: 3px; background: var(--surface-2); border: 1px solid var(--line); }
-.tab { border: 0; background: transparent; padding: 6px 14px; font-weight: 600; font-size: 13px; color: var(--muted); }
-.tab:hover { color: var(--ink); }
-.tab.on { background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
+.plan-name { border: 0; background: none; padding: 0; text-align: left; color: var(--top-muted); font-size: 12px; }
+.plan-name:hover { color: var(--top-ink); text-decoration: underline; }
+.tabs { display: flex; gap: 2px; }
+.tab { border: 0; background: transparent; padding: 7px 14px; font-weight: 600; font-size: 13.5px; color: var(--top-muted); }
+.tab:hover { color: var(--top-ink); }
+.tab.on { background: var(--top-tab); color: var(--top-ink); }
+.topbar .btn, .topbar .icon-btn { background: transparent; color: var(--top-ink); border-color: var(--top-line); }
+.topbar .btn:hover:not(:disabled), .topbar .icon-btn:hover:not(:disabled) { background: var(--top-tab); }
+.topbar .btn.save { background: var(--save); border-color: var(--save); color: var(--save-ink); }
+.topbar .btn.save:hover:not(:disabled) { background: var(--save); filter: brightness(1.06); }
+.topbar :focus-visible { outline-color: var(--top-ink); }
 .top-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.save-state { font-size: 12px; color: var(--muted); }
-.save-state.bad { color: var(--bad); font-weight: 600; }
+.save-state { font-size: 12px; color: var(--top-muted); }
+.save-state.bad { color: #FFB4A6; font-weight: 600; }
 .icon-btn { width: 32px; height: 32px; display: inline-grid; place-items: center; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); padding: 0; }
 .icon-btn:hover:not(:disabled) { background: var(--surface-2); }
 .icon-btn:disabled { opacity: .4; cursor: default; }
@@ -170,7 +192,7 @@ body.fs .slot-name b { font-size: 15px; }
 .tray .band-checks { width: 290px; }
 .tray .band-checks .checks { max-height: 80px; overflow: auto; }
 .tray .check { padding: 3px 6px; font-size: 12px; }
-.tray .free-rooms { width: 300px; }
+.tray .free-rooms { width: 370px; }
 .tray .room-pills { max-height: 80px; overflow: auto; }
 .tray .start-card { width: 330px; padding: 6px 8px; gap: 4px; font-size: 12px; }
 .tray .use-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); column-gap: 10px; max-height: 80px; overflow: auto; }
@@ -188,6 +210,14 @@ body.fs .slot-name b { font-size: 15px; }
 .zone-body:empty::after { content: attr(data-empty); font-size: 12px; color: var(--muted); align-self: center; padding: 0 2px; }
 .zone-sub { font-size: 10.5px; font-weight: 700; color: var(--muted); width: 100%; margin-top: 2px; }
 .zone.off .zone-body { background: var(--off-bg); border-color: var(--off); }
+/* Tray boxes are tinted by job: someone still to place, this period's checks, rooms going spare. */
+.zone.unplaced { background: var(--bad-bg); border-color: color-mix(in srgb, var(--bad) 30%, transparent); }
+.zone.unplaced .zone-head { color: var(--bad); }
+.zone.unplaced .zone-body { background: var(--surface); }
+.zone.band-checks { background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 25%, transparent); }
+.zone.band-checks .zone-head { color: var(--accent); }
+.zone.free-rooms { background: var(--ok-bg); border-color: color-mix(in srgb, var(--ok) 28%, transparent); }
+.zone.free-rooms .zone-head { color: var(--ok); }
 .zone.ppa .zone-body { background: var(--ppa-bg); border-color: var(--ppa); }
 .zone.off .zone-head { color: var(--off); }
 .zone.ppa .zone-head { color: var(--ppa); }
@@ -207,10 +237,9 @@ body.fs .slot-name b { font-size: 15px; }
 .start-card .row { display: flex; gap: 6px; flex-wrap: wrap; }
 
 .mapcol { position: relative; min-width: 0; min-height: 0; display: flex; }
-.mapwrap { flex: 1; overflow: auto; border: 1px solid var(--line); background-color: var(--surface-2); }
-.map { position: relative; min-width: 860px; min-height: 480px;
-  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
-  background-size: 24px 24px; }
+.mapwrap { flex: 1; overflow: auto; border: 1px solid var(--line); background-color: var(--map); }
+/* The map leaves room at the top for the building name tabs. */
+.map { position: relative; min-width: 860px; min-height: 480px; }
 .map-tools { margin-left: auto; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .period-actions { display: flex; flex-wrap: wrap; gap: 4px; }
 .zoom { display: flex; align-items: center; gap: 2px; padding: 2px; background: var(--surface); border: 1px solid var(--line); }
@@ -219,27 +248,39 @@ body.fs .slot-name b { font-size: 15px; }
 .zoom button:disabled { opacity: .35; cursor: default; }
 .zoom span { font-size: 11.5px; font-variant-numeric: tabular-nums; min-width: 38px; text-align: center; color: var(--muted); }
 
-.room { position: absolute; display: flex; flex-direction: column; min-width: 0; background: var(--surface); border: 1px solid var(--line-strong); box-shadow: var(--shadow); overflow: hidden; }
-.room.free { background: var(--free); border-style: dashed; box-shadow: none; }
-.room.alert { border-color: var(--bad); box-shadow: 0 0 0 2px var(--bad-bg); }
-.room.over { border-color: var(--warn); box-shadow: 0 0 0 2px var(--warn-bg); }
-.room-head { display: flex; align-items: flex-start; gap: 4px; padding: 4px 5px 2px 6px; }
-.room-name { flex: 1; min-width: 0; font-size: 11px; font-weight: 700; line-height: 1.15; overflow-wrap: break-word; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.room.free .room-name { color: var(--muted); }
-.room-count { flex: none; margin-left: auto; display: inline-flex; gap: 3px; align-items: center; border: 1px solid var(--line); background: var(--surface-2); padding: 0 4px; font-size: 10.5px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 16px; }
+/* Map style "Navy plan": rooms touch like a floor plan, with hairline walls and no shadows. */
+.room { position: absolute; display: flex; flex-direction: column; min-width: 0; background: var(--surface); border: 1px solid var(--line); overflow: hidden; }
+.room.free { background: var(--free); }
+.room.alert { border-color: var(--bad); box-shadow: inset 0 0 0 1px var(--bad); }
+.room.over { border-color: var(--warn); box-shadow: inset 0 0 0 1px var(--warn); }
+.room.t-out { background: var(--out-bg); }
+/* Open-plan rooms (Learning Spaces 1-3) share dashed walls, so they read as one room. */
+.room.open-t { border-top: 1px dashed var(--line-strong); }
+.room.open-b { border-bottom-color: transparent; }
+.room.open-l { border-left: 1px dashed var(--line-strong); }
+.room.open-r { border-right-color: transparent; }
+.room-head { display: flex; align-items: center; gap: 6px; padding: 6px 7px 1px; position: relative; }
+.room-ic { width: 15px; height: 15px; flex: none; color: var(--accent); }
+.room.t-out .room-ic { color: var(--out); }
+.room.offsite .room-ic { color: var(--off); }
+.room-wm { position: absolute; right: 6px; bottom: 4px; width: min(64px, 45%); height: auto; aspect-ratio: 1; color: var(--ink); opacity: .06; pointer-events: none; }
+.room-name { flex: 1; min-width: 0; font-size: 12.5px; font-weight: 700; line-height: 1.2; overflow-wrap: break-word; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.room-count { flex: none; margin-left: auto; display: inline-flex; gap: 2px; align-items: center; border: 1px solid transparent; background: none; padding: 0 2px; color: var(--muted); font-size: 11px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 16px; }
+.room-count svg { width: 12px; height: 12px; margin-right: 1px; }
 .room-count:hover { border-color: var(--accent); }
 .room-count .cp { color: var(--pupil); }
 .room-count .cs { color: var(--staff); }
-.room-lesson { margin: 0 4px; min-width: 0; font-weight: 600; font-size: 11.5px; padding: 2px 5px; border: 1px solid transparent; background: var(--surface-2); color: var(--ink); }
+.room-lesson { margin: 0 3px; min-width: 0; font-weight: 500; font-size: 12px; padding: 1px 4px; border: 1px solid transparent; background: transparent; color: var(--muted); position: relative; }
 .room-lesson::placeholder { color: var(--muted); font-weight: 500; opacity: .8; }
 .room-lesson:hover { border-color: var(--line); }
-.room-lesson:focus { outline: none; border-color: var(--accent); background: var(--surface); }
+.room-lesson:focus { outline: none; border-color: var(--accent); background: var(--surface); color: var(--ink); }
 .room.free .room-lesson { background: transparent; }
 .room.free .room-lesson::placeholder { color: transparent; }
 .room.free:hover .room-lesson::placeholder, .room.free .room-lesson:focus::placeholder { color: var(--muted); }
-.room-people { flex: 1; min-height: 0; display: flex; flex-wrap: wrap; align-content: flex-start; gap: 3px; padding: 4px 4px 5px; overflow: auto; }
-.room.free .room-people:empty::after { content: "Free"; font-size: 10.5px; color: var(--muted); padding: 0 2px; }
-.room-foot { flex: none; display: flex; flex-wrap: wrap; align-items: center; gap: 2px 4px; padding: 2px 4px 3px 6px; }
+.room-people { flex: 1; min-height: 0; display: flex; flex-wrap: wrap; align-content: flex-start; gap: 4px; padding: 3px 7px 4px; overflow: auto; position: relative; }
+.room.free .room-people:empty::after { content: "Free"; font-size: 11.5px; color: var(--muted); }
+.room-foot { flex: none; display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 2px 4px; padding: 0 5px 3px 7px; position: relative; }
+.room-flag { margin-right: auto; }
 .room-foot.bad { background: var(--bad-bg); color: var(--bad); }
 .room-foot.warn { background: var(--warn-bg); color: var(--warn); }
 .room-flag { font-size: 9.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; }
@@ -263,8 +304,9 @@ body.dragging, body.dragging * { cursor: grabbing !important; user-select: none 
 /* Small rooms on a to-scale plan get a compact layout. */
 .room { container-type: size; }
 @container (max-height: 96px) {
-  .room-head { padding: 2px 4px 1px 5px; }
-  .room-name { font-size: 10px; -webkit-line-clamp: 1; }
+  .room-head { padding: 2px 4px 1px 5px; gap: 4px; }
+  .room-ic { width: 12px; height: 12px; }
+  .room-name { font-size: 11px; -webkit-line-clamp: 1; }
   .room-lesson { font-size: 10px; padding: 0 4px; margin: 0 3px; }
   .room-people { gap: 2px; padding: 2px 3px 3px; }
   .chip { height: 17px; font-size: 10.5px; padding: 0 4px; }
@@ -274,23 +316,27 @@ body.dragging, body.dragging * { cursor: grabbing !important; user-select: none 
 @container (max-height: 70px) {
   .room.free .room-people:empty::after { content: ""; }
 }
+@container (max-width: 150px) {
+  .special-tag { display: none; }
+}
 @container (max-width: 90px) {
-  .room-name { font-size: 10px; overflow-wrap: anywhere; }
+  .room-name { font-size: 11px; overflow-wrap: anywhere; }
+  .room-ic { display: none; }
   .chip { font-size: 10.5px; padding: 0 4px; }
 }
 
 /* Room types and the staff-only boxes */
-.room.offsite { border-style: dashed; border-color: var(--off); }
-.room.offsite .room-name { color: var(--off); }
-.room.offsite.free .room-people:empty::after, .room.staffspace.free .room-people:empty::after { content: ""; }
+.room.offsite { background: var(--off-bg); }
+.room.offsite.alone { border: 1px dashed var(--off-line); }
+.room.staffspace.free .room-people:empty::after { content: ""; }
 .room.staffspace .room-name { color: var(--muted); }
 .room.special, .room.special.free { border: 2px solid var(--ppa); background: var(--ppa-bg); box-shadow: none; }
 .room.special.cover, .room.special.cover.free { border-color: var(--accent); background: var(--accent-soft); }
-.room.special .room-name { color: var(--ppa); }
-.room.special.cover .room-name { color: var(--accent); }
+.room.special .room-name, .room.special .room-ic { color: var(--ppa); }
+.room.special.cover .room-name, .room.special.cover .room-ic { color: var(--accent); }
 .room.special.free .room-people:empty::after { content: "Drop staff here"; font-size: 10.5px; color: var(--muted); }
 .special-tag { flex: none; font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
-.room.use.offsite { background: var(--off-bg); border-style: dashed; border-color: var(--off); box-shadow: none; }
+.room.use.offsite { background: var(--off-bg); box-shadow: none; }
 .week td.cover { background: var(--accent-soft); color: var(--accent); font-weight: 700; }
 
 /* Free rooms, room use */
@@ -302,7 +348,7 @@ body.dragging, body.dragging * { cursor: grabbing !important; user-select: none 
 .room.use::before { content: ""; position: absolute; inset: 0; background: var(--accent); opacity: calc(var(--use) * .32); pointer-events: none; }
 .room.use > * { position: relative; }
 .room.use.unused { border: 2px dashed var(--warn); background: var(--warn-bg); box-shadow: none; }
-.room.use.staffonly { background: var(--free); border-style: dashed; box-shadow: none; color: var(--muted); }
+.room.use.staffonly { background: var(--free); box-shadow: none; color: var(--muted); }
 .use-num { padding: 0 6px; font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .use-num b { font-size: 15px; color: var(--ink); }
 .room.use.unused .use-num { color: var(--warn); font-weight: 700; }
@@ -323,16 +369,31 @@ body.dragging, body.dragging * { cursor: grabbing !important; user-select: none 
 .week td.tot.muted { color: var(--muted); }
 
 /* Floor plan picture and building outlines */
-.map.has-plan { min-width: 0; min-height: 0; margin: 0 auto; background-image: none; background-color: var(--paper); }
+.map.has-plan { min-width: 0; min-height: 0; margin: 0 auto; background-color: var(--paper); }
 .plan-img { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; user-select: none; }
-.outline { position: absolute; border: 2px solid var(--line-strong); background: var(--outline-bg); pointer-events: none; }
-.map.has-plan .outline { background: transparent; }
-.outline-name { position: absolute; left: 8px; bottom: 5px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.outline { position: absolute; background: var(--outline-bg); pointer-events: none; }
+.outline.t-off, .outline.t-out, .map.has-plan .outline { background: transparent; }
+/* A building's name sits on a solid tab on its top-left corner, in the building's colour. */
+.outline-name { position: absolute; left: -1px; bottom: 100%; display: inline-flex; align-items: baseline; gap: 8px; padding: 3px 9px; white-space: nowrap; font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; background: var(--accent); color: var(--tab-ink); }
+.outline-sub { font-weight: 400; text-transform: none; letter-spacing: 0; opacity: .85; }
+.outline.t-hall .outline-name { background: var(--hall); }
+.outline.t-off .outline-name { background: var(--off); }
+.outline.t-out .outline-name { background: var(--out); }
+/* Walls: drawn over the rooms, following the outside edge of each building, however many boxes make it up. */
+.walls { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; z-index: 2; }
+.walls path { fill: none; stroke-width: 2; stroke-linecap: square; }
+.walls .t-main { stroke: var(--accent); }
+.walls .t-hall { stroke: var(--hall); }
+.walls .t-off { stroke: var(--off-line); stroke-dasharray: 7 5; stroke-linecap: butt; }
+.walls .t-out { stroke: var(--out-line); stroke-dasharray: 7 5; stroke-linecap: butt; }
+.plan.editing .walls { display: none; }
+/* While editing, a building's colour and remove buttons sit above it, clear of the rooms. */
+.tone-btn { position: absolute; bottom: calc(100% + 2px); right: 24px; height: 18px; padding: 0 6px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); font-size: 10.5px; font-weight: 700; }
+.outline:not(.label) > .room-del { top: auto; left: auto; bottom: calc(100% + 2px); right: 0; }
 .plan.editing .outline { pointer-events: auto; cursor: move; touch-action: none; border-style: dashed; border-color: var(--warn); }
 .outline.label { border: 0; background: transparent; display: flex; align-items: center; justify-content: center; }
 .label-text { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .09em; color: var(--muted); text-align: center; line-height: 1.15; }
 .map.has-plan .label-text { color: var(--paper-muted); text-shadow: 0 0 3px var(--paper), 0 0 3px var(--paper); }
-.map.has-plan .outline-name { color: var(--paper-muted); }
 .plan.editing .outline.label { border: 1px dashed var(--warn); }
 .outline.label .fade-ctl { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; }
 .fade-ctl input { width: 90px; }
@@ -526,10 +587,12 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
   // PPA and Cover are boxes on the map that only staff can go in.
   const STAFF_ONLY = new Set([PPA, COVER]);
   const SPECIAL_NAMES = { PPA: 'PPA', COVER: 'Cover' };
-  const DEFAULT_SPECIALS = {"PPA": {"x": 0.53, "y": 1.39, "w": 11.7, "h": 19.44}, "COVER": {"x": 12.77, "y": 1.39, "w": 11.7, "h": 19.44}};
+  const DEFAULT_SPECIALS = {"PPA": {"x": 38.3, "y": 54.55, "w": 7.44, "h": 42.72}, "COVER": {"x": 38.3, "y": 9.09, "w": 7.44, "h": 42.43}};
   // Room types: a learning space, a staff-only space (office, reception), or a place off site.
   const KINDS = { room: 'Learning space', staff: 'Staff space', offsite: 'Off-site' };
   const ZOOMS = [1, 1.25, 1.5, 1.75, 2, 2.5, 3];
+  // Building outline colours: a building, the Village Hall, the off-site group and outdoors.
+  const TONES = { main: 'Building', hall: 'Village Hall', off: 'Off-site', out: 'Outdoors' };
 
   // The school's floor plan: a drawing of the buildings, with each place's box in percent of the drawing's width and height.
   const DEFAULT_AREAS = [
@@ -537,7 +600,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     ['A2', 'Learning Space 2', 69.3, 28.2, 10.0, 8.65, 'room'],
     ['A3', 'Learning Space 1', 69.3, 58.49, 10.0, 11.15, 'room'],
     ['A4', 'Small Room 2', 85.5, 32.36, 6.25, 4.91, 'room'],
-    ['A5', 'Polytunnel', 81.75, 3.24, 6.25, 6.24, 'room'],
+    ['A5', 'Garden', 81.75, 3.24, 6.25, 6.24, 'room'],
     ['A6', 'Kitchen', 64.3, 40.6, 5.0, 12.48, 'room'],
     ['A7', 'Village Hall Kitchen', 23.15, 40.6, 8.75, 10.4, 'room'],
     ['A8', 'Stables', 11.95, 73.79, 6.25, 16.64, 'offsite'],
@@ -550,25 +613,27 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     ['A15', 'Science Room', 81.75, 24.04, 10.0, 8.32, 'room'],
     ['A16', 'Small Room', 84.25, 57.99, 7.5, 6.57, 'room'],
     ['A17', 'Small Animals', 91.75, 65.56, 5.25, 8.24, 'room'],
-    ['A18', 'Pod 2', 91.75, 88.77, 6.25, 7.9, 'room'],
-    ['A19', 'Office', 89.5, 73.79, 7.5, 10.4, 'staff'],
-    ['A20', 'Reception', 81.75, 73.79, 7.75, 10.4, 'staff'],
+    ['A18', 'Garden Pod', 91.75, 88.77, 6.25, 7.9, 'room'],
     ['A21', 'Local village', 20.65, 73.79, 6.25, 16.64, 'offsite'],
     ['A22', 'Brook Room', 79.3, 37.27, 12.45, 20.63, 'room'],
     ['A23', 'Other off-site', 29.4, 73.79, 6.25, 16.64, 'offsite']
-  ].map(([id, name, x, y, w, h, kind]) => ({ id, name, x, y, w, h, cap: null, kind }));
+  ].map(([id, name, x, y, w, h, kind]) => ({ id, name, x, y, w, h, cap: null, kind, open: /^A[123]$/.test(id) }));
+  // Office and Reception came with earlier versions. They aren't learning spaces, so the standard map leaves them out;
+  // a plan that still has them keeps them, and each layout knows where they go.
+  const RETIRED_POS = { school: {"A19": [79.26, 78.79, 9.57, 18.48], "A20": [69.68, 78.79, 9.58, 18.48]}, scale: { A19: [89.5, 73.79, 7.5, 10.4], A20: [81.75, 73.79, 7.75, 10.4] } };
   // Two ways to show the same places. "school" (the standard) follows the floor plan's shapes and positions with the
-  // empty space taken out and rooms widened for names; "scale" puts each box on the to-scale drawing.
+  // empty space taken out and rooms widened for names: the Village Hall with the off-site places under it, PPA and Cover,
+  // the main building stepping out round the Kitchen with Pod 1 below, and Outdoors. "scale" puts each box on the to-scale drawing.
   // Places keep their ids, so switching keeps placements.
-  const SCHOOL = {"A11": [25.0, 1.39, 11.7, 19.44], "A12": [0.53, 22.22, 24.2, 33.33], "A7": [25.0, 22.22, 11.7, 18.06], "A10": [28.19, 40.97, 8.51, 14.58], "A9": [0.53, 62.5, 8.78, 36.11], "A8": [9.84, 62.5, 8.78, 36.11], "A21": [19.15, 62.5, 8.78, 36.11], "A23": [28.46, 62.5, 8.78, 36.11], "A14": [67.29, 1.39, 25.53, 11.11], "A5": [93.35, 1.39, 6.12, 18.06], "A15": [67.29, 13.89, 17.82, 13.89], "A4": [73.4, 28.47, 11.7, 9.03], "A2": [48.4, 20.83, 16.49, 15.97], "A1": [48.4, 37.5, 16.49, 27.78], "A3": [48.4, 65.97, 16.49, 17.36], "A6": [40.43, 40.28, 7.71, 18.06], "A22": [65.16, 38.19, 19.95, 27.08], "A16": [71.28, 65.97, 13.83, 10.42], "A17": [85.37, 65.97, 7.45, 18.06], "A13": [51.06, 84.72, 11.7, 13.89], "A20": [67.29, 85.42, 12.5, 13.19], "A19": [80.05, 85.42, 12.77, 13.19], "A18": [93.35, 80.56, 6.12, 18.06]};
+  const SCHOOL = {"A12": [1.06, 9.09, 13.3, 46.97], "A11": [14.36, 9.09, 10.64, 46.97], "A7": [25.0, 9.09, 12.23, 22.73], "A10": [25.0, 31.82, 12.23, 24.24], "A6": [46.81, 25.76, 6.91, 33.33], "A2": [53.72, 4.55, 14.9, 21.21], "A1": [53.72, 25.76, 14.9, 28.79], "A3": [53.72, 54.55, 14.9, 21.21], "A14": [68.62, 4.55, 19.68, 15.15], "A15": [68.62, 19.7, 9.84, 19.69], "A4": [78.46, 19.7, 9.84, 19.69], "A22": [68.62, 39.39, 19.68, 24.25], "A16": [77.13, 63.64, 11.17, 12.12], "A13": [53.72, 78.79, 14.9, 18.48], "A5": [89.89, 9.09, 9.05, 30.3], "A17": [89.89, 39.39, 9.05, 25.76], "A18": [89.89, 68.18, 9.05, 29.09], "A9": [1.06, 61.36, 8.83, 35.91], "A8": [10.16, 61.36, 8.83, 35.91], "A21": [19.26, 61.36, 8.83, 35.91], "A23": [28.35, 61.36, 8.88, 35.91]};
   // The grid layout from an earlier version, only used to recognise plans still arranged that way.
   const OLD_GRID = { A1: [60.5, 25.5, 13, 23.5], A22: [74.5, 25.5, 24.5, 23.5] };
   const LAYOUTS = {
     school: {
       label: 'School layout (standard)',
       pos: SCHOOL,
-      specials: {"PPA": {"x": 0.53, "y": 1.39, "w": 11.7, "h": 19.44}, "COVER": {"x": 12.77, "y": 1.39, "w": 11.7, "h": 19.44}},
-      outlines: [{"id": "B1", "kind": "box", "name": "", "x": 0.21, "y": 21.39, "w": 36.81, "h": 35.0}, {"id": "B2", "kind": "box", "name": "Main building", "x": 40.11, "y": 13.06, "w": 53.03, "h": 86.39}, {"id": "B3", "kind": "box", "name": "", "x": 40.43, "y": 31.67, "w": 5.05, "h": 7.92}, {"id": "B4", "kind": "box", "name": "", "x": 40.43, "y": 59.03, "w": 7.71, "h": 13.19}, {"id": "B5", "kind": "box", "name": "", "x": 25.0, "y": 40.97, "w": 2.93, "h": 14.58}, {"id": "B6", "kind": "label", "name": "Off-site", "x": 0.53, "y": 57.22, "w": 36.7, "h": 4.17}],
+      specials: DEFAULT_SPECIALS,
+      outlines: [{"id": "B1", "kind": "box", "name": "Village Hall", "sub": "Hall, kitchen, conference room · Literacy Lounge upstairs", "tone": "hall", "group": "", "x": 1.06, "y": 9.09, "w": 36.17, "h": 46.97}, {"id": "B2", "kind": "box", "name": "Main building", "sub": "Learning spaces, science and small rooms", "tone": "main", "group": "main", "x": 53.72, "y": 4.55, "w": 34.58, "h": 71.21}, {"id": "B3", "kind": "box", "name": "", "sub": "", "tone": "main", "group": "main", "x": 46.81, "y": 25.76, "w": 6.91, "h": 33.33}, {"id": "B4", "kind": "box", "name": "Off-site", "sub": "", "tone": "off", "group": "", "x": 1.06, "y": 61.36, "w": 36.17, "h": 35.91}, {"id": "B5", "kind": "box", "name": "Outdoors", "sub": "", "tone": "out", "group": "", "x": 89.89, "y": 9.09, "w": 9.05, "h": 88.18}],
       picture: false
     },
     scale: {
@@ -629,6 +694,35 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     unfull: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="square" aria-hidden="true"><path d="M6 2v4H2M14 6h-4V2M10 14v-4h4M2 10h4v4"/></svg>',
     mark: '<svg class="brand-mark" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="2" width="28" height="28"/><path d="M2 13h11V2M13 30V20h17M20 2v11h10"/><circle cx="7.5" cy="20.5" r="2" fill="currentColor" stroke="none"/><circle cx="24" cy="7" r="2" fill="currentColor" stroke="none"/></svg>'
   };
+  // Room icons: 16px line drawings, chosen from the room's name.
+  const ROOM_ICONS = {
+    hall: '<path d="M2 14h12M3 14V7l5-4 5 4v7M6.5 14v-4h3v4"/>',
+    book: '<path d="M2 3.5h4.5a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 0-1.5-1.5H2zM14 3.5H9.5A1.5 1.5 0 0 0 8 5v8.5A1.5 1.5 0 0 1 9.5 12H14z"/>',
+    cook: '<path d="M4 2v4.5a1.5 1.5 0 0 0 3 0V2M5.5 2v12M11 2c-1.2 1-1.5 3-1.5 4.5s.5 2 1.5 2V14"/>',
+    meet: '<circle cx="5" cy="5.5" r="2"/><circle cx="11" cy="5.5" r="2"/><path d="M1.5 13c0-2 1.6-3.5 3.5-3.5S8.5 11 8.5 13M7.5 13c0-2 1.6-3.5 3.5-3.5s3.5 1.5 3.5 3.5"/>',
+    flask: '<path d="M6 2h4M6.5 2v4L3 13h10L9.5 6V2M4.5 10h7"/>',
+    tools: '<path d="M9.5 3.5a3 3 0 0 0 3 4L6 14l-2-2 6.5-6.5a3 3 0 0 0-1-2zM3 3l3 3"/>',
+    door: '<path d="M4 14V2h8v12M2.5 14h11M9.5 8.5v.01"/>',
+    leaf: '<path d="M3 13c0-6 4-10 10-10 0 6-4 10-10 10zM3 13l6-6"/>',
+    paw: '<circle cx="4" cy="7" r="1.3"/><circle cx="6.5" cy="4" r="1.3"/><circle cx="9.5" cy="4" r="1.3"/><circle cx="12" cy="7" r="1.3"/><path d="M5 12c0-2 1.5-3.5 3-3.5S11 10 11 12c0 1-1 1.5-3 1.5S5 13 5 12z"/>',
+    pod: '<path d="M2 14h12M3 14V8l5-3.5L13 8v6M6 14v-3h4v3"/>',
+    tree: '<path d="M8 14v-3M4 11h8L8 3z"/>',
+    shoe: '<path d="M4.5 13V8a3.5 3.5 0 0 1 7 0v5M3.5 13h2M10.5 13h2"/>',
+    home: '<path d="M2.5 8 8 3l5.5 5M4 7v7h8V7"/>',
+    pin: '<path d="M8 14s4.5-4.2 4.5-7.5a4.5 4.5 0 0 0-9 0C3.5 9.8 8 14 8 14z"/><circle cx="8" cy="6.5" r="1.5"/>',
+    person: '<circle cx="8" cy="5" r="2.5"/><path d="M3 14c0-2.8 2.2-5 5-5s5 2.2 5 5"/>',
+    clock: '<circle cx="8" cy="8" r="6"/><path d="M8 4.5V8l2.5 1.5"/>'
+  };
+  const ICON_RULES = [[/kitchen|cook/i, 'cook'], [/\bpod\b/i, 'pod'], [/hall/i, 'hall'], [/literacy|learning|lounge|class|library/i, 'book'],
+    [/conference|brook|meeting/i, 'meet'], [/science|lab/i, 'flask'], [/\bdt\b|design|workshop/i, 'tools'], [/garden|polytunnel|allotment|green/i, 'leaf'],
+    [/animal|pet|farm/i, 'paw'], [/wood|forest/i, 'tree'], [/stable|horse|riding/i, 'shoe'], [/village|town|shop/i, 'home']];
+  function iconName(name, kind) {
+    for (const [re, k] of ICON_RULES) if (re.test(name)) return k;
+    return kind === 'offsite' ? 'pin' : 'door';
+  }
+  function roomIcon(k, cls) {
+    return svg('<svg class="' + (cls || 'room-ic') + '" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true">' + ROOM_ICONS[k] + '</svg>');
+  }
   function fmtDate(iso) {
     if (!iso) return '';
     const d = new Date(iso);
@@ -703,7 +797,9 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
         id: str(a.id), name: str(a.name) || 'Room',
         x: clamp(num(a.x, 5), 0, 100 - w), y: clamp(num(a.y, 5), 0, 100 - hh), w, h: hh,
         cap: +a.cap > 0 ? Math.round(+a.cap) : null,
-        kind: KINDS[a.kind] ? a.kind : a.teach === false ? 'staff' : 'room'
+        kind: KINDS[a.kind] ? a.kind : a.teach === false ? 'staff' : 'room',
+        // Part of an open-plan room. Plans from before this was saved: the learning spaces are.
+        open: 'open' in a ? !!a.open : /^learning space/i.test(str(a.name))
       };
     });
     out.specials = {};
@@ -716,7 +812,8 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     const seenO = new Set();
     out.outlines = (Array.isArray(p.outlines) ? p.outlines : []).filter((o) => o && str(o.id) && !seenO.has(str(o.id)) && seenO.add(str(o.id))).map((o) => {
       const w = clamp(num(o.w, 20), 3, 100), hh = clamp(num(o.h, 20), 3, 100);
-      return { id: str(o.id), kind: o.kind === 'label' ? 'label' : 'box', name: str(o.name), x: clamp(num(o.x, 0), 0, 100 - w), y: clamp(num(o.y, 0), 0, 100 - hh), w, h: hh };
+      return { id: str(o.id), kind: o.kind === 'label' ? 'label' : 'box', name: str(o.name), sub: str(o.sub), tone: TONES[o.tone] ? o.tone : 'main', group: str(o.group),
+        x: clamp(num(o.x, 0), 0, 100 - w), y: clamp(num(o.y, 0), 0, 100 - hh), w, h: hh };
     });
     // The floor plan picture is kept outside the plan's data (see rememberImage) so undo stays light.
     const m0 = p.map || {};
@@ -1238,7 +1335,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
           svg(isFull() ? ICONS.unfull : ICONS.full), isFull() ? 'Exit full screen' : 'Full screen'),
         h('button', { type: 'button', class: 'icon-btn', title: 'Undo (Ctrl+Z)', 'aria-label': 'Undo', disabled: !undoStack.length, onclick: undo }, svg(ICONS.undo)),
         h('button', { type: 'button', class: 'icon-btn', title: 'Redo (Ctrl+Y)', 'aria-label': 'Redo', disabled: !redoStack.length, onclick: redo }, svg(ICONS.redo)),
-        h('button', { type: 'button', class: 'btn' + (backupDue() ? ' due' : ''), title: backupDue() ? 'There are changes since your last backup' : 'Download the whole plan as a file', onclick: saveBackup }, 'Save backup'))
+        h('button', { type: 'button', class: 'btn save' + (backupDue() ? ' due' : ''), title: backupDue() ? 'There are changes since your last backup' : 'Download the whole plan as a file', onclick: saveBackup }, 'Save backup'))
     );
     renderSaveState();
   }
@@ -1394,7 +1491,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
           h('button', { type: 'button', class: 'btn small primary', onclick: () => go('setup') }, 'Add people'),
           h('button', { type: 'button', class: 'btn small', onclick: openFilePicker }, 'Open a file…')),
         h('button', { type: 'button', class: 'link-btn', onclick: loadExample }, 'Or try the example school (made-up people)')) : null,
-      h('section', { class: 'zone grow', 'data-zone': NONE }, h('div', { class: 'zone-head' }, 'Not placed yet', h('span', { class: 'n' }, unplaced.length || '')), unplacedBody),
+      h('section', { class: 'zone grow' + (unplaced.length ? ' unplaced' : ''), 'data-zone': NONE }, h('div', { class: 'zone-head' }, 'Not placed yet', h('span', { class: 'n' }, unplaced.length || '')), unplacedBody),
       checks ? h('section', { class: 'zone band-checks' }, h('div', { class: 'zone-head' }, 'This period'), checks) : null,
       h('section', { class: 'zone', 'data-zone': OUT },
         h('div', { class: 'zone-head' }, 'Not in this period', h('span', { class: 'n' }, out.length || '')),
@@ -1442,13 +1539,76 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
 
   function renderMap(s, st) {
     const m = project.map;
+    roomGeo = mapGeometry();
     const map = h('div', { class: 'map' + (m.imageId ? ' has-plan' : ''), id: 'map' },
       m.imageId ? h('img', { class: 'plan-img', src: images.get(m.imageId), alt: '', draggable: 'false', style: { opacity: m.fade } }) : null,
       project.outlines.map(renderOutline),
       project.areas.map((a) => (ui.mapMode === 'use' && !editLayout ? renderRoomUse(a) : renderRoom(a, s, st))),
-      ui.mapMode === 'use' && !editLayout ? null : [PPA, COVER].map((id) => renderSpecial(id, s)));
+      ui.mapMode === 'use' && !editLayout ? null : [PPA, COVER].map((id) => renderSpecial(id, s)),
+      renderWalls());
     return h('div', { class: 'mapcol' },
       h('div', { class: 'mapwrap', id: 'mapwrap' }, map));
+  }
+  // Which building each room sits in (by its centre), and which walls it shares with other parts of an open-plan room.
+  let roomGeo = new Map();
+  function mapGeometry() {
+    const geo = new Map();
+    const boxes = project.outlines.filter((o) => o.kind === 'box');
+    const near = (u, v) => Math.abs(u - v) < 0.3;
+    const overlap = (a0, a1, b0, b1) => Math.min(a1, b1) - Math.max(a0, b0) > 0.5;
+    for (const a of project.areas) {
+      const cx = a.x + a.w / 2, cy = a.y + a.h / 2;
+      const inside = boxes.filter((o) => cx > o.x && cx < o.x + o.w && cy > o.y && cy < o.y + o.h).pop();
+      geo.set(a.id, { tone: inside ? inside.tone : null, open: new Set() });
+    }
+    const open = project.areas.filter((a) => a.open);
+    for (const a of open) for (const b of open) {
+      if (a === b) continue;
+      if (near(a.x + a.w, b.x) && overlap(a.y, a.y + a.h, b.y, b.y + b.h)) { geo.get(a.id).open.add('r'); geo.get(b.id).open.add('l'); }
+      if (near(a.y + a.h, b.y) && overlap(a.x, a.x + a.w, b.x, b.x + b.w)) { geo.get(a.id).open.add('b'); geo.get(b.id).open.add('t'); }
+    }
+    return geo;
+  }
+  // Building walls, drawn over the rooms. Outlines in the same group are one building: the wall follows their outside edge.
+  function renderWalls() {
+    const groups = new Map();
+    for (const o of project.outlines) {
+      if (o.kind !== 'box') continue;
+      const k = o.group || o.id;
+      if (!groups.has(k)) groups.set(k, []);
+      groups.get(k).push(o);
+    }
+    const paths = [...groups.values()].map((list) => '<path class="t-' + list[0].tone + '" vector-effect="non-scaling-stroke" d="' + wallPath(list) + '"/>');
+    return svg('<svg class="walls" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">' + paths.join('') + '</svg>');
+  }
+  // The outside edge of a set of rectangles, as line segments: every cell edge with the inside on one side only.
+  function wallPath(rects) {
+    const r2 = (v) => Math.round(v * 100) / 100;
+    const xs = [...new Set(rects.flatMap((o) => [r2(o.x), r2(o.x + o.w)]))].sort((a, b) => a - b);
+    const ys = [...new Set(rects.flatMap((o) => [r2(o.y), r2(o.y + o.h)]))].sort((a, b) => a - b);
+    const inside = (i, j) => {
+      if (i < 0 || j < 0 || i >= xs.length - 1 || j >= ys.length - 1) return false;
+      const cx = (xs[i] + xs[i + 1]) / 2, cy = (ys[j] + ys[j + 1]) / 2;
+      return rects.some((o) => cx > o.x && cx < o.x + o.w && cy > o.y && cy < o.y + o.h);
+    };
+    let d = '';
+    for (let j = 0; j < ys.length; j++) {
+      let start = null;
+      for (let i = 0; i <= xs.length - 1; i++) {
+        const edge = i < xs.length - 1 && inside(i, j - 1) !== inside(i, j);
+        if (edge && start === null) start = xs[i];
+        if (!edge && start !== null) { d += 'M' + start + ' ' + ys[j] + 'H' + xs[i]; start = null; }
+      }
+    }
+    for (let i = 0; i < xs.length; i++) {
+      let start = null;
+      for (let j = 0; j <= ys.length - 1; j++) {
+        const edge = j < ys.length - 1 && inside(i - 1, j) !== inside(i, j);
+        if (edge && start === null) start = ys[j];
+        if (!edge && start !== null) { d += 'M' + xs[i] + ' ' + start + 'V' + ys[j]; start = null; }
+      }
+    }
+    return d;
   }
   // With a floor plan picture the map keeps the picture's shape; without one it fills the space.
   function sizeMap() {
@@ -1486,12 +1646,17 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     const over = a.cap && pu.length > a.cap;
     const free = !here.length && !str(title);
     const label = a.name + ': ' + (here.length ? plural(pu.length, 'pupil') + ', ' + st2.length + ' staff' : 'free');
+    const g = roomGeo.get(a.id) || { tone: null, open: new Set() };
+    const icon = iconName(a.name, a.kind);
+    const outdoors = a.kind !== 'offsite' && g.tone === 'out';
     return h('div', {
-      class: 'room' + (a.kind === 'offsite' ? ' offsite' : a.kind === 'staff' ? ' staffspace' : '') + (free ? ' free' : '') + (noStaff ? ' alert' : '') + (over && !noStaff ? ' over' : ''),
+      class: 'room' + (a.kind === 'offsite' ? ' offsite' + (g.tone === 'off' ? '' : ' alone') : a.kind === 'staff' ? ' staffspace' : '') + (outdoors ? ' t-out' : '')
+        + [...g.open].map((side) => ' open-' + side).join('') + (free ? ' free' : '') + (noStaff ? ' alert' : '') + (over && !noStaff ? ' over' : ''),
       'data-zone': a.id, 'data-area': a.id, tabindex: editLayout ? null : '0', 'aria-label': label,
       style: { left: a.x + '%', top: a.y + '%', width: a.w + '%', height: a.h + '%' }
     },
-      h('div', { class: 'room-head' },
+      outdoors || a.kind === 'offsite' ? roomIcon(icon, 'room-wm') : null,
+      h('div', { class: 'room-head' }, roomIcon(icon),
         editLayout
           ? h('span', { class: 'room-name', title: a.name + '. Double-click to rename.', ondblclick: () => startRename(a.id) }, a.name)
           : h('span', { class: 'room-name', title: a.name + (a.cap ? ' (room for ' + a.cap + ' pupils)' : '') }, a.name)),
@@ -1500,7 +1665,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       !editLayout && here.length ? h('div', { class: 'room-foot' + (noStaff ? ' bad' : over ? ' warn' : '') },
         noStaff ? h('span', { class: 'room-flag' }, 'No staff') : over ? h('span', { class: 'room-flag' }, 'Room for ' + a.cap) : null,
         h('button', { type: 'button', class: 'room-count', title: plural(pu.length, 'pupil') + ', ' + st2.length + ' staff. Click to pick them all up.', 'data-select-room': a.id },
-          h('span', { class: 'cp' }, pu.length), h('span', { class: 'cs' }, st2.length))) : null,
+          roomIcon('person', ''), h('span', { class: 'cp' }, pu.length), '/', h('span', { class: 'cs' }, st2.length))) : null,
       editLayout ? [
         h('span', { class: 'resize', 'data-resize': a.id, title: 'Drag to resize' }),
         h('button', { type: 'button', class: 'room-del', title: 'Remove ' + a.name, 'aria-label': 'Remove ' + a.name, onclick: () => removeAreaDialog(a) }, '×')
@@ -1515,7 +1680,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       tabindex: editLayout ? null : '0', 'aria-label': SPECIAL_NAMES[id] + ', staff only: ' + plural(here.length, 'person', 'people'),
       style: { left: z.x + '%', top: z.y + '%', width: z.w + '%', height: z.h + '%' }
     },
-      h('div', { class: 'room-head' }, h('span', { class: 'room-name' }, SPECIAL_NAMES[id]), h('span', { class: 'special-tag' }, 'staff')),
+      h('div', { class: 'room-head' }, roomIcon(id === PPA ? 'clock' : 'person'), h('span', { class: 'room-name' }, SPECIAL_NAMES[id]), h('span', { class: 'special-tag' }, 'staff')),
       h('div', { class: 'room-people' }, here.map((p) => chip(p))),
       editLayout ? h('span', { class: 'resize', 'data-resize': id, title: 'Drag to resize' }) : null);
   }
@@ -1540,15 +1705,20 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
         });
       }))) : null);
   }
-  // Building outlines are boxes with a name; labels are just words placed on the map.
+  // Building outlines are boxes with a name tab in the building's colour; labels are just words placed on the map.
   function renderOutline(o) {
     const label = o.kind === 'label';
-    return h('div', { class: 'outline' + (label ? ' label' : ''), 'data-outline': o.id, style: { left: o.x + '%', top: o.y + '%', width: o.w + '%', height: o.h + '%' } },
+    return h('div', { class: 'outline' + (label ? ' label' : ' t-' + o.tone), 'data-outline': o.id, style: { left: o.x + '%', top: o.y + '%', width: o.w + '%', height: o.h + '%' } },
       editLayout
         ? [h('span', { class: (label ? 'label-text' : 'outline-name') + (o.name ? '' : ' empty'), title: 'Double-click to rename', ondblclick: () => startRename(o.id) }, o.name || (label ? 'Label' : 'Outline')),
           h('span', { class: 'resize', 'data-resize': o.id, title: 'Drag to resize' }),
-          h('button', { type: 'button', class: 'room-del', title: label ? 'Remove this label' : 'Remove this outline', 'aria-label': label ? 'Remove this label' : 'Remove this outline', onclick: () => removeOutline(o.id) }, '×')]
-        : o.name ? h('span', { class: label ? 'label-text' : 'outline-name' }, o.name) : null);
+          h('button', { type: 'button', class: 'room-del', title: label ? 'Remove this label' : 'Remove this outline', 'aria-label': label ? 'Remove this label' : 'Remove this outline', onclick: () => removeOutline(o.id) }, '×'),
+          label ? null : h('button', { type: 'button', class: 'tone-btn', title: 'Change the colour: building, Village Hall, off-site or outdoors', onclick: () => cycleTone(o.id) }, TONES[o.tone])]
+        : o.name ? h('span', { class: label ? 'label-text' : 'outline-name' }, o.name, !label && o.sub ? h('span', { class: 'outline-sub' }, o.sub) : null) : null);
+  }
+  function cycleTone(id) {
+    const keys = Object.keys(TONES);
+    mutate((p) => { const o = p.outlines.find((x) => x.id === id); if (o) o.tone = keys[(keys.indexOf(o.tone) + 1) % keys.length]; });
   }
   // A pop-out box for renaming a room, label or outline while arranging the map.
   function startRename(id) {
@@ -1584,7 +1754,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       let n = p.outlines.length + 1;
       while (taken.has('B' + n)) n++;
       newId = 'B' + n;
-      p.outlines.push(label ? { id: newId, kind: 'label', name: '', x: 40, y: 45, w: 16, h: 6 } : { id: newId, kind: 'box', name: '', x: 35, y: 30, w: 25, h: 35 });
+      p.outlines.push(label ? { id: newId, kind: 'label', name: '', x: 40, y: 45, w: 16, h: 6 } : { id: newId, kind: 'box', name: '', sub: '', tone: 'main', group: '', x: 35, y: 30, w: 25, h: 35 });
     });
     startRename(newId);
     toast(label ? 'Label added. Type the words, then drag it into place.' : 'Outline added. Drag it over a building or outdoor area, and drag its corner to fit.');
@@ -2093,6 +2263,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       const pos = L.pos[d.id];
       a.x = pos[0]; a.y = pos[1]; a.w = pos[2]; a.h = pos[3];
     });
+    p.areas.forEach((a) => { const pos = RETIRED_POS[which][a.id]; if (pos) { a.x = pos[0]; a.y = pos[1]; a.w = pos[2]; a.h = pos[3]; } });
     p.specials = clone(L.specials);
     p.outlines = clone(L.outlines);
     p.map = L.picture ? { imageId: rememberImage(DEFAULT_PLAN.image), w: DEFAULT_PLAN.w, h: DEFAULT_PLAN.h, fade: 1 } : { imageId: null, w: 0, h: 0, fade: 1 };
@@ -2449,7 +2620,9 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     let movedToRoomy = null;
     const onScale = project.map.imageId && project.map.imageId === rememberImage(DEFAULT_PLAN.image) && !ui.keptScale;
     const onGrid = Object.entries(OLD_GRID).every(([id, pos]) => { const a = project.areas.find((x) => x.id === id); return a && a.x === pos[0] && a.y === pos[1] && a.w === pos[2] && a.h === pos[3]; });
-    if (saved && (onScale || onGrid)) {
+    // A plan on the school layout from before the building tabs and the main building's real shape moves to the new one.
+    const oldSchool = saved && Array.isArray(saved.outlines) && saved.outlines.some((o) => o && o.id === 'B2' && o.name === 'Main building') && !saved.outlines.some((o) => o && 'tone' in o) && !ui.keptOldMap;
+    if (saved && (onScale || onGrid || oldSchool)) {
       movedToRoomy = JSON.stringify(project);
       applyLayout(project, 'school');
       project = sanitize(project);
@@ -2464,7 +2637,8 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     render();
     if (movedToRoomy) {
       saveNow();
-      toast('Map now follows the school layout, with room for names. Setup → Change map layout has the exact-size drawing.', { label: 'Undo', run: () => { undo(); ui.keptScale = true; saveUI(); } });
+      toast(oldSchool ? 'The map has a new look: the main building’s real shape, building names and room icons. Undo puts your old layout back.'
+        : 'Map now follows the school layout, with room for names. Setup → Change map layout has the exact-size drawing.', { label: 'Undo', run: () => { undo(); if (oldSchool) ui.keptOldMap = true; else ui.keptScale = true; saveUI(); } });
       undoStack = [movedToRoomy];
       renderTopbar();
     }

@@ -48,7 +48,7 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   await page.goto(APP);
 
   console.log('First open');
-  check(await page.locator('.room[data-area]').count() === 23, '23 places from the saved layout, including an off-site place');
+  check(await page.locator('.room[data-area]').count() === 21, '21 places from the saved layout, including an off-site place');
   check(await page.locator('.room.special').count() === 2, 'PPA and Cover boxes on the map');
   const radii = await page.evaluate(() => [...document.querySelectorAll('button, .room, .chip, .zone, .strip-btn, input')].map((el) => getComputedStyle(el).borderTopLeftRadius).filter((r) => r !== '0px'));
   check(radii.length === 0, 'no rounded corners anywhere');
@@ -151,7 +151,7 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
 
   console.log('Week view');
   await page.getByRole('button', { name: 'Week', exact: true }).click();
-  check(await page.locator('table.week tbody tr').count() === 25, 'a row for each place plus PPA and Cover');
+  check(await page.locator('table.week tbody tr').count() === 23, 'a row for each place plus PPA and Cover');
   check(await page.getByText('Alex has 0 of 2 PPA periods').count() === 1, 'PPA shortfall listed');
   await shot(page, '02-week-room');
   await page.getByRole('button', { name: 'By person' }).click();
@@ -280,6 +280,47 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   check(await p8.locator('.plan-img').count() === 1, 'undo puts the to-scale plan back');
   await ctx8.close();
 
+  console.log('Map style: Navy plan');
+  const ctx9 = await browser.newContext({ viewport: { width: 1920, height: 1080 } });
+  const p9 = await ctx9.newPage();
+  await p9.goto(APP);
+  await p9.getByRole('button', { name: 'Or try the example school (made-up people)' }).click();
+  const top = await p9.locator('#topbar').evaluate((el) => getComputedStyle(el).backgroundColor);
+  check(top === 'rgb(21, 35, 58)', 'navy top bar (' + top + ')');
+  check(await p9.locator('.outline-name', { hasText: 'Main building' }).count() === 1 && await p9.locator('.outline-name', { hasText: 'Village Hall' }).count() === 1 && await p9.locator('.outline.t-out .outline-name', { hasText: 'Outdoors' }).count() === 1, 'buildings named by tabs');
+  check(await p9.locator('.walls path').count() === 4, 'one wall per building or group (' + await p9.locator('.walls path').count() + ')');
+  const mainWall = await p9.locator('.walls path.t-main').getAttribute('d');
+  check((mainWall.match(/M/g) || []).length > 4, 'the main building steps out round the Kitchen, not a plain box');
+  const icons = await p9.locator('.room[data-area] .room-head .room-ic').count();
+  check(icons === 21 && await p9.locator('.room.special .room-ic').count() === 2, 'every room has an icon (' + icons + ')');
+  check(await p9.locator('.room[data-area="A1"]').evaluate((el) => el.classList.contains('open-t') && el.classList.contains('open-b')), 'Learning Space 3 shares dashed walls with LS2 and LS1');
+  check(await p9.locator('.room[data-area="A22"]').evaluate((el) => !/open-/.test(el.className)), 'Brook Room has solid walls');
+  check(await p9.locator('.room.t-out').count() === 3 && await p9.locator('.room.offsite.alone').count() === 0, 'outdoor and off-site places take their group’s look');
+  const k = await p9.locator('.room[data-area="A6"]').boundingBox(), l3 = await p9.locator('.room[data-area="A1"]').boundingBox();
+  check(Math.abs(k.x + k.width - l3.x) < 2 && Math.abs(k.y - l3.y) < 2, 'Kitchen touches Learning Space 3');
+  const pod = await p9.locator('.room[data-area="A13"]').boundingBox();
+  check(pod.height > 120, 'Pod 1 is tall enough for names (' + Math.round(pod.height) + ')');
+  await shot(p9, '19-navy-plan');
+
+  console.log('A plan on the earlier school layout');
+  await p9.waitForTimeout(400);
+  await p9.evaluate(() => {
+    const d = JSON.parse(localStorage.getItem('lifehouse_timetabler_v2'));
+    d.outlines = [{ id: 'B1', kind: 'box', name: '', x: 0.21, y: 21.39, w: 36.81, h: 35 }, { id: 'B2', kind: 'box', name: 'Main building', x: 40.11, y: 13.06, w: 53.03, h: 86.39 }, { id: 'B6', kind: 'label', name: 'Off-site', x: 0.53, y: 57.22, w: 36.7, h: 4.17 }];
+    const kit = d.areas.find((a) => a.id === 'A6'); Object.assign(kit, { x: 40.43, y: 40.28, w: 7.71, h: 18.06 });
+    d.areas.forEach((a) => { delete a.open; });
+    localStorage.setItem('lifehouse_timetabler_v2', JSON.stringify(d));
+  });
+  await p9.reload();
+  check(await p9.locator('.room[data-area="A6"]').evaluate((el) => el.style.left) === '46.81%' && await p9.locator('.walls path').count() === 4, 'moves to the new look by itself');
+  check(await p9.locator('#map .chip').count() > 20 && await p9.locator('.room[data-area="A2"].open-b').count() === 1, 'keeps everyone, and the learning spaces are open plan');
+  await p9.getByRole('button', { name: 'Undo' }).first().click();
+  check(await p9.locator('.room[data-area="A6"]').evaluate((el) => el.style.left) === '40.43%', 'undo puts the old layout back');
+  await p9.waitForTimeout(400);
+  await p9.reload();
+  check(await p9.locator('.room[data-area="A6"]').evaluate((el) => el.style.left) === '40.43%', 'and it stays back after a reload');
+  await ctx9.close();
+
   console.log('Bringing in the earlier version’s save');
   const old = {
     people: [{ id: 'S01', name: 'AB', role: 'student' }, { id: 'T01', name: 'Alex', role: 'staff' }],
@@ -324,7 +365,7 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   await p4.goto(APP);
   const roomNames = await p4.locator('.room .room-name').allInnerTexts();
   check(!roomNames.some((n) => /’s|'s/.test(n)), 'no room is named after a member of staff');
-  check(await p4.locator('.room[data-area="A19"]').count() === 1, 'Office is on the map');
+  check(await p4.locator('.room[data-area="A19"], .room[data-area="A20"]').count() === 0, 'Office and Reception are left out of the standard map');
   await p4.getByRole('button', { name: 'Or try the example school (made-up people)' }).click();
   check(await p4.locator('.chip.pupil').count() >= 18 && await p4.locator('.chip.staff').count() >= 20, 'example pupils and staff placed on Monday P1');
   check(await p4.locator('.strip-btn.done').count() >= 15, 'most example periods complete (' + await p4.locator('.strip-btn.done').count() + ')');
@@ -334,9 +375,9 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   check(freePills > 0 && freePills === freeOnMap, 'free rooms listed match the map (' + freePills + ')');
   await shot(p4, '14-example-plan');
   await p4.locator('.map-tools .seg button', { hasText: 'Room use' }).click();
-  check(await p4.locator('.room.use').count() === 23, 'room use view shows every room');
+  check(await p4.locator('.room.use').count() === 21, 'room use view shows every room');
   check(await p4.locator('.room.use.offsite').count() === 4, 'off-site places shown separately in room use');
-  check(await p4.locator('.room.use.staffonly').count() === 2, 'Office and Reception count as staff spaces');
+  check(await p4.locator('.room.use.staffonly').count() === 0, 'no staff spaces on the standard map');
   check(await p4.locator('.room.use.unused').count() + await p4.locator('.use-row').count() > 0, 'least-used list in the tray');
   const firstRow = await p4.locator('.use-row .use-n').first().innerText();
   const lastRow = await p4.locator('.use-row .use-n').last().innerText();
@@ -353,20 +394,20 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   await p4.getByRole('button', { name: 'Plan', exact: true }).click();
   await p4.getByRole('button', { name: 'Edit layout' }).click();
   await p4.getByRole('button', { name: 'Add a room' }).click();
-  await p4.locator('.rename-pop').fill('Garden pod');
+  await p4.locator('.rename-pop').fill('Tool shed');
   await p4.getByRole('button', { name: 'Done' }).click();
   check(await p4.locator('.editbar').count() === 0, 'Done works straight after renaming');
   await p4.getByRole('button', { name: 'Setup' }).click();
   await p4.getByRole('button', { name: 'Load the example…' }).click();
   await p4.getByRole('button', { name: 'Load example' }).click();
-  check(await p4.locator('.room[data-area]').count() === 24 && await p4.locator('.room .room-name', { hasText: 'Garden pod' }).count() === 1, 'example school keeps the rooms on screen');
+  check(await p4.locator('.room[data-area]').count() === 22 && await p4.locator('.room .room-name', { hasText: 'Tool shed' }).count() === 1, 'example school keeps the rooms on screen');
 
   console.log('Staff-only spaces');
   await p4.getByRole('button', { name: 'Setup' }).click();
   await p4.locator('select[aria-label="Small Room type"]').selectOption('staff');
   await p4.getByRole('button', { name: 'Plan', exact: true }).click();
   await p4.locator('.map-tools .seg button', { hasText: 'Room use' }).click();
-  check(await p4.locator('.room.use.staffonly').count() === 3, 'Small Room now a staff space');
+  check(await p4.locator('.room.use.staffonly').count() === 1, 'Small Room now a staff space');
 
   console.log('Floor plan picture and building outlines');
   const png = await p4.evaluate(() => { const c = document.createElement('canvas'); c.width = 800; c.height = 400; const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, 800, 400); g.strokeStyle = '#333'; g.lineWidth = 6; g.strokeRect(20, 20, 360, 360); g.strokeRect(420, 20, 360, 360); return c.toDataURL('image/png').split(',')[1]; });
@@ -381,24 +422,24 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   await p4.locator('.rename-pop').fill('Garden shed');
   await p4.getByRole('button', { name: 'Add a label' }).click();
   await p4.locator('.rename-pop').fill('Yard');
-  check(await p4.locator('.outline.label').count() === 2, 'label added');
+  check(await p4.locator('.outline.label').count() === 1, 'label added');
   await shot(p4, '17-floor-plan-edit');
   await p4.getByRole('button', { name: 'Done' }).click();
   check(await p4.locator('.outline-name', { hasText: 'Garden shed' }).count() === 1, 'outline named');
   await p4.waitForTimeout(400);
   await p4.reload();
-  check(await p4.locator('.plan-img').count() === 1 && await p4.locator('.outline').count() === 8 && await p4.locator('.label-text', { hasText: 'Yard' }).count() === 1, 'picture, outline and label kept after reload');
+  check(await p4.locator('.plan-img').count() === 1 && await p4.locator('.outline').count() === 7 && await p4.locator('.label-text', { hasText: 'Yard' }).count() === 1, 'picture, outline and label kept after reload');
   const [dl4] = await Promise.all([p4.waitForEvent('download'), p4.getByRole('button', { name: 'Save backup' }).click()]);
   const b4 = path.join(TMP, 'b4.json');
   await dl4.saveAs(b4);
   const j4 = JSON.parse(fs.readFileSync(b4, 'utf8'));
-  check(/^data:image\/jpeg;base64,/.test(j4.map.image) && j4.map.w === 800 && j4.outlines.length === 8, 'backup carries the picture, outline and label');
+  check(/^data:image\/jpeg;base64,/.test(j4.map.image) && j4.map.w === 800 && j4.outlines.length === 7, 'backup carries the picture, outline and label');
   await p4.getByRole('button', { name: 'Edit layout' }).click();
   await p4.getByRole('button', { name: 'Add a room' }).click();
-  check(await p4.locator('.room[data-area]').count() === 25, 'room added on top of the picture');
+  check(await p4.locator('.room[data-area]').count() === 23, 'room added on top of the picture');
   await p4.getByRole('button', { name: 'Done' }).click();
   await p4.keyboard.press('Control+z');
-  check(await p4.locator('.room[data-area]').count() === 24 && await p4.locator('.plan-img').count() === 1, 'undo removes the room and keeps the picture');
+  check(await p4.locator('.room[data-area]').count() === 22 && await p4.locator('.plan-img').count() === 1, 'undo removes the room and keeps the picture');
   check(err4.length === 0, 'no errors in the console' + (err4.length ? ': ' + err4.join(' | ') : ''));
   await ctx4.close();
 
