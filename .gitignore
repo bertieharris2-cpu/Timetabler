@@ -1,0 +1,8 @@
+# Keep pupils' details out of this public repository.
+private/
+*timetable backup*.json
+*timetable starter*.json
+*timetable - *.csv
+people*.csv
+*.pdf
+node_modules/

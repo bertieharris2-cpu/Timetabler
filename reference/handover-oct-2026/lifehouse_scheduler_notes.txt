@@ -1,0 +1,39 @@
+Lifehouse Scheduler – Next Steps (Notes for Tomorrow)
+
+1. PPA Handling
+   - Add a special "PPA" area that only accepts staff.
+   - Track staff PPA minutes (period length × slots placed).
+   - Show a badge with PPA owed vs. assigned.
+
+2. Locking Definites
+   - Add a lock toggle 🔒 on each placement.
+   - Locked placements are not touched by auto-fill.
+
+3. Minimum Requirements
+   - Staff: total PPA minutes/week; optional max daily minutes.
+   - Students: min outdoor minutes/week; max group size; required staff.
+   - Areas: optional min staff / max students.
+
+4. Auto-populate Flow
+   Step 0: Load fixed slots (locked).
+   Step 1: Place seed lessons (Numeracy/Literacy).
+   Step 2: Satisfy hard minimums (e.g., staff PPA, student outdoor mins).
+   Step 3: Fill remaining students with soft preferences, leaving warnings.
+   Step 4: Show checklist of issues (e.g., “X missing PPA”, “Woods empty of staff”).
+
+5. Manual Tweaks
+   - Drag & drop always overrides auto-fill.
+   - Checker updates live after every tweak.
+
+Templates made:
+- staff_minimums_template.csv
+- student_requirements_template.csv
+- fixed_slots_template.csv
+- seed_lessons_template.csv
+
+Suggested order to implement:
+   A. PPA counters + lock toggle first.
+   B. Then auto-fill for PPA only.
+   C. Then expand to seed lessons + full auto-fill.
+
+-- End of Notes --
