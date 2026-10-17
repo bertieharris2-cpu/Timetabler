@@ -43,6 +43,12 @@
   --top-tab: #24406B;
   --save: #F2C66D;
   --save-ink: #2A1E05;
+  --sheet-line: #8A949E;
+  --sheet-place: #137A3A;
+  --sheet-band-ink: #16202A;
+  --band-lightblue: #DDEBF7;
+  --band-blue: #8CC9EE;
+  --band-green: #8EDC8E;
   --ok: #1B7339;
   --ok-bg: #E0F3E6;
   --warn: #9A5300;
@@ -69,6 +75,7 @@
     --ppa: #CCA6EE; --ppa-bg: #33244A; --off: #F0B47A; --off-bg: #33261A; --off-line: #B8743A;
     --out: #8FD3A6; --out-bg: #16291D; --out-line: #4F8A63; --hall: #A9B4C1; --tab-ink: #0D1520;
     --top: #0B1220; --top-ink: #E5EAF0; --top-muted: #96A2AE; --top-line: #26324A; --top-tab: #1E3150; --save: #E8B95A;
+    --sheet-line: #3E4B5A; --sheet-place: #7FD49B; --sheet-band-ink: #0D1520; --band-lightblue: #A9C4DE; --band-blue: #6FAFD6; --band-green: #6FBF7A;
     --ok: #82D49D; --ok-bg: #173825; --warn: #F0B866; --warn-bg: #3F2D0F; --bad: #F09C8D; --bad-bg: #481E18;
     --tint-s: 30%; --tint-l: 24%;
     --shadow: 0 1px 2px rgba(0, 0, 0, .45);
@@ -84,6 +91,7 @@
   --ppa: #CCA6EE; --ppa-bg: #33244A; --off: #F0B47A; --off-bg: #33261A; --off-line: #B8743A;
     --out: #8FD3A6; --out-bg: #16291D; --out-line: #4F8A63; --hall: #A9B4C1; --tab-ink: #0D1520;
     --top: #0B1220; --top-ink: #E5EAF0; --top-muted: #96A2AE; --top-line: #26324A; --top-tab: #1E3150; --save: #E8B95A;
+    --sheet-line: #3E4B5A; --sheet-place: #7FD49B; --sheet-band-ink: #0D1520; --band-lightblue: #A9C4DE; --band-blue: #6FAFD6; --band-green: #6FBF7A;
   --ok: #82D49D; --ok-bg: #173825; --warn: #F0B866; --warn-bg: #3F2D0F; --bad: #F09C8D; --bad-bg: #481E18;
   --tint-s: 30%; --tint-l: 24%;
   --shadow: 0 1px 2px rgba(0, 0, 0, .45);
@@ -141,7 +149,7 @@ h1, h2, h3 { text-wrap: balance; }
 .link-btn { border: 0; background: none; padding: 0; color: var(--accent); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
 
 /* ---------- Full screen: compact chrome, more map ---------- */
-.full-btn svg { width: 14px; height: 14px; }
+.btn > svg { width: 14px; height: 14px; flex: none; }
 body.fs .topbar { padding-block: 3px; gap: 8px 12px; }
 body.fs .brand-text, body.fs .save-state { display: none; }
 body.fs .brand-mark { width: 24px; height: 24px; }
@@ -456,6 +464,46 @@ table.week { border-collapse: separate; border-spacing: 0; font-size: 11.5px; }
 .week td.tot:hover { background: var(--surface); }
 .tot.short { color: var(--warn); font-weight: 700; }
 
+/* ---------- Second screen: the day sheet, set out like the sugar paper sheets ---------- */
+body.second #view { overflow: auto; }
+.dsheet-screen { flex: 1; min-height: 0; display: flex; padding: 8px 10px 10px; overflow: auto; }
+.sheets.ds-print { display: none; }
+.ds-empty { margin: 24px auto; font-size: 15px; }
+.dgrid { flex: 1; display: grid; gap: 1px; min-height: 100%; background: var(--sheet-line); border: 1px solid var(--sheet-line); }
+.dgrid > * { background: var(--surface); padding: 3px 6px; min-width: 0; min-height: 0; }
+.dg-title { grid-column: 1 / span 2; position: sticky; top: 0; left: 0; z-index: 2; font-size: 17px; font-weight: 700; }
+.dg-head { position: sticky; top: 0; z-index: 1; display: flex; align-items: flex-end; justify-content: center; font-weight: 700; font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dg-head.np { color: var(--muted); font-weight: 600; white-space: normal; text-align: center; }
+.dg-time { font-weight: 700; font-size: 12.5px; white-space: nowrap; }
+.dg-label { font-weight: 700; font-size: 12.5px; }
+.dg-label.now { background: var(--accent); color: var(--accent-ink); }
+.dg-band { font-weight: 700; font-size: 12.5px; color: var(--sheet-band-ink); }
+.b-lightblue { background: var(--band-lightblue) !important; }
+.b-blue { background: var(--band-blue) !important; }
+.b-green { background: var(--band-green) !important; }
+.dg-cell { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 3px; text-align: center; border: 0; font-size: 12.5px; line-height: 1.3; overflow: auto; color: var(--ink); }
+button.dg-cell:hover { outline: 2px solid var(--accent); outline-offset: -2px; }
+.dg-cell.now { box-shadow: inset 0 3px 0 var(--accent); }
+.dg-cell.np { color: var(--pupil); font-weight: 650; }
+.dg-cell.k-ppa, .dg-cell.k-cover { justify-content: center; font-weight: 600; }
+.dg-cell.k-out { background: repeating-linear-gradient(45deg, var(--surface) 0 6px, var(--surface-2) 6px 12px); }
+.dg-cell.k-none { justify-content: center; color: var(--warn); background: var(--warn-bg); font-size: 11.5px; font-weight: 700; }
+.ds-loc { color: var(--sheet-place); }
+.ds-with { display: block; font-size: 11px; color: var(--muted); }
+.follow { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--top-ink); }
+table.ps { width: 100%; border-collapse: collapse; table-layout: fixed; font: 10.5px/1.3 Calibri, var(--font); color: #000; }
+.ps th, .ps td { border: 1px solid #000; padding: 2px 4px; vertical-align: top; }
+.ps thead th { text-align: center; vertical-align: bottom; font-size: 11px; }
+.ps thead th.ps-title { text-align: left; font-size: 16px; }
+.ps tbody th { text-align: left; white-space: nowrap; width: 54px; }
+.ps tbody th.ps-label { width: 92px; white-space: normal; }
+.ps .ps-lesson td { height: 92px; text-align: center; }
+.ps .ps-band td { font-weight: 700; }
+.ps .ds-loc { color: #00A050; }
+.ps .ds-with { color: #666; font-size: 9.5px; }
+.sheet.staffday { padding: 14px; }
+.ps .b-lightblue, .ps .b-blue, .ps .b-green { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
 /* ---------- Timetables (print) ---------- */
 .print-controls { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; }
 .print-controls label { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
@@ -546,6 +594,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
 /* ---------- Printing ---------- */
 @media print {
   @page { size: A4 landscape; margin: 10mm; }
+  @page wide { size: A3 landscape; margin: 8mm; }
   html, body { height: auto; background: #fff; color: #000; }
   .topbar, .page-head, .print-controls, .print-hint, .toasts { display: none !important; }
   .app, #view { display: block; height: auto; overflow: visible; }
@@ -553,6 +602,9 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
   .sheets { display: block; }
   .sheet { width: auto; box-shadow: none; padding: 0; break-after: page; page-break-after: always; break-inside: avoid; }
   .sheet:last-child { break-after: auto; page-break-after: auto; }
+  .sheet.staffday { page: wide; }
+  body.second .dsheet-screen { display: none !important; }
+  body.second .ds-print { display: block !important; }
   .tt th, .tt td { border-color: #555; }
   body:not([data-view="print"]) #view > * { display: none !important; }
   body:not([data-view="print"]) #view::before { content: "To print timetables, open the Timetables tab and print from there."; font: 16px sans-serif; }
@@ -577,6 +629,11 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
   const FILE_VERSION = 2;
   const STORE_KEY = 'lifehouse_timetabler_v2';
   const UI_KEY = 'lifehouse_timetabler_ui';
+  // The second screen: the same file opened with #sheet shows one day as a column per member of staff,
+  // like the sugar paper sheets. It only reads the plan, and follows the main screen's day and period.
+  const SHEET_MODE = /^#sheet\b/.test(location.hash);
+  const SHEET_UI_KEY = 'lifehouse_timetabler_sheet_ui';
+  const GOTO_KEY = 'lifehouse_timetabler_goto';
   const OLD_KEYS = ['lifehouse_map_v1', 'lifehouse_simple_grid_v1', 'lifehouse_min_export_v1'];
   const DAYS = [
     { id: 'Mon', name: 'Monday' }, { id: 'Tue', name: 'Tuesday' }, { id: 'Wed', name: 'Wednesday' },
@@ -591,6 +648,11 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
   // Room types: a learning space, a staff-only space (office, reception), or a place off site.
   const KINDS = { room: 'Learning space', staff: 'Staff space', offsite: 'Off-site' };
   const ZOOMS = [1, 1.25, 1.5, 1.75, 2, 2.5, 3];
+  // The school day as the day sheets show it: the lessons, and the times between them as coloured rows.
+  const DEFAULT_DAY = [['8.30am', 'Prep and Meeting', 'band', 'lightblue'], ['9.00am', 'Learners Arrive', 'band', 'blue'], ['9.20am', 'Wellbeing', 'band', 'green'],
+    ['9.45am', 'Lesson 1', 'period', 0], ['10.45am', 'Break', 'band', 'green'], ['11.10am', 'Lesson 2', 'period', 1], ['12.00pm', 'Lunch', 'band', 'green'],
+    ['1.10pm', 'Lesson 3', 'period', 2], ['2.10pm', 'Lesson 4', 'period', 3], ['3.10pm', 'Home', 'band', 'green']];
+  const BAND_TONES = { lightblue: 'Light blue', blue: 'Blue', green: 'Green', none: 'No colour' };
   // Building outline colours: a building, the Village Hall, the off-site group and outdoors.
   const TONES = { main: 'Building', hall: 'Village Hall', off: 'Off-site', out: 'Outdoors' };
 
@@ -691,6 +753,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     undo: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 3.5 2.5 6.5l3 3"/><path d="M2.5 6.5h7a4 4 0 0 1 0 8h-2"/></svg>',
     redo: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m10.5 3.5 3 3-3 3"/><path d="M13.5 6.5h-7a4 4 0 0 0 0 8h2"/></svg>',
     full: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="square" aria-hidden="true"><path d="M2 6V2h4M10 2h4v4M14 10v4h-4M6 14H2v-4"/></svg>',
+    screen: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="square" aria-hidden="true"><path d="M1.5 3h8v6h-8zM6.5 7h8v6h-8zM4 13h2"/></svg>',
     unfull: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="square" aria-hidden="true"><path d="M6 2v4H2M14 6h-4V2M10 14v-4h4M2 10h4v4"/></svg>',
     mark: '<svg class="brand-mark" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="2" width="28" height="28"/><path d="M2 13h11V2M13 30V20h17M20 2v11h10"/><circle cx="7.5" cy="20.5" r="2" fill="currentColor" stroke="none"/><circle cx="24" cy="7" r="2" fill="currentColor" stroke="none"/></svg>'
   };
@@ -733,7 +796,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
 
   // ---------- State ----------
   let project = null;
-  const ui = Object.assign({ view: 'plan', day: 'Mon', period: null, zoom: 1, weekMode: 'room', mapMode: 'people', printWhat: 'student', printWho: 'all', printTimes: true }, loadUI());
+  const ui = Object.assign({ view: 'plan', day: 'Mon', period: null, zoom: 1, weekMode: 'room', mapMode: 'people', printWhat: 'student', printWho: 'all', printTimes: true, sheetFollow: true, sheetDay: 'Mon' }, loadUI());
   const sel = new Set();
   let editLayout = false;
   let undoStack = [], redoStack = [];
@@ -758,18 +821,19 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
   let storageOk = true, lastSavedAt = null, saveTimer = null;
   let mapScroll = { left: 0, top: 0 };
 
-  function loadUI() {
-    try { return JSON.parse(localStorage.getItem(UI_KEY)) || {}; } catch (e) { return {}; }
+  function loadUI(key) {
+    try { return JSON.parse(localStorage.getItem(key || (SHEET_MODE ? SHEET_UI_KEY : UI_KEY))) || {}; } catch (e) { return {}; }
   }
   function saveUI() {
-    try { localStorage.setItem(UI_KEY, JSON.stringify(ui)); } catch (e) { /* not essential */ }
+    try { localStorage.setItem(SHEET_MODE ? SHEET_UI_KEY : UI_KEY, JSON.stringify(ui)); } catch (e) { /* not essential */ }
   }
 
   function blankProject() {
+    const periods = [1, 2, 3, 4].map((n) => ({ id: 'P' + n, label: 'P' + n, time: '' }));
     return {
       app: APP_ID, version: FILE_VERSION, name: '', school: 'Lifehouse',
-      periods: [1, 2, 3, 4].map((n) => ({ id: 'P' + n, label: 'P' + n, time: '' })),
-      areas: clone(DEFAULT_AREAS), people: [], slots: {}, outlines: clone(LAYOUTS.school.outlines), specials: clone(DEFAULT_SPECIALS),
+      periods,
+      areas: clone(DEFAULT_AREAS), people: [], slots: {}, outlines: clone(LAYOUTS.school.outlines), specials: clone(DEFAULT_SPECIALS), dayRows: cleanDayRows(null, periods),
       map: { imageId: null, w: 0, h: 0, fade: 1 },
       meta: { created: nowIso(), changedAt: null, backedUpAt: null }
     };
@@ -789,6 +853,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       return { id, label: str(x && x.label) || id, time: str(x && x.time) };
     });
     if (!out.periods.length) out.periods = base.periods;
+    out.dayRows = cleanDayRows(p.dayRows, out.periods);
 
     const seenA = new Set();
     out.areas = (Array.isArray(p.areas) ? p.areas : base.areas).filter((a) => a && str(a.id) && !seenA.has(str(a.id)) && seenA.add(str(a.id))).map((a) => {
@@ -871,6 +936,39 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
   }
 
   // Converts the earlier map/grid prototypes' saved state (P1–P4, no days) into this format.
+  // The day sheet's rows: every period exactly once, plus any coloured rows for the rest of the day.
+  function cleanDayRows(rows, periods) {
+    const ids = periods.map((x) => x.id);
+    if (!Array.isArray(rows)) rows = DEFAULT_DAY.map(([time, label, kind, v], i) => kind === 'band' ? { time, label, kind, tone: v } : { time, label, kind, period: ids[v] });
+    const seen = new Set(), had = new Set();
+    const out = [];
+    rows.forEach((r) => {
+      if (!r || typeof r !== 'object') return;
+      if (r.kind === 'period') {
+        if (!ids.includes(r.period) || had.has(r.period)) return;
+        had.add(r.period);
+        out.push({ id: '', time: str(r.time), label: str(r.label) || (periods.find((x) => x.id === r.period) || {}).label, kind: 'period', period: r.period });
+      } else out.push({ id: '', time: str(r.time), label: str(r.label), kind: 'band', tone: BAND_TONES[r.tone] ? r.tone : 'green' });
+      const id = str(r.id);
+      if (id && !seen.has(id)) { out[out.length - 1].id = id; seen.add(id); }
+    });
+    periods.forEach((per) => { if (!had.has(per.id)) out.push({ id: '', time: str(per.time).split(/[–-]/)[0], label: per.label, kind: 'period', period: per.id }); });
+    let n = 1;
+    out.forEach((r) => { if (!r.id) { while (seen.has('D' + n)) n++; r.id = 'D' + n; seen.add(r.id); } });
+    return out;
+  }
+  // "8.30am", "1.10pm", "13:10" as minutes since midnight, for putting the day's rows in order.
+  function minutesOf(t) {
+    const m = /(\d{1,2})(?:[.:](\d{2}))?\s*(am|pm)?/i.exec(t || '');
+    if (!m) return Infinity;
+    let hr = +m[1];
+    const ap = (m[3] || '').toLowerCase();
+    if (ap === 'pm' && hr < 12) hr += 12;
+    if (ap === 'am' && hr === 12) hr = 0;
+    if (!ap && hr < 7) hr += 12;
+    return hr * 60 + (+m[2] || 0);
+  }
+  const dayRows = () => project.dayRows.map((r, i) => ({ r, i })).sort((a, b) => (minutesOf(a.r.time) - minutesOf(b.r.time)) || a.i - b.i).map((x) => x.r);
   function fromOldFormat(old) {
     const p = blankProject();
     if (Array.isArray(old.areas) && old.areas.length) {
@@ -1063,6 +1161,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
   function saveNow() {
     clearTimeout(saveTimer);
     saveTimer = null;
+    if (SHEET_MODE) return;
     try {
       localStorage.setItem(STORE_KEY, JSON.stringify(exportProject()));
       storageOk = true;
@@ -1076,6 +1175,19 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
   window.addEventListener('beforeunload', () => { if (saveTimer) saveNow(); });
   // If the same file is open in another tab, follow its changes instead of overwriting them.
   window.addEventListener('storage', (e) => {
+    if (SHEET_MODE) { if (e.key === STORE_KEY || e.key === UI_KEY) followMain(); return; }
+    if (e.key === GOTO_KEY && e.newValue) {
+      // The second screen asked to show a period here.
+      try {
+        const g = JSON.parse(e.newValue);
+        if (DAYS.some((d) => d.id === g.day) && project.periods.some((x) => x.id === g.period)) {
+          editLayout = false; ui.mapMode = 'people';
+          goSlot(g.day, g.period, 'plan');
+          if (g.place) setTimeout(() => flashZone(g.place), 60);
+        }
+      } catch (err) { /* ignore */ }
+      return;
+    }
     if (e.key !== STORE_KEY || !e.newValue) return;
     try {
       project = sanitize(JSON.parse(e.newValue));
@@ -1300,6 +1412,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
   }
 
   function render() {
+    if (SHEET_MODE) { renderSecondScreen(); return; }
     rebuildIndexes();
     document.body.dataset.view = ui.view;
     document.title = (project.school || 'School') + ' Timetabler';
@@ -1320,6 +1433,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
   }
 
   function renderTopbar() {
+    if (SHEET_MODE) { renderSheetBar(); return; }
     const bar = $('#topbar');
     const tabs = [['plan', 'Plan'], ['week', 'Week'], ['print', 'Timetables'], ['setup', 'Setup']];
     bar.replaceChildren(
@@ -1331,6 +1445,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
         h('button', { type: 'button', class: 'tab' + (ui.view === id ? ' on' : ''), 'aria-current': ui.view === id ? 'page' : null, onclick: () => go(id) }, label))),
       h('div', { class: 'top-actions' },
         h('span', { class: 'save-state', id: 'save-state' }),
+        h('button', { type: 'button', class: 'btn', title: 'Open the day as staff columns in a new window, to put on a second screen', onclick: openSecondScreen }, svg(ICONS.screen), 'Second screen'),
         h('button', { type: 'button', class: 'btn full-btn', title: (isFull() ? 'Leave full screen' : 'Full screen') + ' (F)', onclick: toggleFullscreen },
           svg(isFull() ? ICONS.unfull : ICONS.full), isFull() ? 'Exit full screen' : 'Full screen'),
         h('button', { type: 'button', class: 'icon-btn', title: 'Undo (Ctrl+Z)', 'aria-label': 'Undo', disabled: !undoStack.length, onclick: undo }, svg(ICONS.undo)),
@@ -2013,9 +2128,10 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
   function renderPrint(root) {
     const what = ui.printWhat;
     const pool = what === 'student' ? pupils() : what === 'staff' ? staff() : what === 'room' ? project.areas.slice().sort((a, b) => a.name.localeCompare(b.name)) : DAYS;
+    const wide = what === 'staffday';
     if (ui.printWho !== 'all' && !pool.some((x) => x.id === ui.printWho)) ui.printWho = 'all';
     const chosen = ui.printWho === 'all' ? pool : pool.filter((x) => x.id === ui.printWho);
-    const whoLabel = { student: 'All pupils', staff: 'All staff', room: 'All rooms', day: 'All five days' }[what];
+    const whoLabel = { student: 'All pupils', staff: 'All staff', room: 'All rooms', day: 'All five days', staffday: 'All five days' }[what];
 
     const whoSelect = h('select', { id: 'print-who', onchange: (e) => { ui.printWho = e.target.value; saveUI(); render(); } },
       h('option', { value: 'all' }, whoLabel),
@@ -2024,18 +2140,19 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
 
     let sheets;
     if (what === 'day') sheets = chosen.map((d) => daySheet(d));
+    else if (wide) sheets = chosen.map((d) => staffDaySheet(d));
     else if (what === 'room') sheets = chosen.map((a) => roomSheet(a));
     else sheets = chosen.map((p) => personSheet(p));
 
     root.append(h('div', { class: 'page' },
       h('div', { class: 'page-head' }, h('h2', null, 'Timetables to print')),
       h('div', { class: 'print-controls' },
-        h('div', { class: 'seg', role: 'group', 'aria-label': 'Which timetables' }, [['student', 'Pupils'], ['staff', 'Staff'], ['room', 'Rooms'], ['day', 'Day sheets']].map(([id, label]) =>
+        h('div', { class: 'seg', role: 'group', 'aria-label': 'Which timetables' }, [['student', 'Pupils'], ['staff', 'Staff'], ['room', 'Rooms'], ['day', 'Days by room'], ['staffday', 'Days by staff']].map(([id, label]) =>
           h('button', { type: 'button', class: what === id ? 'on' : '', 'aria-pressed': what === id ? 'true' : 'false', onclick: () => { ui.printWhat = id; ui.printWho = 'all'; saveUI(); render(); } }, label))),
         h('label', null, 'Show', whoSelect),
         h('label', null, h('input', { type: 'checkbox', id: 'print-times', checked: ui.printTimes, onchange: (e) => { ui.printTimes = e.target.checked; saveUI(); render(); } }), 'Show times'),
         h('button', { type: 'button', class: 'btn primary', onclick: () => window.print(), disabled: !sheets.length }, 'Print ' + plural(sheets.length, 'page')),
-        h('span', { class: 'hint print-hint' }, 'One A4 landscape page each. To email them, choose “Save as PDF” as the printer.')),
+        h('span', { class: 'hint print-hint' }, (wide ? 'One A3 landscape page per day, a column for each member of staff.' : 'One A4 landscape page each.') + ' To email them, choose “Save as PDF” as the printer.')),
       sheets.length ? h('div', { class: 'sheets' }, sheets) : h('p', { class: 'hint' }, 'Nobody to show yet. Add pupils and staff in Setup.')
     ));
   }
@@ -2103,6 +2220,259 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     return sheetFrame('day', d.name, 'Whole school' + (project.name ? ' · ' + project.name : ''), h('table', { class: 'tt' }, head, body), notIn.length ? 'Not in all day: ' + names(notIn) : '');
   }
 
+  // ----- Day sheets: one day as a column per member of staff, set out like the sugar paper sheets -----
+  // What one member of staff is doing in one period.
+  function dayCellParts(p, s) {
+    const place = s.at[p.id];
+    if (place === OUT) return { kind: 'out', text: '' };
+    if (place === PPA) return { kind: 'ppa', text: 'PPA', place };
+    if (place === COVER) return { kind: 'cover', text: 'Cover', place };
+    const a = place && areaById.get(place);
+    if (!a) return { kind: 'none', text: '' };
+    const others = peopleAt(s, place).filter((x) => x.id !== p.id);
+    return { kind: a.kind === 'offsite' ? 'off' : 'place', place, room: a.name, lesson: str(s.titles[place]),
+      pupils: names(others.filter(isPupil)), staffWith: names(others.filter(isStaff)) };
+  }
+  const unplacedPupilsIn = (s) => pupils().filter((x) => !s.at[x.id]);
+  // The second screen: a time column, the day's rows (lessons tall, the rest as coloured bands), and a column per member of staff.
+  function staffDayGrid(d, nowPeriod) {
+    const list = staff();
+    if (!list.length) return h('p', { class: 'hint ds-empty' }, 'No staff yet. Add them in Setup on the main screen.');
+    const rows = dayRows();
+    const slotFor = (r) => slotOf(slotKey(d.id, r.period));
+    const showNp = rows.some((r) => r.kind === 'period' && unplacedPupilsIn(slotFor(r)).length);
+    const cols = list.length + (showNp ? 1 : 0);
+    return h('div', { class: 'dgrid', 'aria-label': d.name + ', a column for each member of staff',
+      style: { gridTemplateColumns: '64px 112px repeat(' + cols + ', minmax(68px, 1fr))', gridTemplateRows: 'auto ' + rows.map((r) => r.kind === 'period' ? 'minmax(0, 1fr)' : 'auto').join(' ') } },
+      h('div', { class: 'dg-title' }, d.name),
+      list.map((p) => h('div', { class: 'dg-head', title: p.full || p.name }, p.name)),
+      showNp ? h('div', { class: 'dg-head np' }, 'Pupils not placed') : null,
+      rows.map((r) => {
+        const time = h('div', { class: 'dg-time' }, r.time);
+        if (r.kind === 'band') return [time, h('div', { class: 'dg-band b-' + r.tone, style: { gridColumn: '2 / span ' + (cols + 1) } }, r.label)];
+        const s = slotFor(r), per = periodOf(r.period), now = r.period === nowPeriod;
+        return [time, h('div', { class: 'dg-label' + (now ? ' now' : '') }, r.label),
+          list.map((p) => {
+            const c = dayCellParts(p, s);
+            const desc = c.kind === 'out' ? 'not in' : c.kind === 'none' ? 'not placed' : c.text || [c.room, c.pupils, c.staffWith && 'with ' + c.staffWith].filter(Boolean).join(', ');
+            return h('button', {
+              type: 'button', class: 'dg-cell k-' + c.kind + (now ? ' now' : ''),
+              title: (c.lesson ? c.lesson + '. ' : '') + 'Show ' + d.name + ' ' + per.label + ' on the main screen', 'aria-label': p.name + ', ' + r.label + ': ' + desc,
+              onclick: () => askMainToShow(d.id, r.period, c.place)
+            }, c.kind === 'none' ? 'Not placed' : c.text ? c.text : [
+              h('span', null, h('span', { class: 'ds-loc' }, c.room), c.pupils ? ' ' + c.pupils : ''),
+              c.staffWith ? h('span', { class: 'ds-with' }, 'with ' + c.staffWith) : null]);
+          }),
+          showNp ? h('div', { class: 'dg-cell np' + (now ? ' now' : '') }, names(unplacedPupilsIn(s))) : null];
+      }));
+  }
+  // The same day on paper: A3 landscape, as the sugar paper sheets are set out.
+  function staffDaySheet(d) {
+    const list = staff();
+    const rows = dayRows();
+    const slotFor = (r) => slotOf(slotKey(d.id, r.period));
+    const showNp = rows.some((r) => r.kind === 'period' && unplacedPupilsIn(slotFor(r)).length);
+    const cols = list.length + (showNp ? 1 : 0);
+    const head = h('thead', null, h('tr', null, h('th', { colspan: 2, class: 'ps-title' }, d.name), list.map((p) => h('th', { scope: 'col' }, p.name)), showNp ? h('th', { scope: 'col' }, 'Pupils not placed') : null));
+    const body = h('tbody', null, rows.map((r) => {
+      if (r.kind === 'band') return h('tr', { class: 'ps-band' }, h('th', { scope: 'row' }, r.time), h('td', { colspan: cols + 1, class: 'b-' + r.tone }, r.label));
+      const s = slotFor(r);
+      return h('tr', { class: 'ps-lesson' }, h('th', { scope: 'row' }, r.time), h('th', { scope: 'row', class: 'ps-label' }, r.label),
+        list.map((p) => {
+          const c = dayCellParts(p, s);
+          if (!c.room) return h('td', null, c.text);
+          return h('td', null, h('span', { class: 'ds-loc' }, c.room), c.pupils ? ' ' + c.pupils : '', c.staffWith ? h('span', { class: 'ds-with' }, 'with ' + c.staffWith) : null);
+        }),
+        showNp ? h('td', { class: 'ps-np' }, names(unplacedPupilsIn(s))) : null);
+    }));
+    return h('section', { class: 'sheet staffday' }, list.length ? h('table', { class: 'ps' }, head, body) : h('p', { class: 'na' }, d.name + ': no staff yet.'));
+  }
+
+  // ----- Excel: the five day sheets as a workbook, a tab per day, formatted like the paper ones -----
+  const CRC_TABLE = (() => { const t = []; for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t.push(c >>> 0); } return t; })();
+  function crc32(bytes) { let c = 0xFFFFFFFF; for (let i = 0; i < bytes.length; i++) c = CRC_TABLE[(c ^ bytes[i]) & 0xFF] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+  // A zip file with the files stored as they are (an .xlsx is a zip of XML files).
+  function zipFiles(files) {
+    const enc = new TextEncoder();
+    const parts = [], central = [];
+    let offset = 0;
+    files.forEach(([name, text]) => {
+      const nm = enc.encode(name), data = enc.encode(text), crc = crc32(data);
+      const head = new DataView(new ArrayBuffer(30));
+      [[0, 0x04034b50, 4], [4, 20, 2], [6, 0, 2], [8, 0, 2], [10, 0, 2], [12, 33, 2], [14, crc, 4], [18, data.length, 4], [22, data.length, 4], [26, nm.length, 2], [28, 0, 2]]
+        .forEach(([at, v, n]) => (n === 4 ? head.setUint32(at, v, true) : head.setUint16(at, v, true)));
+      const cd = new DataView(new ArrayBuffer(46));
+      [[0, 0x02014b50, 4], [4, 20, 2], [6, 20, 2], [8, 0, 2], [10, 0, 2], [12, 0, 2], [14, 33, 2], [16, crc, 4], [20, data.length, 4], [24, data.length, 4], [28, nm.length, 2],
+        [30, 0, 2], [32, 0, 2], [34, 0, 2], [36, 0, 2], [38, 0, 4], [42, offset, 4]].forEach(([at, v, n]) => (n === 4 ? cd.setUint32(at, v, true) : cd.setUint16(at, v, true)));
+      parts.push(new Uint8Array(head.buffer), nm, data);
+      central.push(new Uint8Array(cd.buffer), nm);
+      offset += 30 + nm.length + data.length;
+    });
+    const cdSize = central.reduce((n, b) => n + b.length, 0);
+    const end = new DataView(new ArrayBuffer(22));
+    [[0, 0x06054b50, 4], [4, 0, 2], [6, 0, 2], [8, files.length, 2], [10, files.length, 2], [12, cdSize, 4], [16, offset, 4], [20, 0, 2]]
+      .forEach(([at, v, n]) => (n === 4 ? end.setUint32(at, v, true) : end.setUint16(at, v, true)));
+    return new Blob(parts.concat(central, [new Uint8Array(end.buffer)]), { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  }
+  const xmlEsc = (v) => String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const colName = (n) => { let s = ''; for (n++; n > 0; n = Math.floor((n - 1) / 26)) s = String.fromCharCode(65 + ((n - 1) % 26)) + s; return s; };
+  // Cell styles, in the order styles.xml lists them.
+  const XS = { title: 1, name: 2, time: 3, label: 4, lightblue: 5, blue: 6, green: 7, none: 8, cell: 9 };
+  function daySheetXml(d) {
+    const list = staff(), rows = dayRows();
+    const slotFor = (r) => slotOf(slotKey(d.id, r.period));
+    const showNp = rows.some((r) => r.kind === 'period' && unplacedPupilsIn(slotFor(r)).length);
+    const last = list.length + 1 + (showNp ? 1 : 0);
+    const run = (text, color) => '<r><rPr>' + (color ? '<color rgb="' + color + '"/>' : '') + '<sz val="11"/><rFont val="Calibri"/></rPr><t xml:space="preserve">' + xmlEsc(text) + '</t></r>';
+    const cell = (c, r, style, inner) => '<c r="' + colName(c) + r + '" s="' + style + '"' + (inner ? ' t="inlineStr"><is>' + inner + '</is></c>' : '/>');
+    const text = (t) => (t ? '<t xml:space="preserve">' + xmlEsc(t) + '</t>' : '');
+    const out = [], merges = [];
+    out.push('<row r="1" ht="21" customHeight="1">' + cell(0, 1, XS.title, text(d.name)) + '</row>');
+    out.push('<row r="2">' + cell(0, 2, XS.name) + cell(1, 2, XS.name) + list.map((p, i) => cell(i + 2, 2, XS.name, text(p.name))).join('') + (showNp ? cell(last, 2, XS.name, text('Pupils not placed')) : '') + '</row>');
+    rows.forEach((r, ri) => {
+      const n = ri + 3;
+      let line = cell(0, n, XS.time, text(r.time));
+      if (r.kind === 'band') {
+        line += cell(1, n, XS[r.tone], text(r.label));
+        for (let c = 2; c <= last; c++) line += cell(c, n, XS[r.tone]);
+        merges.push('B' + n + ':' + colName(last) + n);
+        out.push('<row r="' + n + '">' + line + '</row>');
+        return;
+      }
+      const s = slotFor(r);
+      line += cell(1, n, XS.label, text(r.label));
+      list.forEach((p, i) => {
+        const c = dayCellParts(p, s);
+        line += cell(i + 2, n, XS.cell, c.room ? run(c.room, 'FF00B050') + (c.pupils ? run(' ' + c.pupils) : '') + (c.staffWith ? run('\nwith ' + c.staffWith, 'FF7F7F7F') : '') : text(c.text));
+      });
+      if (showNp) line += cell(last, n, XS.cell, text(names(unplacedPupilsIn(s))));
+      out.push('<row r="' + n + '" ht="78" customHeight="1">' + line + '</row>');
+    });
+    return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
+      + '<sheetPr><pageSetUpPr fitToPage="1"/></sheetPr>'
+      + '<sheetViews><sheetView workbookViewId="0"><pane xSplit="2" ySplit="2" topLeftCell="C3" activePane="bottomRight" state="frozen"/></sheetView></sheetViews>'
+      + '<sheetFormatPr defaultRowHeight="15"/>'
+      + '<cols><col min="1" max="1" width="9" customWidth="1"/><col min="2" max="2" width="17" customWidth="1"/><col min="3" max="' + (last + 1) + '" width="14" customWidth="1"/></cols>'
+      + '<sheetData>' + out.join('') + '</sheetData>'
+      + (merges.length ? '<mergeCells count="' + merges.length + '">' + merges.map((m) => '<mergeCell ref="' + m + '"/>').join('') + '</mergeCells>' : '')
+      + '<pageMargins left="0.3" right="0.3" top="0.3" bottom="0.3" header="0" footer="0"/><pageSetup paperSize="8" orientation="landscape" fitToWidth="1" fitToHeight="1"/></worksheet>';
+  }
+  function exportDaySheets() {
+    const ns = 'http://schemas.openxmlformats.org/', head = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n';
+    const xf = (font, fill, align) => '<xf numFmtId="0" fontId="' + font + '" fillId="' + fill + '" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment ' + align + '/></xf>';
+    const fill = (rgb) => '<fill><patternFill patternType="solid"><fgColor rgb="' + rgb + '"/><bgColor indexed="64"/></patternFill></fill>';
+    const styles = head + '<styleSheet xmlns="' + ns + 'spreadsheetml/2006/main">'
+      + '<fonts count="3"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="14"/><name val="Calibri"/></font></fonts>'
+      + '<fills count="5"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill>' + fill('FFDDEBF7') + fill('FF8CC9EE') + fill('FF8EDC8E') + '</fills>'
+      + '<borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border><border><left style="thin"><color auto="1"/></left><right style="thin"><color auto="1"/></right><top style="thin"><color auto="1"/></top><bottom style="thin"><color auto="1"/></bottom><diagonal/></border></borders>'
+      + '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>'
+      + '<cellXfs count="10"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>'
+      + '<xf numFmtId="0" fontId="2" fillId="0" borderId="0" xfId="0" applyFont="1"/>'
+      + xf(1, 0, 'horizontal="center" vertical="bottom"') + xf(1, 0, 'horizontal="left" vertical="top"') + xf(1, 0, 'horizontal="left" vertical="top"')
+      + xf(1, 2, 'horizontal="left" vertical="center"') + xf(1, 3, 'horizontal="left" vertical="center"') + xf(1, 4, 'horizontal="left" vertical="center"') + xf(1, 0, 'horizontal="left" vertical="center"')
+      + xf(0, 0, 'horizontal="center" vertical="top" wrapText="1"') + '</cellXfs>'
+      + '<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>';
+    const files = [
+      ['[Content_Types].xml', head + '<Types xmlns="' + ns + 'package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/>'
+        + '<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>'
+        + DAYS.map((d, i) => '<Override PartName="/xl/worksheets/sheet' + (i + 1) + '.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>').join('') + '</Types>'],
+      ['_rels/.rels', head + '<Relationships xmlns="' + ns + 'package/2006/relationships"><Relationship Id="rId1" Type="' + ns + 'officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'],
+      ['xl/workbook.xml', head + '<workbook xmlns="' + ns + 'spreadsheetml/2006/main" xmlns:r="' + ns + 'officeDocument/2006/relationships"><sheets>'
+        + DAYS.map((d, i) => '<sheet name="' + d.name + '" sheetId="' + (i + 1) + '" r:id="rId' + (i + 1) + '"/>').join('') + '</sheets></workbook>'],
+      ['xl/_rels/workbook.xml.rels', head + '<Relationships xmlns="' + ns + 'package/2006/relationships">'
+        + DAYS.map((d, i) => '<Relationship Id="rId' + (i + 1) + '" Type="' + ns + 'officeDocument/2006/relationships/worksheet" Target="worksheets/sheet' + (i + 1) + '.xml"/>').join('')
+        + '<Relationship Id="rId' + (DAYS.length + 1) + '" Type="' + ns + 'officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>'],
+      ['xl/styles.xml', styles]
+    ].concat(DAYS.map((d, i) => ['xl/worksheets/sheet' + (i + 1) + '.xml', daySheetXml(d)]));
+    const blob = zipFiles(files);
+    const url = URL.createObjectURL(blob);
+    const a = h('a', { href: url, download: fileSafe((project.school || 'School') + ' day sheets - ' + (project.name || 'plan')) + '.xlsx' });
+    document.body.append(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  // The school day card in Setup: the times and names of the day sheet's rows.
+  function schoolDayCard() {
+    const rows = dayRows();
+    const setRow = (id, key, value, merge) => mutate((p) => { const r = p.dayRows.find((x) => x.id === id); if (r) r[key] = value; }, merge ? { merge: key + '|' + id, render: false } : {});
+    return h('section', { class: 'card' },
+      h('h3', null, 'The school day', h('span', { class: 'n' }, 'how the day sheets are set out')),
+      h('p', { class: 'hint' }, 'The rows down the side of each day sheet, in time order. Lessons are the periods above; the other rows show as coloured bands across the sheet.'),
+      h('table', { class: 'edit-table' }, h('thead', null, h('tr', null, h('th', null, 'Time'), h('th', null, 'Name'), h('th', null, 'Shows as'), h('th', null, ''))),
+        h('tbody', null, rows.map((r) => h('tr', null,
+          h('td', null, h('input', { class: 'txt sm', value: r.time, placeholder: 'e.g. 9.45am', 'aria-label': r.label + ' time', style: { width: '82px' }, oninput: (e) => setRow(r.id, 'time', e.target.value, true), onchange: () => render() })),
+          h('td', null, h('input', { class: 'txt sm', value: r.label, 'aria-label': 'Name of the ' + r.time + ' row', oninput: (e) => setRow(r.id, 'label', e.target.value, true) })),
+          h('td', null, r.kind === 'period'
+            ? h('span', { class: 'hint' }, 'Lesson: ' + periodOf(r.period).label)
+            : h('select', { class: 'txt sm', 'aria-label': r.label + ' colour', onchange: (e) => setRow(r.id, 'tone', e.target.value) }, Object.entries(BAND_TONES).map(([k, v]) => h('option', { value: k, selected: r.tone === k }, v)))),
+          h('td', null, r.kind === 'band' ? h('button', { type: 'button', class: 'x-btn', title: 'Remove ' + (r.label || 'this row'), 'aria-label': 'Remove ' + (r.label || 'this row'), onclick: () => mutate((p) => { p.dayRows = p.dayRows.filter((x) => x.id !== r.id); }) }, '×') : null))))),
+      h('div', null, h('button', { type: 'button', class: 'btn small', onclick: () => mutate((p) => { p.dayRows.push({ id: '', time: '', label: 'New row', kind: 'band', tone: 'green' }); p.dayRows = cleanDayRows(p.dayRows, p.periods); }) }, 'Add a row (break, lunch…)')));
+  }
+
+  // ----- The second screen -----
+  let sheetWin = null, sheetSeen = { plan: null, ui: null };
+  function openSecondScreen() {
+    const url = location.href.split('#')[0] + '#sheet';
+    if (sheetWin && !sheetWin.closed) { try { sheetWin.focus(); return; } catch (e) { /* open again */ } }
+    sheetWin = window.open(url, 'lifehouse-second-screen', 'popup,width=1400,height=900');
+    if (!sheetWin) toast('The browser blocked the new window. Allow pop-ups for this page, then try again.');
+    else toast('Day sheet opened in a new window. Drag it onto the other screen, then press F for full screen.');
+  }
+  const mainUi = () => loadUI(UI_KEY);
+  function sheetDayId() {
+    const m = mainUi();
+    if (ui.sheetFollow && DAYS.some((d) => d.id === m.day)) return m.day;
+    return DAYS.some((d) => d.id === ui.sheetDay) ? ui.sheetDay : 'Mon';
+  }
+  function showSheetDay(id) {
+    ui.sheetFollow = false; ui.sheetDay = id;
+    saveUI(); render();
+  }
+  // Picks up changes the main screen has saved: the plan, and the day and period it shows.
+  function followMain() {
+    let plan = null, mui = null;
+    try { plan = localStorage.getItem(STORE_KEY); mui = localStorage.getItem(UI_KEY); } catch (e) { return; }
+    if (plan === sheetSeen.plan && mui === sheetSeen.ui) return;
+    if (plan !== sheetSeen.plan && plan) { try { project = sanitize(JSON.parse(plan)); } catch (e) { /* keep what is shown */ } }
+    sheetSeen = { plan, ui: mui };
+    render();
+  }
+  function askMainToShow(day, period, place) {
+    try { localStorage.setItem(GOTO_KEY, JSON.stringify({ day, period, place: place || null, at: Date.now() })); } catch (e) { /* not essential */ }
+  }
+  function renderSheetBar() {
+    const day = sheetDayId();
+    $('#topbar').replaceChildren(
+      h('div', { class: 'brand' }, svg(ICONS.mark),
+        h('div', { class: 'brand-text' }, h('span', { class: 'brand-name' }, 'Day sheet'),
+          h('span', { class: 'plan-name' }, (project.school || 'School') + ' Timetabler' + (project.name ? ' · ' + project.name : '')))),
+      h('nav', { class: 'tabs', 'aria-label': 'Days' }, DAYS.map((d) =>
+        h('button', { type: 'button', class: 'tab' + (d.id === day ? ' on' : ''), 'aria-current': d.id === day ? 'page' : null, onclick: () => showSheetDay(d.id) }, d.name))),
+      h('label', { class: 'follow', title: 'Show the day chosen on the main screen, and mark its period' },
+        h('input', { type: 'checkbox', id: 'sheet-follow', checked: ui.sheetFollow, onchange: (e) => { ui.sheetFollow = e.target.checked; if (!ui.sheetFollow) ui.sheetDay = day; saveUI(); render(); } }),
+        'Follow the main screen'),
+      h('div', { class: 'top-actions' },
+        h('button', { type: 'button', class: 'btn', onclick: exportDaySheets }, 'Export for Excel'),
+        h('button', { type: 'button', class: 'btn', onclick: () => window.print(), title: 'All five days, one A3 landscape page each' }, 'Print the week'),
+        h('button', { type: 'button', class: 'btn full-btn', title: (isFull() ? 'Leave full screen' : 'Full screen') + ' (F)', onclick: toggleFullscreen },
+          svg(isFull() ? ICONS.unfull : ICONS.full), isFull() ? 'Exit full screen' : 'Full screen')));
+  }
+  function renderSecondScreen() {
+    rebuildIndexes();
+    document.body.dataset.view = 'print';
+    document.body.classList.add('second');
+    document.title = 'Day sheet · ' + (project.school || 'School') + ' Timetabler';
+    renderSheetBar();
+    const d = DAYS.find((x) => x.id === sheetDayId()) || DAYS[0];
+    const m = mainUi();
+    const now = ui.sheetFollow && m.day === d.id ? m.period : null;
+    $('#view').replaceChildren(
+      h('div', { class: 'dsheet-screen' }, project.people.length || project.areas.length ? staffDayGrid(d, now) : h('p', { class: 'hint ds-empty' }, 'Open the timetabler on the main screen first.')),
+      h('div', { class: 'sheets ds-print' }, DAYS.map(staffDaySheet)));
+  }
+
   // ----- Setup view -----
   function renderSetup(root) {
     root.append(h('div', { class: 'page' },
@@ -2116,6 +2486,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
             h('input', { class: 'txt', id: 'school-name', value: project.school, oninput: (e) => mutate((p) => { p.school = e.target.value; }, { merge: 'school-name', render: false }) })),
           h('p', { class: 'hint' }, 'Both names appear on printed timetables and in backup file names.')),
         periodsCard(),
+        schoolDayCard(),
         peopleCard('student'),
         peopleCard('staff'),
         roomsCard(),
@@ -2138,6 +2509,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       let n = p.periods.length + 1;
       while (taken.has('P' + n)) n++;
       p.periods.push({ id: 'P' + n, label: 'P' + n, time: '' });
+      p.dayRows = cleanDayRows(p.dayRows, p.periods);
     });
   }
   function removePeriodDialog(per) {
@@ -2146,6 +2518,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     confirmBox('Remove ' + per.label + '?', uses ? 'This removes ' + per.label + ' from every day, with its ' + plural(uses, 'placement') + ' and lesson names.' : 'Nothing is planned in ' + per.label + ' yet.', 'Remove period', () => {
       mutate((p) => {
         p.periods = p.periods.filter((x) => x.id !== per.id);
+        p.dayRows = cleanDayRows(p.dayRows, p.periods);
         DAYS.forEach((d) => { delete p.slots[slotKey(d.id, per.id)]; });
       });
     }, true);
@@ -2247,8 +2620,8 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       h('div', { class: 'files' },
         h('div', { class: 'file-act' }, h('b', null, 'Save backup'), h('p', null, 'Downloads the whole plan: rooms, people, timetable and lesson names.' + (project.meta.backedUpAt ? ' Last saved ' + fmtDate(project.meta.backedUpAt) + '.' : ' Not saved yet.')), h('button', { type: 'button', class: 'btn small primary', onclick: saveBackup }, 'Save backup')),
         h('div', { class: 'file-act' }, h('b', null, 'Open a file'), h('p', null, 'Open a backup, an old version’s saved file, or a people list (CSV with name and role columns).'), h('button', { type: 'button', class: 'btn small', onclick: openFilePicker }, 'Open a file…')),
-        h('div', { class: 'file-act' }, h('b', null, 'Export for Excel'), h('p', null, 'One row for every person in every period, or one row per person with the week across.'),
-          h('div', { style: { display: 'flex', gap: '6px', flexWrap: 'wrap' } }, h('button', { type: 'button', class: 'btn small', onclick: exportAllocations }, 'Rows per period'), h('button', { type: 'button', class: 'btn small', onclick: exportGrid }, 'Week grid'))),
+        h('div', { class: 'file-act' }, h('b', null, 'Export for Excel'), h('p', null, 'One row for every person in every period, one row per person with the week across, or a day sheet for each day with a column per member of staff.'),
+          h('div', { style: { display: 'flex', gap: '6px', flexWrap: 'wrap' } }, h('button', { type: 'button', class: 'btn small', onclick: exportAllocations }, 'Rows per period'), h('button', { type: 'button', class: 'btn small', onclick: exportGrid }, 'Week grid'), h('button', { type: 'button', class: 'btn small', onclick: exportDaySheets }, 'Day sheets'))),
         h('div', { class: 'file-act' }, h('b', null, 'Start a new half-term'), h('p', null, 'Keep the rooms and people. Start from this timetable, or from an empty one.'), h('button', { type: 'button', class: 'btn small', onclick: newTermDialog }, 'New half-term…')),
         old ? h('div', { class: 'file-act' }, h('b', null, 'Earlier version found'), h('p', null, 'The old map saved a plan on this computer. Bring in its rooms, people and P1–P4 (into Monday).'), h('button', { type: 'button', class: 'btn small', onclick: () => offerOld(old) }, 'Bring it in…')) : null,
         h('div', { class: 'file-act' }, h('b', null, 'Example school'), h('p', null, 'Made-up pupils and staff with a filled-in week on your rooms and map, for trying things out or showing someone. Replaces the people and timetable on screen.'), h('button', { type: 'button', class: 'btn small', onclick: loadExample }, 'Load the example…')),
@@ -2585,6 +2958,16 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
   // ---------- Keyboard ----------
   document.addEventListener('keydown', (e) => {
     if (document.querySelector('dialog[open]')) return;
+    if (SHEET_MODE) {
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      if (e.key === 'f' || e.key === 'F') { e.preventDefault(); toggleFullscreen(); }
+      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+        e.preventDefault();
+        const i = DAYS.findIndex((d) => d.id === sheetDayId());
+        showSheetDay(DAYS[(i + (e.key === 'ArrowRight' ? 1 : DAYS.length - 1)) % DAYS.length].id);
+      }
+      return;
+    }
     const typing = e.target.closest && e.target.closest('input, textarea, select, [contenteditable="true"]');
     const mod = e.ctrlKey || e.metaKey;
     if (mod && !e.altKey && e.key.toLowerCase() === 'z' && !typing) { e.preventDefault(); if (e.shiftKey) redo(); else undo(); return; }
@@ -2622,13 +3005,13 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     const onGrid = Object.entries(OLD_GRID).every(([id, pos]) => { const a = project.areas.find((x) => x.id === id); return a && a.x === pos[0] && a.y === pos[1] && a.w === pos[2] && a.h === pos[3]; });
     // A plan on the school layout from before the building tabs and the main building's real shape moves to the new one.
     const oldSchool = saved && Array.isArray(saved.outlines) && saved.outlines.some((o) => o && o.id === 'B2' && o.name === 'Main building') && !saved.outlines.some((o) => o && 'tone' in o) && !ui.keptOldMap;
-    if (saved && (onScale || onGrid || oldSchool)) {
+    if (saved && !SHEET_MODE && (onScale || onGrid || oldSchool)) {
       movedToRoomy = JSON.stringify(project);
       applyLayout(project, 'school');
       project = sanitize(project);
     }
     // A plan still on the earlier built-in room layout, with nobody added, moves to the school floor plan.
-    if (saved && !project.people.length && !Object.keys(project.slots).length && !project.map.imageId && project.areas.some((a) => a.name === 'Central Learning Space')) {
+    if (saved && !SHEET_MODE && !project.people.length && !Object.keys(project.slots).length && !project.map.imageId && project.areas.some((a) => a.name === 'Central Learning Space')) {
       const fresh = blankProject();
       project = Object.assign(fresh, { name: project.name, school: project.school, periods: project.periods });
     }
@@ -2642,7 +3025,11 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       undoStack = [movedToRoomy];
       renderTopbar();
     }
-    if (!saved) {
+    if (SHEET_MODE) {
+      sheetSeen = { plan: raw, ui: localStorage.getItem(UI_KEY) };
+      setInterval(followMain, 1500);
+    }
+    if (!saved && !SHEET_MODE) {
       const old = findOld();
       if (old && !ui.oldDeclined) offerOld(old);
     }
