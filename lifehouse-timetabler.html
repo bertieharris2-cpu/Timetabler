@@ -49,6 +49,8 @@
   --band-lightblue: #DDEBF7;
   --band-blue: #8CC9EE;
   --band-green: #8EDC8E;
+  --lesson-wellbeing: #E3F4E3;
+  --lesson-academic: #E2EDF9;
   --ok: #1B7339;
   --ok-bg: #E0F3E6;
   --warn: #9A5300;
@@ -75,7 +77,7 @@
     --ppa: #CCA6EE; --ppa-bg: #33244A; --off: #F0B47A; --off-bg: #33261A; --off-line: #B8743A;
     --out: #8FD3A6; --out-bg: #16291D; --out-line: #4F8A63; --hall: #A9B4C1; --tab-ink: #0D1520;
     --top: #0B1220; --top-ink: #E5EAF0; --top-muted: #96A2AE; --top-line: #26324A; --top-tab: #1E3150; --save: #E8B95A;
-    --sheet-line: #3E4B5A; --sheet-place: #7FD49B; --sheet-band-ink: #0D1520; --band-lightblue: #A9C4DE; --band-blue: #6FAFD6; --band-green: #6FBF7A;
+    --sheet-line: #3E4B5A; --sheet-place: #7FD49B; --sheet-band-ink: #0D1520; --band-lightblue: #A9C4DE; --band-blue: #6FAFD6; --band-green: #6FBF7A; --lesson-wellbeing: #1B3324; --lesson-academic: #1B2B40;
     --ok: #82D49D; --ok-bg: #173825; --warn: #F0B866; --warn-bg: #3F2D0F; --bad: #F09C8D; --bad-bg: #481E18;
     --tint-s: 30%; --tint-l: 24%;
     --shadow: 0 1px 2px rgba(0, 0, 0, .45);
@@ -91,7 +93,7 @@
   --ppa: #CCA6EE; --ppa-bg: #33244A; --off: #F0B47A; --off-bg: #33261A; --off-line: #B8743A;
     --out: #8FD3A6; --out-bg: #16291D; --out-line: #4F8A63; --hall: #A9B4C1; --tab-ink: #0D1520;
     --top: #0B1220; --top-ink: #E5EAF0; --top-muted: #96A2AE; --top-line: #26324A; --top-tab: #1E3150; --save: #E8B95A;
-    --sheet-line: #3E4B5A; --sheet-place: #7FD49B; --sheet-band-ink: #0D1520; --band-lightblue: #A9C4DE; --band-blue: #6FAFD6; --band-green: #6FBF7A;
+    --sheet-line: #3E4B5A; --sheet-place: #7FD49B; --sheet-band-ink: #0D1520; --band-lightblue: #A9C4DE; --band-blue: #6FAFD6; --band-green: #6FBF7A; --lesson-wellbeing: #1B3324; --lesson-academic: #1B2B40;
   --ok: #82D49D; --ok-bg: #173825; --warn: #F0B866; --warn-bg: #3F2D0F; --bad: #F09C8D; --bad-bg: #481E18;
   --tint-s: 30%; --tint-l: 24%;
   --shadow: 0 1px 2px rgba(0, 0, 0, .45);
@@ -523,6 +525,29 @@ table.pt { width: 100%; border-collapse: collapse; table-layout: fixed; color: v
 .pt .pt-ic.small { display: inline-block; width: 18px; height: 18px; margin: 0 6px -4px 0; }
 .pictures .pt .pt-lesson td { height: 31mm; }
 .pictures .pt .pt-subject { font-size: 17px; }
+.pt img.pt-ic { object-fit: contain; }
+.edit-table.symbols td { vertical-align: middle; }
+.sym-cell { width: 44px; }
+.sym-prev { display: block; width: 32px; height: 32px; object-fit: contain; color: var(--ink); stroke-width: 1.3; }
+.sym-reset { margin-left: 8px; font-size: 12px; }
+.photo-cell { white-space: nowrap; }
+/* Wellbeing and academic lessons: pale shading behind the cell, never the only way to tell. */
+.lt-wellbeing { background: var(--lesson-wellbeing); }
+.lt-academic { background: var(--lesson-academic); }
+.dg-cell.lt-wellbeing { background: var(--lesson-wellbeing); }
+.dg-cell.lt-academic { background: var(--lesson-academic); }
+.sheet .lt-wellbeing { background: #E3F4E3; }
+.sheet .lt-academic { background: #E2EDF9; }
+.sheet .lt-wellbeing, .sheet .lt-academic { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.pt-key { display: flex; gap: 14px; margin-top: 6px; font-size: 11px; color: var(--paper-muted); }
+.pt-key i { display: inline-block; width: 12px; height: 12px; margin-right: 5px; vertical-align: -2px; border: 1px solid var(--paper-line); }
+.lt-pick.lt-wellbeing, .lt-pick.lt-academic { color: var(--ink); }
+.photo-btn { width: 30px; height: 30px; padding: 0; border: 1px dashed var(--line-strong); background: var(--surface-2); color: var(--muted); font-size: 16px; vertical-align: middle; overflow: hidden; }
+.photo-btn img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.photo-del { margin-left: 6px; font-size: 12px; }
+.pt .pt-staff { display: flex; justify-content: center; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.pt .pt-person { display: flex; flex-direction: column; align-items: center; font-size: 11px; }
+.pt .pt-photo { width: 34px; height: 34px; object-fit: cover; border: 1px solid var(--paper-line); }
 .pictures .pt .pt-teacher { margin-top: 3px; font-size: 12px; }
 .pictures .pt .pt-double .pt-ic { width: 72px; height: 72px; }
 .pt .pt-name, .pt .pt-band td, .pt thead th, .pt .pt-when { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -634,7 +659,13 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
   .sheet.staffday .ps thead th.ps-title { font-size: 12px; }
   .sheet.staffday .ps .ds-with { font-size: 7px; }
   .pictures .pt .pt-lesson td { height: 22mm; padding: 2px 3px; }
-  .pictures .pt .pt-lesson .pt-ic { width: 40px; height: 40px; margin-bottom: 3px; }
+  .pictures .pt .pt-lesson .pt-ic { width: 34px; height: 34px; margin-bottom: 2px; }
+  .pictures .pt .pt-subject { font-size: 14px; }
+  .pictures .pt .pt-group { margin-top: 1px; font-size: 10px; }
+  .pictures .pt .pt-staff { margin-top: 2px; gap: 4px; }
+  .pictures .pt .pt-photo { width: 24px; height: 24px; }
+  .pictures .pt .pt-person { font-size: 9px; }
+  .pt-key { margin-top: 3px; font-size: 9px; }
   .pictures .pt .pt-band td, .pictures .pt .pt-band th { padding: 1px 6px; font-size: 11px; }
   .pictures .pt .pt-ic.small { width: 14px; height: 14px; margin-bottom: -3px; }
   .pictures .pt .pt-name { font-size: 18px; padding: 3px; }
@@ -656,6 +687,8 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
 <div class="toasts" id="toasts" aria-live="polite"></div>
 <input type="file" id="file-open" accept=".json,.csv,application/json,text/csv" hidden>
 <input type="file" id="image-open" accept="image/*" hidden>
+<input type="file" id="symbol-open" accept="image/*" hidden>
+<input type="file" id="photo-open" accept="image/*" hidden>
 
 <script>
 (function () {
@@ -836,6 +869,23 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     [/literacy|reading|english|story|writ|library/i, 'book'], [/\barts?\b|craft|paint|draw|creative/i, 'palette'], [/music|sing/i, 'note'], [/wellbeing|pshe|calm|mindful/i, 'heart'],
     [/career|work experience|enterprise/i, 'briefcase'], [/out and about|community|trip|town|visit|travel/i, 'bus'], [/champion|reward|choice|golden/i, 'star'],
     [/1:1|one to one/i, 'person'], [/group/i, 'meet'], [/break|snack/i, 'cup'], [/lunch|dinner/i, 'plate'], [/home/i, 'home'], [/arrive|arrival/i, 'door']];
+  const subjectKey = (name) => str(name).toLowerCase().replace(/\s+/g, ' ');
+  // Wellbeing and academic lessons are shaded pale green and pale blue on pupil timetables and day sheets.
+  const LESSON_TYPES = { wellbeing: 'Wellbeing', academic: 'Academic', none: 'Neither' };
+  const WELLBEING_RE = /wellbeing|\bpe\b|sport|gym|swim|cook|food|bak|garden|\bbees?\b|animal|\bpets?\b|farm|wood|forest|horse|riding|stable|\barts?\b|craft|paint|music|sing|drama|out and about|community|trip|champion|reward|choice|golden|d\s*&\s*d|game|yoga|calm|mindful|pshe|social|play/i;
+  const ACADEMIC_RE = /literacy|numeracy|math|english|science|phonics|reading|spelling|writ|\bict\b|comput|tech|\bdt\b|history|geography|topic|story|career/i;
+  function lessonType(subject) {
+    const k = subjectKey(subject);
+    const chosen = (project.subjectTypes || {})[k];
+    if (chosen) return chosen;
+    return WELLBEING_RE.test(k) ? 'wellbeing' : ACADEMIC_RE.test(k) ? 'academic' : 'none';
+  }
+  // A subject's symbol on a picture timetable: the school's own picture if one was chosen, otherwise a built-in one.
+  function lessonSymbol(subject, room, kind, cls) {
+    const id = (project.symbols || {})[subjectKey(subject)];
+    if (id && images.has(id)) return h('img', { class: cls + ' pt-img', src: images.get(id), alt: '' });
+    return roomIcon(lessonIcon(subject, room, kind), cls);
+  }
   function lessonIcon(subject, room, kind) {
     for (const [re, k] of LESSON_ICON_RULES) if (re.test(subject)) return k;
     return room ? iconName(room, kind) : 'star';
@@ -880,6 +930,14 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     const out = Object.assign({}, project);
     const m = project.map;
     out.map = { image: m.imageId ? images.get(m.imageId) || null : null, w: m.w, h: m.h, fade: m.fade };
+    out.symbols = {};
+    for (const [k, id] of Object.entries(project.symbols || {})) if (images.has(id)) out.symbols[k] = images.get(id);
+    out.people = project.people.map((x) => {
+      const y = Object.assign({}, x);
+      delete y.photoId;
+      if (x.photoId && images.has(x.photoId)) y.photo = images.get(x.photoId);
+      return y;
+    });
     return out;
   }
   let storageOk = true, lastSavedAt = null, saveTimer = null;
@@ -897,7 +955,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     return {
       app: APP_ID, version: FILE_VERSION, name: '', school: 'Lifehouse',
       periods,
-      areas: clone(DEFAULT_AREAS), people: [], slots: {}, outlines: clone(LAYOUTS.school.outlines), specials: clone(DEFAULT_SPECIALS), dayRows: cleanDayRows(null, periods),
+      areas: clone(DEFAULT_AREAS), people: [], slots: {}, outlines: clone(LAYOUTS.school.outlines), specials: clone(DEFAULT_SPECIALS), dayRows: cleanDayRows(null, periods), symbols: {}, subjectTypes: {},
       map: { imageId: null, w: 0, h: 0, fade: 1 },
       meta: { created: nowIso(), changedAt: null, backedUpAt: null }
     };
@@ -944,6 +1002,17 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       return { id: str(o.id), kind: o.kind === 'label' ? 'label' : 'box', name: str(o.name), sub: str(o.sub), tone: TONES[o.tone] ? o.tone : 'main', group: str(o.group),
         x: clamp(num(o.x, 0), 0, 100 - w), y: clamp(num(o.y, 0), 0, 100 - hh), w, h: hh };
     });
+    // Pictures chosen for subjects on picture timetables, kept like the floor plan picture.
+    out.symbols = {};
+    for (const [k, v] of Object.entries(p.symbols && typeof p.symbols === 'object' ? p.symbols : {})) {
+      const key = subjectKey(k);
+      if (!key || typeof v !== 'string') continue;
+      if (v.startsWith('data:image/')) out.symbols[key] = rememberImage(v);
+      else if (images.has(v)) out.symbols[key] = v;
+    }
+    // Wellbeing or academic, where the school has chosen differently from the guess.
+    out.subjectTypes = {};
+    for (const [k, v] of Object.entries(p.subjectTypes && typeof p.subjectTypes === 'object' ? p.subjectTypes : {})) if (subjectKey(k) && LESSON_TYPES[v]) out.subjectTypes[subjectKey(k)] = v;
     // The floor plan picture is kept outside the plan's data (see rememberImage) so undo stays light.
     const m0 = p.map || {};
     let imageId = null;
@@ -957,7 +1026,10 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     out.people = (Array.isArray(p.people) ? p.people : []).filter((x) => x && str(x.id) && str(x.name) && !seenPeople.has(str(x.id)) && seenPeople.add(str(x.id))).map((x) => ({
       id: str(x.id), name: str(x.name), full: str(x.full),
       role: x.role === 'staff' ? 'staff' : 'student',
-      ppa: Math.max(0, Math.round(num(x.ppa, 0)))
+      ppa: Math.max(0, Math.round(num(x.ppa, 0))),
+      // Staff who lead lessons are the ones named on pupil timetables; support staff are left off.
+      lead: x.role === 'staff' && !!x.lead,
+      photoId: typeof x.photo === 'string' && x.photo.startsWith('data:image/') ? rememberImage(x.photo) : x.photoId && images.has(x.photoId) ? x.photoId : null
     }));
 
     // Plans from before off-site places existed had one "Off-site" box; its placements move to an off-site place.
@@ -1012,7 +1084,8 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
         if (!ids.includes(r.period) || had.has(r.period)) return;
         had.add(r.period);
         out.push({ id: '', time: str(r.time), label: str(r.label) || (periods.find((x) => x.id === r.period) || {}).label, kind: 'period', period: r.period });
-      } else out.push({ id: '', time: str(r.time), label: str(r.label), kind: 'band', tone: BAND_TONES[r.tone] ? r.tone : 'green' });
+      } else out.push({ id: '', time: str(r.time), label: str(r.label), kind: 'band', tone: BAND_TONES[r.tone] ? r.tone : 'green',
+        pupils: 'pupils' in r ? !!r.pupils : !/prep|meeting|briefing/i.test(str(r.label)) });
       const id = str(r.id);
       if (id && !seen.has(id)) { out[out.length - 1].id = id; seen.add(id); }
     });
@@ -1298,6 +1371,18 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     reader.readAsText(f);
   });
   function openFilePicker() { fileInput.click(); }
+  const symbolInput = $('#symbol-open');
+  symbolInput.addEventListener('change', () => {
+    const f = symbolInput.files && symbolInput.files[0];
+    symbolInput.value = '';
+    if (f && symbolFor) loadSymbol(f, symbolFor);
+  });
+  const photoInput = $('#photo-open');
+  photoInput.addEventListener('change', () => {
+    const f = photoInput.files && photoInput.files[0];
+    photoInput.value = '';
+    if (f && photoFor) loadPhoto(f, photoFor);
+  });
   const imageInput = $('#image-open');
   imageInput.addEventListener('change', () => {
     const f = imageInput.files && imageInput.files[0];
@@ -2266,37 +2351,43 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     const a = place && areaById.get(place);
     if (!a) return { kind: 'none', key: '' };
     const here = peopleAt(s, place), staffHere = here.filter(isStaff);
+    const leads = staffHere.filter((x) => x.lead);
+    const shown = leads.length ? leads : staffHere;
     const subject = str(s.titles[place]) || a.name;
-    return { kind: 'lesson', subject, room: a.name, roomKind: a.kind, group: groupWord(here.filter(isPupil).length), teachers: names(staffHere),
-      key: place + '|' + subject + '|' + staffHere.map((x) => x.id).join(',') };
+    return { kind: 'lesson', subject, type: lessonType(subject), room: a.name, roomKind: a.kind, group: groupWord(here.filter(isPupil).length), teachers: names(shown), staffShown: shown,
+      key: place + '|' + subject + '|' + shown.map((x) => x.id).join(',') };
   }
   // The week as a table of the school day's rows: a narrow time column, then Monday to Friday.
   // The same lesson in periods next to each other is one tall box, like a double lesson on paper.
   function pupilSheet(p, pictures) {
-    const rows = dayRows();
+    const rows = dayRows().filter((r) => r.kind === 'period' || r.pupils);
     const cells = DAYS.map((d) => rows.map((r) => r.kind === 'period' ? pupilLesson(p, slotOf(slotKey(d.id, r.period))) : null));
     const span = DAYS.map(() => rows.map(() => 1));
     cells.forEach((col, di) => { for (let i = rows.length - 1; i > 0; i--) { const a = col[i - 1], b = col[i]; if (a && b && a.key && a.key === b.key) { span[di][i - 1] += span[di][i]; span[di][i] = 0; } } });
-    const sym = (k, cls) => roomIcon(k, cls || 'pt-ic');
     const lessonCell = (c, n) => {
-      const attrs = n > 1 ? { rowspan: n, class: 'pt-double' } : null;
+      const attrs = { rowspan: n > 1 ? n : null, class: (n > 1 ? 'pt-double ' : '') + (c.type ? 'lt-' + c.type : '') };
       if (c.kind === 'out') return h('td', attrs, h('span', { class: 'na' }, 'Not in'));
       if (c.kind !== 'lesson') return h('td', attrs, '');
       return h('td', attrs,
-        pictures ? sym(lessonIcon(c.subject, c.room, c.roomKind)) : null,
+        pictures ? lessonSymbol(c.subject, c.room, c.roomKind, 'pt-ic') : null,
         h('span', { class: 'pt-subject' }, c.subject),
         c.group ? h('span', { class: 'pt-group' }, c.group) : null,
-        c.teachers ? h('span', { class: 'pt-teacher' }, c.teachers) : null);
+        pictures && c.staffShown.some((x) => x.photoId && images.has(x.photoId))
+          ? h('span', { class: 'pt-staff' }, c.staffShown.map((x) => h('span', { class: 'pt-person' },
+            x.photoId && images.has(x.photoId) ? h('img', { class: 'pt-photo', src: images.get(x.photoId), alt: '' }) : null, h('span', null, x.full || x.name))))
+          : c.teachers ? h('span', { class: 'pt-teacher' }, c.teachers) : null);
     };
     const head = h('thead', null,
       h('tr', null, h('th', { colspan: DAYS.length + 1, class: 'pt-name' }, p.full || p.name)),
       h('tr', null, h('th', { class: 'pt-corner' }, ui.printTimes ? 'Time' : ''), DAYS.map((d) => h('th', { scope: 'col' }, d.name))));
     const body = h('tbody', null, rows.map((r, i) => {
       const when = h('th', { scope: 'row', class: 'pt-when' }, ui.printTimes && r.time ? h('b', null, r.time) : null, r.kind === 'period' ? h('span', null, r.label) : null);
-      if (r.kind === 'band') return h('tr', { class: 'pt-band' }, when, h('td', { colspan: DAYS.length }, pictures ? sym(lessonIcon(r.label), 'pt-ic small') : null, r.label));
+      if (r.kind === 'band') return h('tr', { class: 'pt-band' }, when, h('td', { colspan: DAYS.length }, pictures ? lessonSymbol(r.label, '', '', 'pt-ic small') : null, r.label));
       return h('tr', { class: 'pt-lesson' }, when, DAYS.map((d, di) => (span[di][i] ? lessonCell(cells[di][i], span[di][i]) : null)));
     }));
-    return h('section', { class: 'sheet pupil' + (pictures ? ' pictures' : '') }, h('table', { class: 'pt' }, head, body));
+    const types = new Set(cells.flat().filter((c) => c && c.type && c.type !== 'none').map((c) => c.type));
+    return h('section', { class: 'sheet pupil' + (pictures ? ' pictures' : '') }, h('table', { class: 'pt' }, head, body),
+      types.size ? h('div', { class: 'pt-key' }, ['wellbeing', 'academic'].filter((t) => types.has(t)).map((t) => h('span', null, h('i', { class: 'lt-' + t }), LESSON_TYPES[t] + ' lessons'))) : null);
   }
   function roomSheet(a) {
     const head = h('thead', null, h('tr', null, h('th', null, ''), DAYS.map((d) => h('th', { scope: 'col' }, d.name))));
@@ -2338,7 +2429,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     const a = place && areaById.get(place);
     if (!a) return { kind: 'none', text: '' };
     const others = peopleAt(s, place).filter((x) => x.id !== p.id);
-    return { kind: a.kind === 'offsite' ? 'off' : 'place', place, room: a.name, lesson: str(s.titles[place]),
+    return { kind: a.kind === 'offsite' ? 'off' : 'place', place, room: a.name, lesson: str(s.titles[place]), type: lessonType(str(s.titles[place]) || a.name),
       pupils: names(others.filter(isPupil)), staffWith: names(others.filter(isStaff)) };
   }
   const unplacedPupilsIn = (s) => pupils().filter((x) => !s.at[x.id]);
@@ -2364,7 +2455,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
             const c = dayCellParts(p, s);
             const desc = c.kind === 'out' ? 'not in' : c.kind === 'none' ? 'not placed' : c.text || [c.room, c.pupils, c.staffWith && 'with ' + c.staffWith].filter(Boolean).join(', ');
             return h('button', {
-              type: 'button', class: 'dg-cell k-' + c.kind + (now ? ' now' : ''),
+              type: 'button', class: 'dg-cell k-' + c.kind + (c.type ? ' lt-' + c.type : '') + (now ? ' now' : ''),
               title: (c.lesson ? c.lesson + '. ' : '') + 'Show ' + d.name + ' ' + per.label + ' on the main screen', 'aria-label': p.name + ', ' + r.label + ': ' + desc,
               onclick: () => askMainToShow(d.id, r.period, c.place)
             }, c.kind === 'none' ? 'Not placed' : c.text ? c.text : [
@@ -2390,7 +2481,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
         list.map((p) => {
           const c = dayCellParts(p, s);
           if (!c.room) return h('td', null, c.text);
-          return h('td', null, h('span', { class: 'ds-loc' }, c.room), c.pupils ? ' ' + c.pupils : '', c.staffWith ? h('span', { class: 'ds-with' }, 'with ' + c.staffWith) : null);
+          return h('td', { class: 'lt-' + c.type }, h('span', { class: 'ds-loc' }, c.room), c.pupils ? ' ' + c.pupils : '', c.staffWith ? h('span', { class: 'ds-with' }, 'with ' + c.staffWith) : null);
         }),
         showNp ? h('td', { class: 'ps-np' }, names(unplacedPupilsIn(s))) : null);
     }));
@@ -2426,7 +2517,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
   const xmlEsc = (v) => String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   const colName = (n) => { let s = ''; for (n++; n > 0; n = Math.floor((n - 1) / 26)) s = String.fromCharCode(65 + ((n - 1) % 26)) + s; return s; };
   // Cell styles, in the order styles.xml lists them.
-  const XS = { title: 1, name: 2, time: 3, label: 4, lightblue: 5, blue: 6, green: 7, none: 8, cell: 9 };
+  const XS = { title: 1, name: 2, time: 3, label: 4, lightblue: 5, blue: 6, green: 7, none: 8, cell: 9, wellbeing: 10, academic: 11 };
   function daySheetXml(d) {
     const list = staff(), rows = dayRows();
     const slotFor = (r) => slotOf(slotKey(d.id, r.period));
@@ -2452,7 +2543,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       line += cell(1, n, XS.label, text(r.label));
       list.forEach((p, i) => {
         const c = dayCellParts(p, s);
-        line += cell(i + 2, n, XS.cell, c.room ? run(c.room, 'FF00B050') + (c.pupils ? run(' ' + c.pupils) : '') + (c.staffWith ? run('\nwith ' + c.staffWith, 'FF7F7F7F') : '') : text(c.text));
+        line += cell(i + 2, n, c.room && XS[c.type] ? XS[c.type] : XS.cell, c.room ? run(c.room, 'FF00B050') + (c.pupils ? run(' ' + c.pupils) : '') + (c.staffWith ? run('\nwith ' + c.staffWith, 'FF7F7F7F') : '') : text(c.text));
       });
       if (showNp) line += cell(last, n, XS.cell, text(names(unplacedPupilsIn(s))));
       out.push('<row r="' + n + '" ht="78" customHeight="1">' + line + '</row>');
@@ -2472,14 +2563,14 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     const fill = (rgb) => '<fill><patternFill patternType="solid"><fgColor rgb="' + rgb + '"/><bgColor indexed="64"/></patternFill></fill>';
     const styles = head + '<styleSheet xmlns="' + ns + 'spreadsheetml/2006/main">'
       + '<fonts count="3"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="14"/><name val="Calibri"/></font></fonts>'
-      + '<fills count="5"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill>' + fill('FFDDEBF7') + fill('FF8CC9EE') + fill('FF8EDC8E') + '</fills>'
+      + '<fills count="7"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill>' + fill('FFDDEBF7') + fill('FF8CC9EE') + fill('FF8EDC8E') + fill('FFE3F4E3') + fill('FFE2EDF9') + '</fills>'
       + '<borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border><border><left style="thin"><color auto="1"/></left><right style="thin"><color auto="1"/></right><top style="thin"><color auto="1"/></top><bottom style="thin"><color auto="1"/></bottom><diagonal/></border></borders>'
       + '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>'
-      + '<cellXfs count="10"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>'
+      + '<cellXfs count="12"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>'
       + '<xf numFmtId="0" fontId="2" fillId="0" borderId="0" xfId="0" applyFont="1"/>'
       + xf(1, 0, 'horizontal="center" vertical="bottom"') + xf(1, 0, 'horizontal="left" vertical="top"') + xf(1, 0, 'horizontal="left" vertical="top"')
       + xf(1, 2, 'horizontal="left" vertical="center"') + xf(1, 3, 'horizontal="left" vertical="center"') + xf(1, 4, 'horizontal="left" vertical="center"') + xf(1, 0, 'horizontal="left" vertical="center"')
-      + xf(0, 0, 'horizontal="center" vertical="top" wrapText="1"') + '</cellXfs>'
+      + xf(0, 0, 'horizontal="center" vertical="top" wrapText="1"') + xf(0, 5, 'horizontal="center" vertical="top" wrapText="1"') + xf(0, 6, 'horizontal="center" vertical="top" wrapText="1"') + '</cellXfs>'
       + '<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>';
     const files = [
       ['[Content_Types].xml', head + '<Types xmlns="' + ns + 'package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/>'
@@ -2502,22 +2593,93 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
+  // Every subject on the timetable (lesson names, or the room where none was typed) and the day's other rows.
+  function subjectsInUse() {
+    const seen = new Map();
+    const add = (name, room, kind, band) => { const k = subjectKey(name); if (k && !seen.has(k)) seen.set(k, { name: str(name), room, kind, band: !!band }); };
+    for (const [key, s] of Object.entries(project.slots)) {
+      const used = new Set(Object.values(s.at));
+      project.areas.forEach((a) => { if (used.has(a.id) || str(s.titles[a.id])) add(str(s.titles[a.id]) || a.name, a.name, a.kind); });
+    }
+    project.dayRows.forEach((r) => { if (r.kind === 'band') add(r.label, '', '', true); });
+    Object.keys(project.symbols || {}).forEach((k) => { if (!seen.has(k)) seen.set(k, { name: k, room: '', kind: '' }); });
+    return [...seen.values()].sort((a, b) => (a.band - b.band) || a.name.localeCompare(b.name));
+  }
+  let symbolFor = null;
+  function chooseSymbol(name) { symbolFor = name; $('#symbol-open').click(); }
+  // Reads a picture and makes it small enough to keep in the browser: at most 240px. A photo is cropped
+  // square and kept as JPEG; a symbol keeps its shape and stays PNG, so see-through backgrounds stay see-through.
+  function loadSmallPicture(file, photo, done) {
+    if (!/^image\//.test(file.type)) { toast('Choose a picture file, such as a PNG or JPG.'); return; }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const iw = img.naturalWidth, ih = img.naturalHeight;
+        const side = Math.min(iw, ih);
+        const sw = photo ? side : iw, sh = photo ? side : ih;
+        const scale = Math.min(1, 240 / Math.max(sw, sh));
+        const w = Math.max(1, Math.round(sw * scale)), hh = Math.max(1, Math.round(sh * scale));
+        const c = document.createElement('canvas');
+        c.width = w; c.height = hh;
+        const g = c.getContext('2d');
+        if (photo) { g.fillStyle = '#ffffff'; g.fillRect(0, 0, w, hh); }
+        g.drawImage(img, photo ? (iw - sw) / 2 : 0, photo ? (ih - sh) / 2 : 0, sw, sh, 0, 0, w, hh);
+        done(rememberImage(photo ? c.toDataURL('image/jpeg', 0.85) : c.toDataURL('image/png')));
+      };
+      img.onerror = () => toast('That picture could not be opened. Try a PNG or JPG.');
+      img.src = String(reader.result);
+    };
+    reader.readAsDataURL(file);
+  }
+  function loadSymbol(file, name) {
+    loadSmallPicture(file, false, (id) => {
+      mutate((p) => { p.symbols = Object.assign({}, p.symbols, { [subjectKey(name)]: id }); });
+      toast('Picture added for ' + name);
+    });
+  }
+  let photoFor = null;
+  function choosePhoto(pid) { photoFor = pid; $('#photo-open').click(); }
+  function loadPhoto(file, pid) {
+    loadSmallPicture(file, true, (id) => {
+      mutate((proj) => { const x = proj.people.find((q) => q.id === pid); if (x) x.photoId = id; });
+      toast('Photo added. It stays on this computer and in your backups.');
+    });
+  }
+  function symbolsCard() {
+    const list = subjectsInUse();
+    return h('section', { class: 'card' },
+      h('h3', null, 'Subjects', h('span', { class: 'n' }, 'type and picture')),
+      h('p', { class: 'hint' }, 'Wellbeing lessons are shaded pale green and academic lessons pale blue on pupil timetables and day sheets; the app guesses from the name, and you can change it. Each subject shows a built-in symbol on picture timetables; to use the pictures your pupils already know (such as Widgit symbols), choose your own. Subjects appear here once they’re on the timetable.'),
+      list.length ? h('div', { class: 'table-box' }, h('table', { class: 'edit-table symbols' }, h('tbody', null, list.map((x) => {
+        const own = (project.symbols || {})[subjectKey(x.name)];
+        return h('tr', null,
+          h('td', { class: 'sym-cell' }, lessonSymbol(x.name, x.room, x.kind, 'sym-prev')),
+          h('td', null, x.name, own ? null : h('span', { class: 'hint' }, ' · built-in')),
+          h('td', null, x.band ? h('span', { class: 'hint' }, 'Rest of the day') : h('select', { class: 'txt sm lt-pick lt-' + lessonType(x.name), 'aria-label': x.name + ' type', onchange: (e) => mutate((p) => { p.subjectTypes = Object.assign({}, p.subjectTypes, { [subjectKey(x.name)]: e.target.value }); }) },
+            Object.entries(LESSON_TYPES).map(([k, v]) => h('option', { value: k, selected: lessonType(x.name) === k }, v)))),
+          h('td', { class: 'num' },
+            h('button', { type: 'button', class: 'btn small', 'aria-label': (own ? 'Change the picture for ' : 'Choose a picture for ') + x.name, onclick: () => chooseSymbol(x.name) }, own ? 'Change…' : 'Choose picture…'),
+            own ? h('button', { type: 'button', class: 'link-btn sym-reset', onclick: () => mutate((p) => { const n = Object.assign({}, p.symbols); delete n[subjectKey(x.name)]; p.symbols = n; }) }, 'Use built-in') : null));
+      })))) : h('p', { class: 'hint' }, 'Nothing on the timetable yet.'));
+  }
   // The school day card in Setup: the times and names of the day sheet's rows.
   function schoolDayCard() {
     const rows = dayRows();
     const setRow = (id, key, value, merge) => mutate((p) => { const r = p.dayRows.find((x) => x.id === id); if (r) r[key] = value; }, merge ? { merge: key + '|' + id, render: false } : {});
     return h('section', { class: 'card' },
       h('h3', null, 'The school day', h('span', { class: 'n' }, 'how the day sheets are set out')),
-      h('p', { class: 'hint' }, 'The rows down the side of each day sheet, in time order. Lessons are the periods above; the other rows show as coloured bands across the sheet.'),
-      h('table', { class: 'edit-table' }, h('thead', null, h('tr', null, h('th', null, 'Time'), h('th', null, 'Name'), h('th', null, 'Shows as'), h('th', null, ''))),
+      h('p', { class: 'hint' }, 'The rows down the side of each day sheet, in time order. Lessons are the periods above; the other rows show as coloured bands across the sheet. Untick “Pupils” for rows pupils aren’t in for, such as staff meetings, to leave them off pupil timetables.'),
+      h('table', { class: 'edit-table' }, h('thead', null, h('tr', null, h('th', null, 'Time'), h('th', null, 'Name'), h('th', null, 'Shows as'), h('th', { title: 'Show this row on pupil timetables' }, 'Pupils'), h('th', null, ''))),
         h('tbody', null, rows.map((r) => h('tr', null,
           h('td', null, h('input', { class: 'txt sm', value: r.time, placeholder: 'e.g. 9.45am', 'aria-label': r.label + ' time', style: { width: '82px' }, oninput: (e) => setRow(r.id, 'time', e.target.value, true), onchange: () => render() })),
           h('td', null, h('input', { class: 'txt sm', value: r.label, 'aria-label': 'Name of the ' + r.time + ' row', oninput: (e) => setRow(r.id, 'label', e.target.value, true) })),
           h('td', null, r.kind === 'period'
             ? h('span', { class: 'hint' }, 'Lesson: ' + periodOf(r.period).label)
             : h('select', { class: 'txt sm', 'aria-label': r.label + ' colour', onchange: (e) => setRow(r.id, 'tone', e.target.value) }, Object.entries(BAND_TONES).map(([k, v]) => h('option', { value: k, selected: r.tone === k }, v)))),
+          h('td', null, r.kind === 'band' ? h('input', { type: 'checkbox', checked: r.pupils, title: 'Show on pupil timetables', 'aria-label': 'Show ' + (r.label || 'this row') + ' on pupil timetables', onchange: (e) => setRow(r.id, 'pupils', e.target.checked) }) : h('span', { class: 'hint' }, '✓')),
           h('td', null, r.kind === 'band' ? h('button', { type: 'button', class: 'x-btn', title: 'Remove ' + (r.label || 'this row'), 'aria-label': 'Remove ' + (r.label || 'this row'), onclick: () => mutate((p) => { p.dayRows = p.dayRows.filter((x) => x.id !== r.id); }) }, '×') : null))))),
-      h('div', null, h('button', { type: 'button', class: 'btn small', onclick: () => mutate((p) => { p.dayRows.push({ id: '', time: '', label: 'New row', kind: 'band', tone: 'green' }); p.dayRows = cleanDayRows(p.dayRows, p.periods); }) }, 'Add a row (break, lunch…)')));
+      h('div', null, h('button', { type: 'button', class: 'btn small', onclick: () => mutate((p) => { p.dayRows.push({ id: '', time: '', label: 'New row', kind: 'band', tone: 'green', pupils: true }); p.dayRows = cleanDayRows(p.dayRows, p.periods); }) }, 'Add a row (break, lunch…)')));
   }
 
   // ----- The second screen -----
@@ -2596,6 +2758,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
           h('p', { class: 'hint' }, 'Both names appear on printed timetables and in backup file names.')),
         periodsCard(),
         schoolDayCard(),
+        symbolsCard(),
         peopleCard('student'),
         peopleCard('staff'),
         roomsCard(),
@@ -2665,6 +2828,12 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       }))),
       role === 'staff' ? h('td', null, h('input', { class: 'txt sm', type: 'number', min: '0', max: '30', value: String(p.ppa || 0), style: { width: '58px' }, 'aria-label': p.name + ' PPA periods a week',
         oninput: (e) => mutate((proj) => { const x = proj.people.find((q) => q.id === p.id); if (x) x.ppa = Math.max(0, Math.round(+e.target.value || 0)); }, { merge: 'ppa|' + p.id, render: false }) })) : null,
+      role === 'staff' ? h('td', { class: 'num' }, h('input', { type: 'checkbox', checked: p.lead, 'aria-label': p.name + ' leads lessons', title: 'Named on pupil timetables. Leave unticked for support staff.',
+        onchange: (e) => mutate((proj) => { const x = proj.people.find((q) => q.id === p.id); if (x) x.lead = e.target.checked; }) })) : null,
+      role === 'staff' ? h('td', { class: 'photo-cell' },
+        h('button', { type: 'button', class: 'photo-btn', title: p.photoId ? 'Change ' + p.name + '’s photo' : 'Add a photo of ' + p.name, 'aria-label': p.photoId ? 'Change ' + p.name + '’s photo' : 'Add a photo of ' + p.name, onclick: () => choosePhoto(p.id) },
+          p.photoId && images.has(p.photoId) ? h('img', { src: images.get(p.photoId), alt: '' }) : '+'),
+        p.photoId ? h('button', { type: 'button', class: 'link-btn photo-del', 'aria-label': 'Remove ' + p.name + '’s photo', onclick: () => mutate((proj) => { const x = proj.people.find((q) => q.id === p.id); if (x) x.photoId = null; }) }, 'Remove') : null) : null,
       h('td', null, h('button', { type: 'button', class: 'x-btn', title: 'Remove ' + p.name, 'aria-label': 'Remove ' + p.name, onclick: () => removePersonDialog(p) }, '×'))));
     const ta = h('textarea', { class: 'txt', id: 'add-' + role, rows: '2', placeholder: role === 'staff' ? 'e.g. Jo, Priya, Alex' : 'e.g. AB, CD, EFG' });
     const add = () => {
@@ -2678,13 +2847,14 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     return h('section', { class: 'card' },
       h('h3', null, label, h('span', { class: 'n' }, list.length ? String(list.length) : 'none yet')),
       list.length ? h('div', { class: 'table-box' }, h('table', { class: 'edit-table' },
-        h('thead', null, h('tr', null, h('th', { title: 'What shows on the map: initials or first names' }, 'On the map'), h('th', null, 'Full name'), h('th', null, 'In on'), role === 'staff' ? h('th', { title: 'PPA periods needed each week' }, 'PPA') : null, h('th', null, ''))),
+        h('thead', null, h('tr', null, h('th', { title: 'What shows on the map: initials or first names' }, 'On the map'), h('th', null, 'Full name'), h('th', null, 'In on'), role === 'staff' ? h('th', { title: 'PPA periods needed each week' }, 'PPA') : null,
+          role === 'staff' ? h('th', { title: 'Named on pupil timetables. Leave unticked for support staff.' }, 'Leads') : null, role === 'staff' ? h('th', null, 'Photo') : null, h('th', null, ''))),
         h('tbody', null, rows))) : null,
       h('div', { class: 'add-box' },
         h('label', { class: 'field', for: 'add-' + role }, 'Add ' + label.toLowerCase() + (role === 'staff' ? '' : ' (initials or first names)')),
         ta,
         h('div', { class: 'row' }, h('button', { type: 'button', class: 'btn small primary', onclick: add }, 'Add'), h('span', { class: 'hint' }, 'Separate names with commas, spaces or new lines.'))),
-      role === 'staff' ? h('p', { class: 'hint' }, 'PPA is the number of periods a week each person needs. The Week view warns when someone is short.') : h('p', { class: 'hint' }, 'Days: click a letter to mark someone as not in that day (part-time). For one period only, drag them to “Not in this period” on the map.'));
+      role === 'staff' ? h('p', { class: 'hint' }, 'PPA is the number of periods a week each person needs; the Week view warns when someone is short. Tick “Leads” for staff who lead lessons: pupil timetables name them and leave support staff off (a room with nobody ticked shows everyone in it). Photos show on picture timetables. They stay on this computer and in your backup files.') : h('p', { class: 'hint' }, 'Days: click a letter to mark someone as not in that day (part-time). For one period only, drag them to “Not in this period” on the map.'));
   }
   function removePersonDialog(p) {
     confirmBox('Remove ' + p.name + '?', p.name + ' will be taken off the list and out of every period.', 'Remove', () => {
@@ -2803,6 +2973,8 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       p.outlines = clone(layout.outlines);
       p.map = clone(layout.map);
       p.specials = clone(layout.specials);
+      p.symbols = clone(layout.symbols || {});
+      if (layout.dayRows) p.dayRows = clone(layout.dayRows);
     }
     p.name = 'Example school (made-up people)';
     p.periods = [['P1', '9:30–10:30'], ['P2', '10:45–11:45'], ['P3', '12:30–1:30'], ['P4', '1:45–2:45']].map(([id, time]) => ({ id, label: id, time }));

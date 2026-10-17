@@ -15,4 +15,4 @@ The look is defined in the **Lifehouse Timetabler** design system: https://claud
 
 ## Privacy
 
-This repository is public. Never commit pupils' or real staff names, people lists, backups, the school's floor plan picture, or place names that identify the school. Examples use made-up names.
+This repository is public. Never commit pupils' or real staff names, staff photos, people lists, backups, timetables or documents from school, the school's floor plan picture, or place names that identify the school. Examples use made-up names; test pictures are generated.
