@@ -173,7 +173,7 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   check(await page.locator('table.week tbody tr').count() === 23, 'a row for each place plus PPA and Cover');
   check(await page.getByText('Alex has 0 of 2 PPA periods').count() === 1, 'PPA shortfall listed');
   await shot(page, '02-week-room');
-  await page.getByRole('button', { name: 'By person' }).click();
+  await page.getByRole('button', { name: 'By person', exact: true }).click();
   check(await page.locator('td.out').count() === 4, 'GH shows "not in" for Wednesday’s 4 periods');
   await shot(page, '03-week-person');
   await page.locator('table.week td.place').first().click();
@@ -320,6 +320,9 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   const [sheet] = await Promise.all([p10.waitForEvent('popup'), p10.getByRole('button', { name: 'Second screen' }).click()]);
   sheet.on('pageerror', (e) => err10.push('second screen: ' + e.message));
   await sheet.setViewportSize({ width: 1920, height: 1080 });
+  await sheet.waitForSelector('.lgrid');
+  check(await sheet.locator('.sheet-look button.on').innerText() === 'Lessons by staff' && await sheet.locator('.lgrid .lg-name.staff').count() === 23, 'the second screen opens on Lessons by staff, a column per member of staff');
+  await sheet.getByRole('button', { name: 'Paper sheet' }).click();
   await sheet.waitForSelector('.dgrid');
   check(await sheet.locator('.dg-head').count() === 23, 'a column for each member of staff');
   check(await sheet.locator('.dg-band').count() === 5 && await sheet.locator('.dg-band', { hasText: 'Wellbeing' }).count() === 1, 'the rest of the day shows as coloured rows');
@@ -711,7 +714,7 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   await p4.locator('.room[data-area="A11"] .use-cell').nth(5).click();
   check(await p4.locator('.slot-name b').innerText() === 'Tuesday · P2' && await p4.locator('.room.use').count() === 0, 'clicking a square opens that period with people');
   await p4.getByRole('button', { name: 'Week', exact: true }).click();
-  await p4.getByRole('button', { name: 'By room' }).click();
+  await p4.getByRole('button', { name: 'By room', exact: true }).click();
   check(await p4.locator('table.week thead th', { hasText: 'Pupils in' }).count() === 1, 'week by room has a pupils-in column');
   await shot(p4, '16-week-room-use');
 
@@ -767,6 +770,39 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   check(await p4.locator('.room[data-area]').count() === 22 && await p4.locator('.plan-img').count() === 1, 'undo removes the room and keeps the picture');
   check(err4.length === 0, 'no errors in the console' + (err4.length ? ': ' + err4.join(' | ') : ''));
   await ctx4.close();
+
+  console.log('Week view lessons, and the people and groups file');
+  const ctx12 = await browser.newContext({ viewport: { width: 1600, height: 950 }, acceptDownloads: true });
+  const p12 = await ctx12.newPage();
+  const err12 = [];
+  p12.on('pageerror', (e) => err12.push(e.message));
+  await p12.goto(APP);
+  await p12.getByRole('button', { name: 'Or try the example school (made-up people)' }).click();
+  await p12.getByRole('button', { name: 'Week', exact: true }).click();
+  await p12.locator('.page-head .seg button', { hasText: 'Lessons by staff' }).click();
+  await p12.locator('.page-head .seg button', { hasText: 'Tuesday' }).click();
+  check(await p12.locator('.week-lessons .lg-title').innerText() === 'Tuesday' && await p12.locator('.week-lessons .lg-name.staff').count() === 23 && await p12.locator('.week-lessons .lg-head').count() === 4, 'the Week view has Lessons by staff, a day at a time, as on the second screen');
+  await p12.locator('.week-lessons .lg-cell.l-3').first().click();
+  check(/^Tuesday · P3$/.test(await p12.locator('.slot-name b').innerText()), 'clicking a lesson opens it on the map');
+  await p12.getByRole('button', { name: 'Week', exact: true }).click();
+  await p12.locator('.page-head .seg button', { hasText: 'Lessons by room' }).click();
+  check(await p12.locator('.week-lessons .lg-name', { hasText: 'Learning Space 2' }).count() === 1, 'and Lessons by room');
+  await setupTo(p12, 'Plan and files');
+  const [pf] = await Promise.all([p12.waitForEvent('download'), p12.getByRole('button', { name: 'Save people and groups' }).click()]);
+  const pfPath = path.join(TMP, 'people and groups.json');
+  await pf.saveAs(pfPath);
+  const pj = JSON.parse(fs.readFileSync(pfPath, 'utf8'));
+  check(pj.kind === 'lifehouse-people-and-groups' && pj.people.length === 44 && pj.groups.length === 6 && !pj.slots && !pj.areas && (pj.notIn.S20 || []).includes('Wed|P3'), 'saves the people, groups and who is not in when, without rooms or timetable');
+  await p12.getByRole('button', { name: 'Clear everything…' }).click();
+  await p12.locator('dialog').getByRole('button', { name: 'Clear everything' }).click();
+  await p12.setInputFiles('#file-open', pfPath);
+  check(await p12.locator('dialog').innerText().then((t) => /21 pupils, 23 members of staff, 6 groups/.test(t)), 'opening it says what is in it');
+  await p12.getByRole('button', { name: 'Bring them in' }).click();
+  await p12.waitForTimeout(400);
+  const pAfter = await p12.evaluate(() => JSON.parse(localStorage.getItem('lifehouse_timetabler_v2')));
+  check(pAfter.people.length === 44 && pAfter.groups.length === 6 && pAfter.groups[0].members.length === 6 && pAfter.slots['Wed|P3'].at.S20 === 'OUT' && !Object.values((pAfter.slots['Mon|P1'] || { at: {} }).at).some((v) => v !== 'OUT'), 'brings the people and groups into an empty plan, with reduced timetables, and no placements');
+  check(err12.length === 0, 'no errors' + (err12.length ? ': ' + err12.join(' | ') : ''));
+  await ctx12.close();
 
   if (SHOTS) {
     console.log('Screenshots');

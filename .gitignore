@@ -4,5 +4,6 @@ private/
 *timetable starter*.json
 *timetable - *.csv
 people*.csv
+*people and groups*.json
 *.pdf
 node_modules/
