@@ -52,6 +52,8 @@
   --lesson-wellbeing: #E3F4E3;
   --lesson-academic: #E2EDF9;
   --staff-sheet-head: #F8C99B;
+  --lesson-1: #2F6DB5; --lesson-1-bg: #E6EFFA; --lesson-2: #1E7F72; --lesson-2-bg: #E0F2EE;
+  --lesson-3: #A8640A; --lesson-3-bg: #FCEFDA; --lesson-4: #A63F72; --lesson-4-bg: #F8E6EF;
   --staff-sheet-band: #FDEBD8;
   --book-head: #4E6B55; --book-gold: #D6A23E; --book-ink: #1F2A24; --book-muted: #4A584F;
   --book-band: #EEF2EC; --book-band-edge: #9CAE9F; --book-band-ink: #26332B; --book-empty-edge: #93A396;
@@ -86,6 +88,7 @@
     --out: #8FD3A6; --out-bg: #16291D; --out-line: #4F8A63; --hall: #A9B4C1; --tab-ink: #0D1520;
     --top: #0B1220; --top-ink: #E5EAF0; --top-muted: #96A2AE; --top-line: #26324A; --top-tab: #1E3150; --save: #E8B95A;
     --sheet-line: #3E4B5A; --sheet-place: #7FD49B; --sheet-band-ink: #0D1520; --band-lightblue: #A9C4DE; --band-blue: #6FAFD6; --band-green: #6FBF7A; --lesson-wellbeing: #1B3324; --lesson-academic: #1B2B40;
+    --lesson-1: #3E7CC4; --lesson-1-bg: #1B2A3D; --lesson-2: #23887A; --lesson-2-bg: #16302B; --lesson-3: #B06E14; --lesson-3-bg: #35291A; --lesson-4: #B04A7E; --lesson-4-bg: #35202C;
     --ok: #82D49D; --ok-bg: #173825; --warn: #F0B866; --warn-bg: #3F2D0F; --bad: #F09C8D; --bad-bg: #481E18;
     --tint-s: 30%; --tint-l: 24%;
     --shadow: 0 1px 2px rgba(0, 0, 0, .45);
@@ -102,6 +105,7 @@
     --out: #8FD3A6; --out-bg: #16291D; --out-line: #4F8A63; --hall: #A9B4C1; --tab-ink: #0D1520;
     --top: #0B1220; --top-ink: #E5EAF0; --top-muted: #96A2AE; --top-line: #26324A; --top-tab: #1E3150; --save: #E8B95A;
     --sheet-line: #3E4B5A; --sheet-place: #7FD49B; --sheet-band-ink: #0D1520; --band-lightblue: #A9C4DE; --band-blue: #6FAFD6; --band-green: #6FBF7A; --lesson-wellbeing: #1B3324; --lesson-academic: #1B2B40;
+    --lesson-1: #3E7CC4; --lesson-1-bg: #1B2A3D; --lesson-2: #23887A; --lesson-2-bg: #16302B; --lesson-3: #B06E14; --lesson-3-bg: #35291A; --lesson-4: #B04A7E; --lesson-4-bg: #35202C;
   --ok: #82D49D; --ok-bg: #173825; --warn: #F0B866; --warn-bg: #3F2D0F; --bad: #F09C8D; --bad-bg: #481E18;
   --tint-s: 30%; --tint-l: 24%;
   --shadow: 0 1px 2px rgba(0, 0, 0, .45);
@@ -226,6 +230,11 @@ body:not(.alerts-on) .gw-split, body:not(.alerts-on) .gchip-split, body:not(.ale
 body:not(.alerts-on) .need-mark.short, body:not(.alerts-on) .room-foot .room-flag, body:not(.alerts-on) details.issues { display: none !important; }
 body:not(.alerts-on) .room.alert, body:not(.alerts-on) .room.over { border-color: var(--line); box-shadow: none; }
 body:not(.alerts-on) .room-foot.bad, body:not(.alerts-on) .room-foot.warn { background: none; color: inherit; }
+.room.dim { opacity: 0.32; }
+.room.dim:hover, .room.dim:focus-within, .room.dim.drop-ok { opacity: 0.9; }
+.focus-pick { font-size: 12px; }
+.focus-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 4px 14px; max-height: 50vh; overflow: auto; padding: 4px 0; }
+.focus-list label { display: flex; align-items: center; gap: 6px; font-size: 13.5px; }
 .alerts-toggle { display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; font-weight: 600; color: var(--muted); white-space: nowrap; }
 .gen-ok { padding: 8px 10px; background: var(--ok-bg); color: var(--ok); font-weight: 600; }
 .gen-checks { display: flex; flex-direction: column; gap: 6px; max-height: 300px; overflow: auto; }
@@ -583,6 +592,28 @@ table.pt { width: 100%; border-collapse: collapse; table-layout: fixed; color: v
 .lt-wellbeing { background: var(--lesson-wellbeing); }
 .lt-academic { background: var(--lesson-academic); }
 .dg-cell.lt-wellbeing { background: var(--lesson-wellbeing); }
+/* The second screen's lesson views: a column per lesson, each its own colour, no times. */
+.lgrid { flex: 1; align-self: flex-start; display: grid; grid-auto-rows: max-content; gap: 6px; min-width: 0; }
+.lg-title { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; font-size: 20px; font-weight: 700; background: var(--ground); }
+.lg-head { position: sticky; top: 0; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 6px; color: #fff; font-size: 17px; font-weight: 700; }
+.lg-head .now-tag { padding: 1px 6px; background: #fff; color: var(--ink); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; }
+.lg-name { display: flex; flex-direction: column; justify-content: center; gap: 2px; padding: 6px 10px; background: var(--surface); border: 1px solid var(--line); font-size: 15px; font-weight: 700; min-width: 0; }
+.lg-name small { font-size: 11.5px; font-weight: 600; color: var(--muted); }
+.lg-name.staff { border-left: 4px solid var(--staff); }
+.lg-cell { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 3px; min-height: 52px; padding: 7px 11px; border: 0; border-top: 3px solid transparent; text-align: left; color: var(--ink); font: inherit; font-size: 13.5px; line-height: 1.3; min-width: 0; }
+button.lg-cell:hover { outline: 2px solid var(--accent); outline-offset: -2px; }
+.lg-cell.now { box-shadow: inset 0 0 0 2px var(--lc); }
+.lg-cell b { font-size: 15px; }
+.lg-cell .lg-staff { color: var(--staff); font-weight: 650; }
+.lg-cell .lg-pupils { color: var(--ink); }
+.lg-cell .lg-quiet { color: var(--muted); font-style: italic; }
+.lg-cell.k-ppa b { color: var(--ppa); }
+.lg-cell.k-out { background: repeating-linear-gradient(45deg, var(--surface) 0 6px, var(--surface-2) 6px 12px) !important; }
+.lg-np { color: var(--pupil); font-weight: 650; }
+.l-1 { --lc: var(--lesson-1); --lb: var(--lesson-1-bg); } .l-2 { --lc: var(--lesson-2); --lb: var(--lesson-2-bg); }
+.l-3 { --lc: var(--lesson-3); --lb: var(--lesson-3-bg); } .l-4 { --lc: var(--lesson-4); --lb: var(--lesson-4-bg); }
+.lg-head { background: var(--lc); } .lg-cell { background: var(--lb); border-top-color: var(--lc); }
+.sheet-look button { white-space: nowrap; }
 .dg-cell.lt-academic { background: var(--lesson-academic); }
 .sheet .lt-wellbeing { background: #E3F4E3; }
 .sheet .lt-academic { background: #E2EDF9; }
@@ -776,8 +807,12 @@ table.gweek { width: 100%; border-collapse: collapse; table-layout: fixed; backg
 .gw-members li.staff { color: var(--staff); border-left-color: var(--staff); }
 .gw-members li.away { opacity: 0.45; text-decoration: line-through; }
 .gw-placed { margin-bottom: 4px; }
+.gw-members li .gw-sup { padding: 0; border: 0; background: none; font: inherit; color: inherit; cursor: grab; touch-action: none; }
+.gw-members li.support { font-style: italic; }
+.gw-staff-list { display: flex; flex-wrap: wrap; gap: 4px; }
+.gw-staff-list .chip { cursor: grab; touch-action: none; }
+.gw-staff-list .chip.sel, .gw-sup.sel { outline: 2px solid var(--accent); outline-offset: 1px; }
 .gw-placed .gw-members { font-size: 12px; }
-.gw-others { display: block; margin-top: 4px; font-size: 11.5px; color: var(--muted); }
 .lead-seg { flex-wrap: wrap; }
 .lead-controls { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; padding: 6px 10px; background: var(--surface); border: 1px solid var(--line); }
 .lead-controls .member-label { width: auto; margin-left: 10px; }
@@ -1247,6 +1282,8 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     // The school's logo at the top of pupils' book timetables.
     out.logoId = typeof p.logo === 'string' && p.logo.startsWith('data:image/') ? rememberImage(p.logo) : p.logoId && images.has(p.logoId) ? p.logoId : null;
     // Wellbeing or academic, where the school has chosen differently from the guess.
+    // Rooms used for the main lessons; the others can be faded on the map. Null means the app's guess.
+    out.mainRooms = Array.isArray(p.mainRooms) ? p.mainRooms.filter((id) => out.areas.some((a) => a.id === id)) : null;
     out.subjectTypes = {};
     for (const [k, v] of Object.entries(p.subjectTypes && typeof p.subjectTypes === 'object' ? p.subjectTypes : {})) if (subjectKey(k) && LESSON_TYPES[v]) out.subjectTypes[subjectKey(k)] = v;
     // The floor plan picture is kept outside the plan's data (see rememberImage) so undo stays light.
@@ -2055,9 +2092,31 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     return h('label', { class: 'alerts-toggle', title: 'Show warnings: rooms with no staff, split groups, pupils short of a subject' },
       h('input', { type: 'checkbox', checked: !!ui.showAlerts, onchange: (e) => { ui.showAlerts = e.target.checked; saveUI(); render(); } }), 'Show alerts');
   }
+  // Main (academic) lessons are planned first, so the other rooms can be faded to make the map quieter.
+  const MAIN_GUESS_OUT = /garden|animal|wood|forest|stable|horse|hall|kitchen|polytunnel|yard|field|village|tunnel|allotment|bee/i;
+  function mainRoomIds() {
+    return new Set(project.mainRooms || project.areas.filter((a) => a.kind === 'room' && !MAIN_GUESS_OUT.test(a.name)).map((a) => a.id));
+  }
+  function chooseMainRooms() {
+    const chosen = mainRoomIds();
+    const list = h('div', { class: 'focus-list' }, project.areas.slice().sort((a, b) => a.name.localeCompare(b.name)).map((a) =>
+      h('label', null, h('input', { type: 'checkbox', value: a.id, checked: chosen.has(a.id) }), a.name)));
+    dialog({
+      title: 'Rooms for main lessons', wide: true,
+      body: [h('p', null, 'Tick the rooms used for the main lessons. With “Main lesson rooms” ticked on the map, the others are faded, so the map is quieter while the main lessons go in. Faded rooms still take names.'), list],
+      actions: [{ label: 'Cancel' }, { label: 'Save', kind: 'primary', run: () => {
+        const ids = [...list.querySelectorAll('input:checked')].map((i) => i.value);
+        mutate((p) => { p.mainRooms = ids; });
+        ui.mapFocus = true; saveUI(); render();
+      } }]
+    });
+  }
   function renderMapTools() {
     const zi = ZOOMS.indexOf(ui.zoom);
     return h('div', { class: 'map-tools' },
+        editLayout || ui.mapMode !== 'people' ? null : h('label', { class: 'alerts-toggle', title: 'Fade the rooms that are not used for main lessons' },
+          h('input', { type: 'checkbox', checked: !!ui.mapFocus, onchange: (e) => { ui.mapFocus = e.target.checked; saveUI(); render(); } }), 'Main lesson rooms'),
+        editLayout || ui.mapMode !== 'people' ? null : h('button', { type: 'button', class: 'link-btn focus-pick', onclick: chooseMainRooms }, 'Choose…'),
         editLayout ? null : alertsToggle(),
         editLayout ? null : h('div', { class: 'seg', role: 'group', 'aria-label': 'What the map shows' },
           [['people', 'People'], ['use', 'Room use']].map(([id, label]) => h('button', { type: 'button', class: ui.mapMode === id ? 'on' : '', 'aria-pressed': ui.mapMode === id ? 'true' : 'false', onclick: () => { ui.mapMode = id; sel.clear(); saveUI(); render(); } }, label))),
@@ -2179,9 +2238,11 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       h('p', { class: 'hint' }, 'Darker rooms are busier. The little grid in each room is its week: a row per day, a square per period. Click a square to plan that period.'));
   }
 
+  let mainSet = new Set();
   function renderMap(s, st) {
     const m = project.map;
     roomGeo = mapGeometry();
+    mainSet = mainRoomIds();
     const map = h('div', { class: 'map' + (m.imageId ? ' has-plan' : ''), id: 'map' },
       m.imageId ? h('img', { class: 'plan-img', src: images.get(m.imageId), alt: '', draggable: 'false', style: { opacity: m.fade } }) : null,
       project.outlines.map(renderOutline),
@@ -2291,9 +2352,10 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     const g = roomGeo.get(a.id) || { tone: null, open: new Set() };
     const icon = iconName(a.name, a.kind);
     const outdoors = a.kind !== 'offsite' && g.tone === 'out';
+    const dim = ui.mapFocus && !editLayout && ui.mapMode === 'people' && !mainSet.has(a.id);
     return h('div', {
       class: 'room' + (a.kind === 'offsite' ? ' offsite' + (g.tone === 'off' ? '' : ' alone') : a.kind === 'staff' ? ' staffspace' : '') + (outdoors ? ' t-out' : '')
-        + [...g.open].map((side) => ' open-' + side).join('') + (free ? ' free' : '') + (noStaff ? ' alert' : '') + (over && !noStaff ? ' over' : ''),
+        + [...g.open].map((side) => ' open-' + side).join('') + (free ? ' free' : '') + (noStaff ? ' alert' : '') + (over && !noStaff ? ' over' : '') + (dim ? ' dim' : ''),
       'data-zone': a.id, 'data-area': a.id, tabindex: editLayout ? null : '0', 'aria-label': label,
       style: { left: a.x + '%', top: a.y + '%', width: a.w + '%', height: a.h + '%' }
     },
@@ -2977,6 +3039,44 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
           showNp ? h('div', { class: 'dg-cell np' + (now ? ' now' : '') }, names(unplacedPupilsIn(s))) : null];
       }));
   }
+  // The second screen's clearer views: a column per lesson, each its own colour, and no times of day.
+  // By staff, a row per member of staff; by room, a row per room in use that day.
+  function lessonsGrid(d, nowPeriod, by) {
+    const lessons = dayRows().filter((r) => r.kind === 'period');
+    const slots = lessons.map((r) => slotOf(slotKey(d.id, r.period)));
+    const tone = (i) => ' l-' + ((i % 4) + 1);
+    const cell = (i, kind, kids, place, label) => h('button', { type: 'button', class: 'lg-cell k-' + kind + tone(i) + (lessons[i].period === nowPeriod ? ' now' : ''),
+      'aria-label': label, title: 'Show ' + d.name + ' ' + lessons[i].label + ' on the main screen', onclick: () => askMainToShow(d.id, lessons[i].period, place) }, kids);
+    const rows = [];
+    if (by === 'rooms') {
+      const used = project.areas.filter((a) => slots.some((s) => peopleAt(s, a.id).length || str(s.titles[a.id]))).sort((a, b) => a.name.localeCompare(b.name));
+      used.forEach((a) => rows.push([h('div', { class: 'lg-name' }, a.name, a.kind === 'offsite' ? h('small', null, 'Off-site') : null), slots.map((s, i) => {
+        const here = peopleAt(s, a.id), t = str(s.titles[a.id]);
+        if (!here.length && !t) return cell(i, 'free', h('span', { class: 'lg-quiet' }, 'Free'), a.id, a.name + ', ' + lessons[i].label + ': free');
+        return cell(i, 'place', [h('b', null, t || 'Lesson'), here.some(isStaff) ? h('span', { class: 'lg-staff' }, names(here.filter(isStaff))) : null,
+          here.some(isPupil) ? h('span', { class: 'lg-pupils' }, names(here.filter(isPupil))) : null], a.id, a.name + ', ' + lessons[i].label + ': ' + (t || 'lesson'));
+      })]));
+      [[PPA, 'PPA'], [COVER, 'Cover']].forEach(([id, name]) => {
+        if (!slots.some((s) => peopleAt(s, id).length)) return;
+        rows.push([h('div', { class: 'lg-name' }, name, h('small', null, 'Staff only')), slots.map((s, i) => cell(i, id === PPA ? 'ppa' : 'cover', h('span', { class: 'lg-staff' }, names(peopleAt(s, id))), id, name + ', ' + lessons[i].label))]);
+      });
+    } else {
+      staff().forEach((p) => rows.push([h('div', { class: 'lg-name staff', title: p.full || p.name }, p.name), slots.map((s, i) => {
+        const c = dayCellParts(p, s), lab = p.name + ', ' + lessons[i].label + ': ';
+        if (c.kind === 'out') return cell(i, 'out', h('span', { class: 'lg-quiet' }, 'Not in'), null, lab + 'not in');
+        if (c.kind === 'none') return cell(i, 'none', h('span', { class: 'lg-quiet' }, 'Not placed'), null, lab + 'not placed');
+        if (c.text) return cell(i, c.kind, h('b', null, c.text), c.place, lab + c.text);
+        return cell(i, c.kind, [h('b', null, c.subject), c.pupils ? h('span', { class: 'lg-pupils' }, c.pupils) : null], c.place, lab + c.subject);
+      })]));
+    }
+    if (slots.some((s) => unplacedPupilsIn(s).length)) rows.push([h('div', { class: 'lg-name' }, 'Pupils not placed'),
+      slots.map((s, i) => cell(i, 'np', h('span', { class: 'lg-np' }, names(unplacedPupilsIn(s))), NONE, 'Pupils not placed, ' + lessons[i].label))]);
+    if (!rows.length) return h('p', { class: 'hint ds-empty' }, by === 'rooms' ? 'Nothing planned on ' + d.name + ' yet.' : 'No staff yet. Add them in Setup on the main screen.');
+    return h('div', { class: 'lgrid', style: { gridTemplateColumns: 'minmax(120px, 170px) repeat(' + lessons.length + ', minmax(140px, 1fr))' }, 'aria-label': d.name + ', a column for each lesson' },
+      h('div', { class: 'lg-title' }, d.name),
+      lessons.map((r, i) => h('div', { class: 'lg-head' + tone(i) }, r.label, r.period === nowPeriod ? h('span', { class: 'now-tag' }, 'Now') : null)),
+      rows);
+  }
   // The same day on paper: A3 landscape, as the sugar paper sheets are set out.
   function staffDaySheet(d) {
     const list = staff();
@@ -3234,6 +3334,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
   function askMainToShow(day, period, place) {
     try { localStorage.setItem(GOTO_KEY, JSON.stringify({ day, period, place: place || null, at: Date.now() })); } catch (e) { /* not essential */ }
   }
+  const SHEET_LOOKS = [['paper', 'Paper sheet'], ['staff', 'Lessons by staff'], ['rooms', 'Lessons by room']];
   function renderSheetBar() {
     const day = sheetDayId();
     $('#topbar').replaceChildren(
@@ -3242,6 +3343,8 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
           h('span', { class: 'plan-name' }, (project.school || 'School') + ' Timetabler' + (project.name ? ' · ' + project.name : '')))),
       h('nav', { class: 'tabs', 'aria-label': 'Days' }, DAYS.map((d) =>
         h('button', { type: 'button', class: 'tab' + (d.id === day ? ' on' : ''), 'aria-current': d.id === day ? 'page' : null, onclick: () => showSheetDay(d.id) }, d.name))),
+      h('div', { class: 'seg sheet-look', role: 'group', 'aria-label': 'How the day is set out' }, SHEET_LOOKS.map(([id, label]) =>
+        h('button', { type: 'button', class: (ui.sheetLook || 'paper') === id ? 'on' : '', 'aria-pressed': (ui.sheetLook || 'paper') === id ? 'true' : 'false', onclick: () => { ui.sheetLook = id; saveUI(); render(); } }, label))),
       h('label', { class: 'follow', title: 'Show the day chosen on the main screen, and mark its period' },
         h('input', { type: 'checkbox', id: 'sheet-follow', checked: ui.sheetFollow, onchange: (e) => { ui.sheetFollow = e.target.checked; if (!ui.sheetFollow) ui.sheetDay = day; saveUI(); render(); } }),
         'Follow the main screen'),
@@ -3261,7 +3364,8 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     const m = mainUi();
     const now = ui.sheetFollow && m.day === d.id ? m.period : null;
     $('#view').replaceChildren(
-      h('div', { class: 'dsheet-screen' }, project.people.length || project.areas.length ? staffDayGrid(d, now) : h('p', { class: 'hint ds-empty' }, 'Open the timetabler on the main screen first.')),
+      h('div', { class: 'dsheet-screen' }, !(project.people.length || project.areas.length) ? h('p', { class: 'hint ds-empty' }, 'Open the timetabler on the main screen first.')
+        : ui.sheetLook === 'staff' || ui.sheetLook === 'rooms' ? lessonsGrid(d, now, ui.sheetLook) : staffDayGrid(d, now)),
       h('div', { class: 'sheets ds-print' }, DAYS.map(staffDaySheet)));
   }
 
@@ -3767,6 +3871,8 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       if (gc) { drag = { x0: e.clientX, y0: e.clientY, id: e.pointerId, kind: 'group', group: project.groups.find((g) => g.id === gc.dataset.group), from: gc.dataset.from || null, started: false }; return; }
       const pc = e.target.closest('.ppa-chip');
       if (pc) { drag = { x0: e.clientX, y0: e.clientY, id: e.pointerId, kind: 'ppa', from: pc.dataset.from || null, started: false }; return; }
+      const sc = e.target.closest('[data-pid]');
+      if (sc && !sc.closest('.ghost')) { drag = { x0: e.clientX, y0: e.clientY, id: e.pointerId, kind: 'support', pid: sc.dataset.pid, from: sc.dataset.from || null, started: false }; return; }
       const cell = e.target.closest('[data-cell]');
       if (cell && gwPicked) drag = { x0: e.clientX, y0: e.clientY, id: e.pointerId, kind: 'tap', cell: cell.dataset.cell };
       return;
@@ -3800,10 +3906,11 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     if (!drag || e.pointerId !== drag.id) return;
     const dist = Math.hypot(e.clientX - drag.x0, e.clientY - drag.y0);
     if (drag.kind === 'tap') { if (dist > 8) drag = null; return; }
-    if (drag.kind === 'chip' || drag.kind === 'group' || drag.kind === 'ppa') {
+    if (drag.kind === 'chip' || drag.kind === 'group' || drag.kind === 'ppa' || drag.kind === 'support') {
       if (!drag.started) {
         if (dist < 6) return;
         if (drag.kind === 'group') startGroupDrag();
+        else if (drag.kind === 'support') { drag.started = true; drag.ids = []; drag.ghost = h('div', { class: 'ghost' }, chip(person(drag.pid))); document.body.append(drag.ghost); document.body.classList.add('dragging'); }
         else if (drag.kind === 'ppa') { drag.started = true; drag.ids = []; drag.ghost = h('div', { class: 'ghost' }, ppaChip(null)); document.body.append(drag.ghost); document.body.classList.add('dragging'); }
         else startChipDrag();
       }
@@ -3980,6 +4087,9 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
           h('span', { class: 'hint' }, g.perWeek ? n + ' of ' + g.perWeek + ' a week' : plural(n, 'lesson') + ' this week',
             ' · ' + (g.room ? (areaById.get(g.room) || {}).name : 'no usual room')));
       }) : h('p', { class: 'hint' }, 'No groups for these subjects yet.'),
+      list.length ? h('div', { class: 'gw-item gw-ppa' }, h('div', { class: 'zone-head' }, 'Support staff'),
+        h('div', { class: 'gw-staff-list' }, staff().filter((p) => !teacher || p.id !== teacher.id).map((p) => gwStaffChip(p, null))),
+        h('span', { class: 'hint' }, 'Drag onto a group on the week to put them in with it; drag back here to take them out.')) : null,
       teacher ? h('div', { class: 'gw-item gw-ppa' }, h('div', { class: 'zone-head' }, 'PPA'),
         ppaChip(null), h('span', { class: 'hint' }, ppaN + (teacher.ppa ? ' of ' + teacher.ppa : '') + ' PPA this week')) : null,
       h('p', { class: 'hint' }, 'Change groups in Setup → Groups.'));
@@ -3991,26 +4101,57 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
           const key = slotKey(d.id, per.id), s = slotOf(key);
           const mine = list.filter((g) => groupPlace(g, s));
           const split = list.map((g) => ({ g, sp: groupSplit(g, s) })).filter((x) => x.sp);
-          const others = project.groups.filter((g) => !list.includes(g) && groupPlace(g, s));
           // Where this page's teacher is, when it isn't with one of the groups shown
           const tAt = teacher && s.at[teacher.id];
           const tNote = !tAt || tAt === PPA || mine.some((g) => groupPlace(g, s) === tAt) ? null
             : h('span', { class: 'gw-teacher' }, teacher.name + ': ' + (tAt === OUT ? 'not in' : placeName(tAt)));
           return h('td', { 'data-cell': key, 'aria-label': d.name + ' ' + per.label, tabindex: gwPicked ? '0' : null, onkeydown: (e) => { if ((e.key === 'Enter' || e.key === ' ') && gwPicked && e.target === e.currentTarget) { e.preventDefault(); dropPicked(key); } } },
-            mine.map((g) => h('div', { class: 'gw-placed' }, gweekChip(g, key), groupMembers(g, s))),
+            mine.map((g) => h('div', { class: 'gw-placed', 'data-group': g.id }, gweekChip(g, key), groupMembers(g, s, key))),
             tAt === PPA ? ppaChip(key) : null,
             tNote,
             split.map(({ g, sp }) => h('span', { class: 'gw-split', title: g.name + ' is split: ' + names(sp.away) + ' elsewhere' }, '! ' + g.name + ': ' + names(sp.away) + ' elsewhere')),
-            others.length ? h('span', { class: 'gw-others', title: 'Other groups this lesson' }, 'Also: ' + others.map((g) => g.name).join(', ')) : null);
+            null);
         })))));
     root.append(h('div', { class: 'page gw-page' }, head, controls, h('div', { class: 'gw-wrap' }, tray, h('div', { class: 'gw-grid' }, grid))));
   }
   // The people in a group, listed down under its chip: pupils, then staff. In a lesson, anyone not with the group then is faded.
-  function groupMembers(g, s) {
+  // In a lesson, support staff put in with the group (not members, not the page's teacher) follow, and can be dragged off again.
+  function groupMembers(g, s, key) {
     const at = s && groupPlace(g, s);
     const ppl = g.members.map(person).filter(Boolean).sort((a, b) => isStaff(a) - isStaff(b));
+    const support = at ? peopleAt(s, at).filter((x) => isStaff(x) && !g.members.includes(x.id) && x.id !== gwTeacher) : [];
     return h('ul', { class: 'gw-members', 'aria-label': 'In ' + g.name }, ppl.map((x) =>
-      h('li', { class: (isStaff(x) ? 'staff' : 'pupil') + (at && s.at[x.id] !== at ? ' away' : ''), title: at && s.at[x.id] !== at ? x.name + ' is not with the group this lesson' : null }, x.name)));
+      h('li', { class: (isStaff(x) ? 'staff' : 'pupil') + (at && s.at[x.id] !== at ? ' away' : ''), title: at && s.at[x.id] !== at ? x.name + ' is not with the group this lesson' : null }, x.name)),
+      support.map((x) => h('li', { class: 'staff support' }, gwStaffChip(x, key, true))));
+  }
+  // A member of staff to drag in as support: in the list (key null) or in a lesson.
+  function gwStaffChip(p, key, inLesson) {
+    const picked = gwPicked && gwPicked.pid === p.id && gwPicked.from === (key || null);
+    return h('button', { type: 'button', class: (inLesson ? 'gw-sup' : 'chip staff') + (picked ? ' sel' : ''), 'data-pid': p.id, 'data-from': key || null, 'aria-pressed': picked ? 'true' : 'false',
+      title: inLesson ? p.name + ' (support). Drag back to the list to take them out.' : 'Drag ' + p.name + ' onto a group on the week' }, p.name);
+  }
+  // Puts a member of staff in with a group in a lesson, or (key null) takes them out of the lesson they came from.
+  function placeSupport(pid, key, groupId, from) {
+    const p = person(pid);
+    if (!p) return;
+    if (!key) {
+      if (!from) return;
+      mutate(() => { const s0 = slotOf(from, true); delete s0.at[pid]; });
+      toast(p.name + ' taken out of ' + slotLabel(from), { label: 'Undo', run: undo });
+      return;
+    }
+    const s = slotOf(key);
+    const mine = groupId ? project.groups.filter((g) => g.id === groupId) : [...document.querySelectorAll('td[data-cell="' + key + '"] .gw-placed')].map((el) => project.groups.find((g) => g.id === el.dataset.group)).filter(Boolean);
+    const g = mine.length === 1 ? mine[0] : null;
+    const place = g && groupPlace(g, s);
+    if (!place) { toast(mine.length > 1 ? 'Drop ' + p.name + ' onto one of the groups.' : 'Put a group in ' + slotLabel(key) + ' first, then drag ' + p.name + ' onto it.'); render(); return; }
+    if (s.at[pid] === OUT) { toast(p.name + ' is not in on ' + slotLabel(key)); render(); return; }
+    const was = s.at[pid];
+    mutate(() => {
+      if (from && from !== key) { const s0 = slotOf(from, true); if (s0.at[pid]) delete s0.at[pid]; }
+      slotOf(key, true).at[pid] = place;
+    });
+    toast(p.name + ' in with ' + g.name + ', ' + slotLabel(key) + (was && was !== place && (!from || from !== key) ? ' (moved from ' + placeName(was) + ')' : ''), { label: 'Undo', run: undo });
   }
   // PPA for this page's teacher: in the list (key null) to drag onto the week, or in a lesson.
   let gwTeacher = null;
@@ -4033,6 +4174,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     const pk = gwPicked;
     gwPicked = null;
     if (!pk) return;
+    if (pk.pid) { if (cell === 'tray') { if (pk.from) placeSupport(pk.pid, null, null, pk.from); else render(); } else placeSupport(pk.pid, cell, null, pk.from); return; }
     if (cell === 'tray') { if (pk.from) { mutate(() => takeGroupOutWithTeacher(pk.group, pk.from)); toast(pk.group.name + ' taken out of ' + slotLabel(pk.from), { label: 'Undo', run: undo }); } else render(); return; }
     render();
     scheduleGroup(pk.group, cell, pk.from);
@@ -4129,6 +4271,25 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       if (d.room) { pickUpRoom(d.room); return; }
       const z = zoneFromPoint(e.clientX, e.clientY);
       if (sel.size && z && z.dataset.zone === d.zone) placeMany([...sel], d.zone);
+      return;
+    }
+    if (d.kind === 'support') {
+      if (!d.started) {
+        if (cancelled) return;
+        gwPicked = gwPicked && gwPicked.pid === d.pid && gwPicked.from === d.from ? null : { pid: d.pid, from: d.from };
+        render();
+        if (gwPicked) toast((person(d.pid) || {}).name + ' picked up. Tap a group on the week to put them in with it' + (d.from ? ', or tap the list to take them out.' : '.'));
+        return;
+      }
+      d.ghost.remove();
+      document.body.classList.remove('dragging');
+      if (d.hover) d.hover.classList.remove('drop-ok');
+      const c = cancelled ? null : cellFromPoint(e.clientX, e.clientY);
+      if (!c) return;
+      const under = document.elementFromPoint(e.clientX, e.clientY);
+      const gp = under && under.closest('.gw-placed');
+      if (c.dataset.cell === 'tray') placeSupport(d.pid, null, null, d.from);
+      else if (c.dataset.cell !== d.from || gp) placeSupport(d.pid, c.dataset.cell, gp ? gp.dataset.group : null, d.from);
       return;
     }
     if (d.kind === 'ppa') {

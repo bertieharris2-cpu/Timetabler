@@ -345,6 +345,14 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   await xl.saveAs(xlPath);
   const zip = fs.readFileSync(xlPath);
   check(zip.slice(0, 2).toString() === 'PK' && /\.xlsx$/.test(xl.suggestedFilename()) && ['Monday', 'Friday', 'Home time'].every((w) => zip.includes(w)), 'Excel workbook with a tab per day');
+  await sheet.getByRole('button', { name: 'Lessons by staff' }).click();
+  const lgText = await sheet.locator('.lgrid').innerText();
+  check(await sheet.locator('.lg-head').count() === 4 && /Lesson 1/.test(lgText) && !/\d\.\d\d(am|pm)/.test(lgText) && await sheet.locator('.lg-name.staff').count() > 0, 'lessons by staff: a coloured column per lesson, no times');
+  check(await sheet.locator('.lg-head.l-1').evaluate((e) => getComputedStyle(e).backgroundColor) !== await sheet.locator('.lg-head.l-2').evaluate((e) => getComputedStyle(e).backgroundColor), 'each lesson its own colour');
+  await sheet.getByRole('button', { name: 'Lessons by room' }).click();
+  check(await sheet.locator('.lg-name', { hasText: 'Learning Space 2' }).count() === 1, 'lessons by room: a row per room in use');
+  await sheet.getByRole('button', { name: 'Paper sheet' }).click();
+  check(await sheet.locator('.dgrid').count() === 1, 'and back to the paper sheet');
   check(await sheet.evaluate(() => localStorage.getItem('lifehouse_timetabler_v2')) === await p10.evaluate(() => localStorage.getItem('lifehouse_timetabler_v2')), 'the second screen never changes the plan');
   check(err10.length === 0, 'no errors in either window' + (err10.length ? ': ' + err10.join(' | ') : ''));
 
@@ -539,11 +547,20 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   const saved = await p11.evaluate(() => JSON.parse(localStorage.getItem('lifehouse_timetabler_v2')));
   check(saved.slots['Wed|P3'].at.T03 === saved.slots['Wed|P3'].at.S06, 'the page’s teacher goes in with the group');
   check(await p11.locator('.gw-tray .gw-item', { hasText: 'Literacy set 2' }).locator('.gw-members li.pupil').count() === 5
-    && await p11.locator('td[data-cell="Wed|P3"] .gw-placed', { hasText: 'Literacy set 2' }).locator('.gw-members li').count() === 6, 'the children are listed under each group, in the list and on the week');
+    && await p11.locator('td[data-cell="Wed|P3"] .gw-placed', { hasText: 'Literacy set 2' }).locator('.gw-members li:not(.support)').count() === 6, 'the children are listed under each group, in the list and on the week');
   await dragBox(p11.locator('.gw-tray .ppa-chip'), p11.locator('td[data-cell="Thu|P4"]'));
   check(await p11.locator('td[data-cell="Thu|P4"] .ppa-chip').count() === 1, 'PPA dragged onto the week');
   await dragBox(p11.locator('td[data-cell="Thu|P4"] .ppa-chip'), p11.locator('.gw-tray'));
   check(await p11.locator('td[data-cell="Thu|P4"] .ppa-chip').count() === 0, 'and dragged back off');
+  check(await p11.locator('td .gw-others').count() === 0, 'no “Also:” list of other pages’ groups');
+  await dragBox(p11.locator('.gw-staff-list .chip', { hasText: /^Zac$/ }), p11.locator('td[data-cell="Wed|P3"] .gw-placed'));
+  await p11.waitForTimeout(400);
+  let sup = await p11.evaluate(() => JSON.parse(localStorage.getItem('lifehouse_timetabler_v2')));
+  check(sup.slots['Wed|P3'].at.T23 === sup.slots['Wed|P3'].at.S06 && await p11.locator('td[data-cell="Wed|P3"] .gw-sup', { hasText: 'Zac' }).count() === 1, 'support staff dragged in with a group');
+  await dragBox(p11.locator('td[data-cell="Wed|P3"] .gw-sup', { hasText: 'Zac' }), p11.locator('.gw-tray'));
+  await p11.waitForTimeout(400);
+  sup = await p11.evaluate(() => JSON.parse(localStorage.getItem('lifehouse_timetabler_v2')));
+  check(!sup.slots['Wed|P3'].at.T23 && await p11.locator('td[data-cell="Wed|P3"] .gw-sup', { hasText: 'Zac' }).count() === 0, 'and dragged back out');
   await p11.getByRole('button', { name: '+ Add a teacher' }).click();
   await p11.locator('dialog select').selectOption({ label: 'Kat' });
   await p11.locator('dialog label', { hasText: 'Forest school' }).locator('input').check();
@@ -598,6 +615,14 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   check(await p9.locator('.room.t-out').count() === 3 && await p9.locator('.room.offsite.alone').count() === 0, 'outdoor and off-site places take their group’s look');
   const k = await p9.locator('.room[data-area="A6"]').boundingBox(), l3 = await p9.locator('.room[data-area="A1"]').boundingBox();
   check(Math.abs(k.x + k.width - l3.x) < 2 && Math.abs(k.y - l3.y) < 2, 'Kitchen touches Learning Space 3');
+  check(await p9.locator('.room.dim').count() === 0, 'no rooms faded until asked');
+  await p9.getByRole('checkbox', { name: 'Main lesson rooms' }).check();
+  check(await p9.locator('.room.dim').count() > 3 && await p9.locator('.room[data-area="A1"].dim').count() === 0 && await p9.locator('.room.special.dim').count() === 0, 'Main lesson rooms fades the other rooms, not the learning spaces or PPA');
+  await p9.getByRole('button', { name: 'Choose…' }).click();
+  await p9.locator('dialog label', { hasText: /^Learning Space 3$/ }).locator('input').uncheck();
+  await p9.locator('dialog').getByRole('button', { name: 'Save' }).click();
+  check(await p9.locator('.room[data-area="A1"].dim').count() === 1, 'the rooms can be chosen');
+  await p9.getByRole('checkbox', { name: 'Main lesson rooms' }).uncheck();
   const pod = await p9.locator('.room[data-area="A13"]').boundingBox();
   check(pod.height > 120, 'Pod 1 is tall enough for names (' + Math.round(pod.height) + ')');
   await shot(p9, '19-navy-plan');
