@@ -698,7 +698,7 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   check(await p4.locator('.chip.pupil').count() >= 18 && await p4.locator('.chip.staff').count() >= 20, 'example pupils and staff placed on Monday P1');
   check(await p4.locator('.strip-btn.done').count() >= 15, 'most example periods complete (' + await p4.locator('.strip-btn.done').count() + ')');
   check(await p4.locator('.strip-btn[aria-label^="Friday P4"]').evaluate((b) => b.classList.contains('todo') || b.classList.contains('alert')), 'Friday P4 left unfinished to show the checks');
-  check(await p4.locator('.tray-tabs button').allInnerTexts().then((t) => t.map((x) => x.replace(/\s*\d+$/, '')).join('|') === 'Groups|Left to place|Not in'), 'the tray has three views: groups, left to place, not in');
+  check(await p4.locator('.tray-tabs button').allInnerTexts().then((t) => t.map((x) => x.replace(/\s*\d+$/, '')).join('|') === 'Groups|Lessons|Left to place|Not in'), 'the tray has four views: groups, lessons to place, left to place, not in');
   check(await p4.locator('.tgroup').count() === 6 && await p4.locator('.tgroup').first().locator('.tgroup-list .chip').count() === 6, 'each group card lists its members');
   check(await p4.locator('.free-rooms, .band-checks').count() === 0, 'no free rooms or checks boxes in the tray');
   await shot(p4, '14-example-plan');
@@ -787,12 +787,31 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   await p12.getByRole('button', { name: 'Week', exact: true }).click();
   await p12.locator('.page-head .seg button', { hasText: 'Lessons by room' }).click();
   check(await p12.locator('.week-lessons .lg-name', { hasText: 'Learning Space 2' }).count() === 1, 'and Lessons by room');
+  // Each pupil's page: group lessons shown, other lessons added and placed from the tray
+  await p12.getByRole('button', { name: 'Pupils', exact: true }).click();
+  await p12.locator('.pupil-nav button', { hasText: /^HM/ }).click();
+  check(await p12.locator('ul.pgroups li').count() === 2 && await p12.locator('.pweek tbody tr').count() === 4, 'a pupil’s page shows their week and their groups');
+  await p12.getByRole('button', { name: '+ Therapy' }).click();
+  await p12.locator('[data-req] select[aria-label="With"]').last().selectOption({ label: 'Pip' });
+  check(await p12.locator('[data-req]').count() === 1 && await p12.locator('[data-req] .gchip-week').innerText() === '0 of 1', 'a lesson to place is added on the pupil’s page');
+  await p12.getByRole('button', { name: 'Plan', exact: true }).click();
+  await p12.locator('.strip button, .period-strip button', { hasText: 'P1' }).first().click().catch(() => {});
+  await p12.locator('.tray-tabs button', { hasText: 'Lessons' }).click();
+  const hmChip = p12.locator('.rchip', { hasText: 'HM' });
+  check(await hmChip.count() === 1 && /Therapy/.test(await hmChip.innerText()) && /Pip/.test(await hmChip.innerText()), 'it waits in the tray under Lessons');
+  await hmChip.click();
+  await p12.locator('.room[data-area="A2"] .room-head').click();
+  await p12.waitForTimeout(400);
+  const placed = await p12.evaluate(() => JSON.parse(localStorage.getItem('lifehouse_timetabler_v2')));
+  const k12 = Object.keys(placed.slots).find((k) => placed.slots[k].at.S06 === 'A2' && placed.slots[k].at.T16 === 'A2');
+  check(!!k12 && !!placed.slots[k12].titles.A2, 'tap it then a room: the pupil and member of staff go there');
+  await p12.getByRole('button', { name: 'Pupils', exact: true }).click();
   await setupTo(p12, 'Plan and files');
   const [pf] = await Promise.all([p12.waitForEvent('download'), p12.getByRole('button', { name: 'Save people and groups' }).click()]);
   const pfPath = path.join(TMP, 'people and groups.json');
   await pf.saveAs(pfPath);
   const pj = JSON.parse(fs.readFileSync(pfPath, 'utf8'));
-  check(pj.kind === 'lifehouse-people-and-groups' && pj.people.length === 44 && pj.groups.length === 6 && !pj.slots && !pj.areas && (pj.notIn.S20 || []).includes('Wed|P3'), 'saves the people, groups and who is not in when, without rooms or timetable');
+  check(pj.kind === 'lifehouse-people-and-groups' && pj.people.length === 44 && pj.groups.length === 6 && pj.requests.length === 5 && !pj.slots && !pj.areas && (pj.notIn.S20 || []).includes('Wed|P3'), 'saves the people, groups and who is not in when, without rooms or timetable');
   await p12.getByRole('button', { name: 'Clear everything…' }).click();
   await p12.locator('dialog').getByRole('button', { name: 'Clear everything' }).click();
   await p12.setInputFiles('#file-open', pfPath);
@@ -800,7 +819,7 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   await p12.getByRole('button', { name: 'Bring them in' }).click();
   await p12.waitForTimeout(400);
   const pAfter = await p12.evaluate(() => JSON.parse(localStorage.getItem('lifehouse_timetabler_v2')));
-  check(pAfter.people.length === 44 && pAfter.groups.length === 6 && pAfter.groups[0].members.length === 6 && pAfter.slots['Wed|P3'].at.S20 === 'OUT' && !Object.values((pAfter.slots['Mon|P1'] || { at: {} }).at).some((v) => v !== 'OUT'), 'brings the people and groups into an empty plan, with reduced timetables, and no placements');
+  check(pAfter.people.length === 44 && pAfter.groups.length === 6 && pAfter.requests.length === 5 && pAfter.groups[0].members.length === 6 && pAfter.slots['Wed|P3'].at.S20 === 'OUT' && !Object.values((pAfter.slots['Mon|P1'] || { at: {} }).at).some((v) => v !== 'OUT'), 'brings the people and groups into an empty plan, with reduced timetables, and no placements');
   check(err12.length === 0, 'no errors' + (err12.length ? ': ' + err12.join(' | ') : ''));
   await ctx12.close();
 

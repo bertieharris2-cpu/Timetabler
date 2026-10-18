@@ -146,6 +146,8 @@ h1, h2, h3 { text-wrap: balance; }
 .top-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .save-state { font-size: 12px; color: var(--top-muted); }
 .save-state.bad { color: #FFB4A6; font-weight: 600; }
+@media (max-width: 1500px) { .save-state:not(.bad) { display: none; } .tab { padding: 7px 10px; } }
+@media (max-width: 1250px) { .brand-text .plan-name { display: none; } }
 .icon-btn { width: 32px; height: 32px; display: inline-grid; place-items: center; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); padding: 0; }
 .icon-btn:hover:not(:disabled) { background: var(--surface-2); }
 .icon-btn:disabled { opacity: .4; cursor: default; }
@@ -214,6 +216,33 @@ body.fs .slot-name b { font-size: 15px; }
 .tray-tabs .n { font-size: 11px; font-variant-numeric: tabular-nums; color: var(--muted); }
 .tray-body { flex: 1; min-height: 0; overflow: auto; padding: 6px; }
 .tray-groups { display: flex; gap: 8px; align-items: stretch; height: 100%; }
+.tray-reqs { display: flex; flex-wrap: wrap; gap: 6px; align-content: flex-start; overflow: auto; height: 100%; }
+.rchip { display: inline-flex; align-items: center; gap: 5px; min-height: 28px; padding: 2px 8px; border: 1px solid var(--ink); border-left: 5px solid var(--accent); background: var(--surface); color: var(--ink); font-size: 12.5px; cursor: grab; touch-action: none; user-select: none; white-space: nowrap; }
+.rchip:hover { box-shadow: inset 0 0 0 1px var(--ink); }
+.rchip.here { border-style: dashed; border-left-style: solid; }
+.rchip.sel { background: var(--ink); color: var(--surface); }
+.rchip.faded { opacity: 0.45; }
+.rchip-who { font-weight: 700; color: var(--pupil); }
+.rchip-staff { font-weight: 700; color: var(--staff); }
+.rchip.sel .rchip-who, .rchip.sel .rchip-staff { color: var(--surface); }
+.gchip-week.short { background: var(--warn-bg); color: var(--warn); }
+.pupil-nav { max-height: calc(100vh - 160px); overflow: auto; }
+.pupil-nav button small { display: block; font-size: 11px; font-weight: 500; color: var(--muted); }
+.pupil-week-wrap { overflow-x: auto; }
+table.pweek { border-collapse: collapse; width: 100%; max-width: 760px; table-layout: fixed; font-size: 12.5px; }
+.pweek th, .pweek td { border: 1px solid var(--line); padding: 0; text-align: center; }
+.pweek thead th { padding: 4px; background: var(--surface-2); }
+.pweek tbody th { width: 84px; padding: 4px 6px; text-align: left; background: var(--surface-2); font-weight: 600; }
+.pweek td button { width: 100%; min-height: 34px; padding: 4px; border: 0; background: transparent; font-weight: 600; color: var(--ink); }
+.pweek td button:hover { outline: 2px solid var(--accent); outline-offset: -2px; }
+.pweek td.gap button { color: var(--muted); font-weight: 400; font-style: italic; }
+.pweek td.out { background: repeating-linear-gradient(45deg, var(--surface) 0 6px, var(--surface-2) 6px 12px); }
+.pweek td.out button { color: var(--muted); font-weight: 400; }
+ul.pgroups { list-style: none; margin: 0 0 8px; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+ul.pgroups li { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 5px 8px; border: 1px solid var(--line); border-left: 5px solid var(--gc); background: var(--surface); }
+.staff-ink { color: var(--staff); font-weight: 600; }
+.edit-table.reqs input.txt { width: 100%; min-width: 120px; }
+.row-btns { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
 .tgroup { flex: none; width: 168px; display: flex; flex-direction: column; gap: 4px; min-height: 0; border: 1px solid var(--line); border-top: 4px solid var(--gc); background: var(--surface-2); padding: 4px; }
 .tgroup > .gchip { flex: none; width: 100%; flex-wrap: wrap; white-space: normal; row-gap: 2px; }
 .tgroup-list { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; overflow: auto; min-height: 0; padding: 1px; }
@@ -1223,7 +1252,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     return {
       app: APP_ID, version: FILE_VERSION, name: '', school: 'Lifehouse',
       periods,
-      areas: clone(DEFAULT_AREAS), people: [], slots: {}, outlines: clone(LAYOUTS.school.outlines), specials: clone(DEFAULT_SPECIALS), dayRows: cleanDayRows(null, periods), earlyHome: clone(DEFAULT_EARLY), logoId: null, symbols: {}, subjectTypes: {}, groups: [], leadViews: [], needs: DEFAULT_NEEDS.map((subject) => ({ subject, perWeek: 0 })),
+      areas: clone(DEFAULT_AREAS), people: [], slots: {}, outlines: clone(LAYOUTS.school.outlines), specials: clone(DEFAULT_SPECIALS), dayRows: cleanDayRows(null, periods), earlyHome: clone(DEFAULT_EARLY), logoId: null, symbols: {}, subjectTypes: {}, groups: [], leadViews: [], requests: [], needs: DEFAULT_NEEDS.map((subject) => ({ subject, perWeek: 0 })),
       map: { imageId: null, w: 0, h: 0, fade: 1 },
       meta: { created: nowIso(), changedAt: null, backedUpAt: null }
     };
@@ -1324,6 +1353,12 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     const staffIds = new Set(out.people.filter((x) => x.role === 'staff').map((x) => x.id)), seenL = new Set();
     out.leadViews = (Array.isArray(p.leadViews) ? p.leadViews : []).filter((v) => v && str(v.id) && !seenL.has(str(v.id)) && seenL.add(str(v.id))).map((v) => ({
       id: str(v.id), staff: staffIds.has(str(v.staff)) ? str(v.staff) : '', subjects: [...new Set((Array.isArray(v.subjects) ? v.subjects : []).map(str).filter(Boolean))]
+    }));
+    // Lessons to place: one pupil's lesson that staff asked for, or therapy, set up on the pupil's page and placed from the tray.
+    const pupilIds = new Set(out.people.filter((x) => x.role !== 'staff').map((x) => x.id)), seenR = new Set();
+    out.requests = (Array.isArray(p.requests) ? p.requests : []).filter((r) => r && str(r.id) && pupilIds.has(str(r.pupil)) && !seenR.has(str(r.id)) && seenR.add(str(r.id))).map((r) => ({
+      id: str(r.id), pupil: str(r.pupil), subject: str(r.subject), staff: staffIds.has(str(r.staff)) ? str(r.staff) : '',
+      perWeek: clamp(Math.round(num(r.perWeek, 1)), 1, 10), room: out.areas.some((a) => a.id === r.room) ? r.room : '', note: str(r.note)
     }));
     // Plans from before off-site places existed had one "Off-site" box; its placements move to an off-site place.
     const slotsIn = p.slots && typeof p.slots === 'object' ? p.slots : {};
@@ -1556,9 +1591,12 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     if (!valid.length) { toast(SPECIAL_NAMES[zone] + ' is for staff only'); return; }
     const key = curKey();
     sel.clear();
+    const pr = pendingRequest && valid.includes(pendingRequest.pupil) && areaById.get(zone) ? pendingRequest : null;
+    pendingRequest = null;
     mutate(() => {
       const s = slotOf(key, true);
       valid.forEach((id) => { if (zone === NONE) delete s.at[id]; else s.at[id] = zone; });
+      if (pr && !str(s.titles[zone]) && areaById.get(zone).kind !== 'staff') s.titles[zone] = pr.subject;
     });
     if (rejected) toast(plural(rejected, 'pupil') + ' left where they were: ' + SPECIAL_NAMES[zone] + ' is for staff only');
   }
@@ -1589,6 +1627,50 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       if (perWeek == null) return;
       if (!school || school.perWeek !== perWeek) x.needs.push({ subject, perWeek });
     });
+  }
+
+  // ----- Lessons to place (set up on each pupil's page) -----
+  // Placed in a period when the pupil is in a room whose lesson has the subject in its name, with the member of staff if one was chosen.
+  function requestHere(r, sl) {
+    const pl = sl.at[r.pupil], a = pl && areaById.get(pl);
+    if (!a || !str(r.subject)) return null;
+    if (r.staff && sl.at[r.staff] !== pl) return null;
+    return subjectKey(str(sl.titles[pl]) || a.name).includes(subjectKey(r.subject)) ? pl : null;
+  }
+  const requestPlaced = (r) => allSlotKeys().filter((k) => requestHere(r, slotOf(k))).length;
+  const requestsLeft = () => project.requests.filter((r) => str(r.subject) && requestPlaced(r) < r.perWeek);
+  function requestLabel(r) {
+    const p = person(r.pupil), t = r.staff && person(r.staff);
+    return (r.subject || 'Lesson') + ' · ' + (p ? p.name : '') + (t ? ' with ' + t.name : '');
+  }
+  let pendingRequest = null;
+  // Drops the pupil (and their member of staff) into a room this period, and names the room's lesson if it has none.
+  function placeRequest(r, zone) {
+    const key = curKey(), s0 = slotOf(key), p = person(r.pupil), t = r.staff && person(r.staff);
+    const a = areaById.get(zone);
+    if (!p) return;
+    if (!a) { toast(zone === NONE || zone === OUT ? 'Drop it onto a room.' : SPECIAL_NAMES[zone] + ' is for staff only'); return; }
+    if (s0.at[p.id] === OUT) { toast(p.name + ' is not in this period'); return; }
+    const title = str(s0.titles[zone]);
+    const tOut = t && s0.at[t.id] === OUT;
+    sel.clear();
+    mutate(() => {
+      const sl = slotOf(key, true);
+      sl.at[p.id] = zone;
+      if (t && !tOut) sl.at[t.id] = zone;
+      if (!title && a.kind !== 'staff') sl.titles[zone] = r.subject;
+    });
+    const named = !title || subjectKey(title).includes(subjectKey(r.subject));
+    toast(requestLabel(r) + ' in ' + a.name + (tOut ? '. ' + t.name + ' is not in this period' : '') + (named ? '' : '. The room’s lesson is “' + title + '”, so it won’t count as ' + r.subject + ' until it’s renamed'), { label: 'Undo', run: undo });
+  }
+  function pickUpRequest(r) {
+    const s0 = slotOf(curKey());
+    const ids = [r.pupil, r.staff].filter((id) => id && person(id) && s0.at[id] !== OUT);
+    sel.clear();
+    ids.forEach((id) => sel.add(id));
+    pendingRequest = r;
+    render();
+    toast(requestLabel(r) + ' picked up. Tap a room to put them there.');
   }
 
   const groupColour = (g) => (GROUP_COLOURS[g.colour] || GROUP_COLOURS.slate)[1];
@@ -1745,7 +1827,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     const notIn = {};
     for (const [k, sl] of Object.entries(project.slots)) for (const [pid, v] of Object.entries(sl.at)) if (v === OUT) (notIn[pid] = notIn[pid] || []).push(k);
     const out = { app: APP_ID, kind: PEOPLE_FILE, version: 1, savedAt: nowIso(), school: project.school,
-      people: full.people, notIn, groups: project.groups, leadViews: project.leadViews, needs: project.needs,
+      people: full.people, notIn, groups: project.groups, leadViews: project.leadViews, requests: project.requests, needs: project.needs,
       subjectTypes: project.subjectTypes, symbols: full.symbols, logo: full.logo };
     const stamp = new Date();
     const d = stamp.getFullYear() + '-' + String(stamp.getMonth() + 1).padStart(2, '0') + '-' + String(stamp.getDate()).padStart(2, '0');
@@ -1762,6 +1844,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     next.people = people;
     next.groups = Array.isArray(obj.groups) ? obj.groups : [];
     next.leadViews = Array.isArray(obj.leadViews) ? obj.leadViews : [];
+    next.requests = Array.isArray(obj.requests) ? obj.requests : [];
     if (Array.isArray(obj.needs) && obj.needs.length) next.needs = obj.needs;
     next.subjectTypes = Object.assign({}, next.subjectTypes, obj.subjectTypes || {});
     next.symbols = Object.assign({}, next.symbols, obj.symbols || {});
@@ -2016,6 +2099,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     else if (ui.view === 'week') renderWeek(view);
     else if (ui.view === 'print') renderPrint(view);
     else if (ui.view === 'groups') renderGroups(view);
+    else if (ui.view === 'pupils') renderPupils(view);
     else renderSetup(view);
     sizeMap();
     view.scrollTop = st;
@@ -2026,7 +2110,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
   function renderTopbar() {
     if (SHEET_MODE) { renderSheetBar(); return; }
     const bar = $('#topbar');
-    const tabs = [['plan', 'Plan'], ['groups', 'Lead teachers'], ['week', 'Week'], ['print', 'Timetables'], ['setup', 'Setup']];
+    const tabs = [['plan', 'Plan'], ['groups', 'Lead teachers'], ['pupils', 'Pupils'], ['week', 'Week'], ['print', 'Timetables'], ['setup', 'Setup']];
     bar.replaceChildren(
       h('div', { class: 'brand' }, svg(ICONS.mark),
         h('div', { class: 'brand-text' },
@@ -2203,7 +2287,8 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     const upPupils = unplaced.filter(isPupil), upStaff = unplaced.filter(isStaff);
     const out = peopleAt(s, OUT);
     const noPeople = !project.people.length;
-    const tabs = [['groups', 'Groups', project.groups.length], ['left', 'Left to place', unplaced.length], ['out', 'Not in', out.length]];
+    const reqs = project.requests.filter((r) => str(r.subject) && (requestPlaced(r) < r.perWeek || requestHere(r, s)));
+    const tabs = [['groups', 'Groups', project.groups.length], ['lessons', 'Lessons', requestsLeft().length], ['left', 'Left to place', unplaced.length], ['out', 'Not in', out.length]];
     const tab = tabs.some(([id]) => id === ui.trayTab) ? ui.trayTab : project.groups.length ? 'groups' : 'left';
     const issues = st.started ? st.issues : [];
     const howTo = 'Drag names onto the map. Or tap several names, then tap a room to move them together. Tap a room’s numbers to pick up everyone in it. Left and right arrow keys change period; Ctrl+Z undoes.';
@@ -2211,6 +2296,9 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       groups: () => project.groups.length ? h('div', { class: 'tray-groups' }, project.groups.map((g) => trayGroup(g, s)))
         : h('div', { class: 'tray-empty' }, h('span', null, 'No groups yet. Set up the literacy and numeracy sets, D&D or the woods, then drag a whole group onto a room.'),
           h('button', { type: 'button', class: 'btn small', onclick: () => { ui.setupTab = 'groups'; go('setup'); } }, 'Set up groups')),
+      lessons: () => reqs.length ? h('div', { class: 'tray-reqs' }, reqs.map((r) => requestChip(r, s)))
+        : h('div', { class: 'tray-empty' }, h('span', null, project.requests.length ? 'Every lesson set up on the pupils’ pages is placed.' : 'Lessons set up on a pupil’s page (therapy, a project with a member of staff, wellbeing) wait here to be placed.'),
+          h('button', { type: 'button', class: 'btn small', onclick: () => go('pupils') }, 'Pupils’ pages')),
       left: () => h('div', { class: 'tray-left' },
         h('section', { class: 'zone grow' + (upPupils.length ? ' unplaced' : ''), 'data-zone': NONE },
           h('div', { class: 'zone-head' }, 'Pupils left', h('span', { class: 'n' }, upPupils.length || '')),
@@ -2271,6 +2359,18 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       g.perWeek ? h('span', { class: 'gchip-week', 'aria-label': n + ' of ' + g.perWeek + ' lessons this week' }, n + '/' + g.perWeek) : null,
       a ? h('span', { class: 'gchip-at' }, '✓ ' + a.name) : null,
       sp ? h('span', { class: 'gchip-split' }, '! ' + names(sp.away) + ' elsewhere') : null);
+  }
+
+  // A lesson to place in the tray: drag it onto a room, or tap it then tap a room.
+  function requestChip(r, sl) {
+    const n = requestPlaced(r), at = requestHere(r, sl), a = at && areaById.get(at), p = person(r.pupil), t = r.staff && person(r.staff);
+    const notIn = sl.at[r.pupil] === OUT;
+    return h('button', { type: 'button', class: 'rchip' + (at ? ' here' : '') + (notIn ? ' faded' : '') + (pendingRequest === r ? ' sel' : ''), 'data-request': r.id,
+      title: requestLabel(r) + (r.note ? '. ' + r.note : '') + (r.room ? '. Usually ' + (areaById.get(r.room) || {}).name : '') + (notIn ? '. ' + p.name + ' is not in this period.' : a ? '. In ' + a.name + ' this period.' : '. Drag onto a room, or tap then tap a room.') },
+      lessonSymbol(r.subject, '', '', 'gchip-ic'), h('b', null, r.subject),
+      h('span', { class: 'rchip-who' }, p ? p.name : ''), t ? h('span', { class: 'rchip-staff' }, t.name) : null,
+      h('span', { class: 'gchip-week' + (n < r.perWeek ? ' short' : ''), 'aria-label': n + ' of ' + r.perWeek + ' this week' }, n + '/' + r.perWeek),
+      a ? h('span', { class: 'gchip-at' }, '✓ ' + a.name) : null);
   }
 
   function renderUseTray() {
@@ -2681,6 +2781,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       const sh = shortNeeds(p);
       if (sh.length) issues.push({ level: 'warn', key: null, pid: p.id, text: p.name + ' is short of ' + sh.map((n) => n.subject + ' (' + n.has + ' of ' + n.perWeek + ')').join(', ') });
     });
+    requestsLeft().forEach((r) => issues.push({ level: 'warn', key: null, pupilPage: r.pupil, text: requestLabel(r) + ': ' + requestPlaced(r) + ' of ' + r.perWeek + ' placed' }));
     project.groups.filter((g) => g.perWeek > 0).forEach((g) => {
       const n = groupLessons(g);
       if (n < g.perWeek) issues.push({ level: 'warn', key: null, text: g.name + ' has ' + n + ' of ' + g.perWeek + ' lessons this week' });
@@ -2709,7 +2810,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
         h('summary', null, 'Things to check (' + issues.length + ')'),
         h('div', { class: 'issue-list' }, issues.map((i) => h('button', {
           type: 'button', class: 'check ' + i.level,
-          onclick: () => { if (i.key) { const [d, p] = i.key.split('|'); goSlot(d, p, 'plan'); setTimeout(() => flashZone(i.zone), 50); } else { if (i.pid) ui.setupTab = 'pupils'; go('setup'); } }
+          onclick: () => { if (i.key) { const [d, p] = i.key.split('|'); goSlot(d, p, 'plan'); setTimeout(() => flashZone(i.zone), 50); } else if (i.pupilPage) { ui.pupilPage = i.pupilPage; go('pupils'); } else { if (i.pid) ui.setupTab = 'pupils'; go('setup'); } }
         }, h('span', null, i.key ? h('b', null, slotLabel(i.key)) : null, i.text))))) : null,
       lessonMode ? h('div', { class: 'week-lessons' }, lessonsGrid(weekDay, ui.day === weekDay.id ? ui.period : null, ui.weekMode, openSlot))
         : ui.weekMode === 'room' ? weekByRoom(keys) : weekByPerson(keys)
@@ -2794,6 +2895,80 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
         h('span', null, 'Each room has its own colour'))));
   }
 
+  // ----- Pupils: a page for each pupil, to set up the lessons they should have -----
+  // Their group lessons come from the groups; other lessons (therapy, a member of staff's project, wellbeing) are added here
+  // and wait in the Plan's tray to be placed. What every pupil needs as standard stays in Setup → Pupils, to check for gaps.
+  function addRequest(pid, subject) {
+    let id = '';
+    mutate((p) => {
+      let n = p.requests.length + 1;
+      while (p.requests.some((r) => r.id === 'R' + n)) n++;
+      id = 'R' + n;
+      p.requests.push({ id, pupil: pid, subject: subject || '', staff: '', perWeek: 1, room: '', note: '' });
+    });
+    setTimeout(() => { const el = document.querySelector('[data-req="' + id + '"] input'); if (el) el.focus(); }, 30);
+  }
+  function setRequest(id, key, value, merge) {
+    mutate((p) => { const r = p.requests.find((x) => x.id === id); if (r) r[key] = value; }, merge ? { merge: 'req|' + key + '|' + id, render: false } : {});
+  }
+  function renderPupils(root) {
+    const list = pupils();
+    const head = h('div', { class: 'page-head' }, h('h2', null, 'Pupils'),
+      h('span', { class: 'hint' }, 'Set up the lessons each pupil should have. Group lessons come from their groups; add the rest here, such as therapy or a project a member of staff has asked for. They wait in the Plan’s tray, under Lessons, to be placed.'));
+    if (!list.length) { root.append(h('div', { class: 'page' }, head, h('p', { class: 'hint' }, 'No pupils yet. Add them in Setup.'))); return; }
+    const p = person(ui.pupilPage) && isPupil(person(ui.pupilPage)) ? person(ui.pupilPage) : list[0];
+    const left = (q) => project.requests.filter((r) => r.pupil === q.id && str(r.subject) && requestPlaced(r) < r.perWeek).length;
+    const nav = h('nav', { class: 'setup-nav pupil-nav', 'aria-label': 'Pupils' }, list.map((q) => {
+      const n = left(q);
+      return h('button', { type: 'button', class: q.id === p.id ? 'on' : '', 'aria-current': q.id === p.id ? 'page' : null, onclick: () => { ui.pupilPage = q.id; saveUI(); render(); } },
+        h('span', null, q.name, q.full ? h('small', null, q.full) : null), n ? h('span', { class: 'n', title: plural(n, 'lesson') + ' still to place' }, n) : null);
+    }));
+    // Their week, to see what's planned and where the gaps are
+    const lessonRows = dayRows().filter((r) => r.kind === 'period');
+    const week = h('table', { class: 'pweek' }, h('thead', null, h('tr', null, h('th', null, ''), DAYS.map((d) => h('th', { scope: 'col' }, d.name.slice(0, 3))))),
+      h('tbody', null, lessonRows.map((r) => h('tr', null, h('th', { scope: 'row' }, r.label), DAYS.map((d) => {
+        const sl = slotOf(slotKey(d.id, r.period)), pl = sl.at[p.id], a = pl && areaById.get(pl);
+        const txt = pl === OUT ? 'Not in' : a ? (str(sl.titles[pl]) || a.name) : '';
+        return h('td', { class: pl === OUT ? 'out' : a ? '' : 'gap' }, h('button', { type: 'button', title: 'Open ' + d.name + ' ' + r.label + ' on the map', onclick: () => goSlot(d.id, r.period, 'plan') }, txt || 'Free'));
+      })))));
+    const groups = project.groups.filter((g) => g.members.includes(p.id));
+    const reqs = project.requests.filter((r) => r.pupil === p.id);
+    const subjects = [...new Set([...project.needs.map((n) => n.subject), ...subjectsInUse().filter((x) => !x.band).map((x) => x.name), 'Therapy', 'Wellbeing', 'Intervention'])].sort((a, b) => a.localeCompare(b));
+    const rooms = project.areas.filter((a) => a.kind !== 'staff').slice().sort((a, b) => a.name.localeCompare(b.name));
+    const main = h('div', { class: 'setup-main' },
+      h('section', { class: 'card' },
+        h('h3', null, p.full || p.name, p.full ? h('span', { class: 'n' }, p.name) : null),
+        h('div', { class: 'pupil-week-wrap' }, week)),
+      h('section', { class: 'card' },
+        h('h3', null, 'From their groups', h('span', { class: 'n' }, groups.length)),
+        groups.length ? h('ul', { class: 'pgroups' }, groups.map((g) => {
+          const n = groupLessons(g), st = g.members.map(person).filter((x) => x && isStaff(x));
+          return h('li', { style: { '--gc': groupColour(g) } }, h('b', null, g.name), h('span', null, g.subject || ''), st.length ? h('span', { class: 'staff-ink' }, names(st)) : null,
+            g.perWeek ? h('span', { class: 'gchip-week' + (n < g.perWeek ? ' short' : '') }, n + ' of ' + g.perWeek + ' placed') : null);
+        })) : h('p', { class: 'hint' }, 'Not in any groups yet.'),
+        h('button', { type: 'button', class: 'link-btn', onclick: () => { ui.setupTab = 'groups'; go('setup'); } }, 'Change groups in Setup → Groups')),
+      h('section', { class: 'card' },
+        h('h3', null, 'Lessons to place', h('span', { class: 'n' }, reqs.length)),
+        h('p', { class: 'hint' }, 'Therapy, a project a member of staff has in mind, wellbeing time, or anything else just for ' + p.name + '. Choose who it’s with if it matters, and how many a week. It counts as placed when ' + p.name + ' is in a lesson with this name (and with that member of staff).'),
+        h('datalist', { id: 'req-subjects' }, subjects.map((x) => h('option', { value: x }))),
+        reqs.length ? h('div', { class: 'table-box' }, h('table', { class: 'edit-table reqs' },
+          h('thead', null, h('tr', null, h('th', null, 'Lesson'), h('th', null, 'With'), h('th', null, 'A week'), h('th', null, 'Usual room'), h('th', null, 'Note'), h('th', null, 'Placed'), h('th', null, ''))),
+          h('tbody', null, reqs.map((r) => {
+            const n = requestPlaced(r);
+            return h('tr', { 'data-req': r.id },
+              h('td', null, h('input', { class: 'txt sm', value: r.subject, list: 'req-subjects', placeholder: 'e.g. Therapy', 'aria-label': 'Lesson', oninput: (e) => setRequest(r.id, 'subject', e.target.value, true), onchange: () => render() })),
+              h('td', null, h('select', { class: 'txt sm', 'aria-label': 'With', onchange: (e) => setRequest(r.id, 'staff', e.target.value) }, h('option', { value: '' }, 'Anyone'), staff().map((t) => h('option', { value: t.id, selected: r.staff === t.id }, t.name)))),
+              h('td', null, h('select', { class: 'txt sm', 'aria-label': 'Lessons a week', onchange: (e) => setRequest(r.id, 'perWeek', +e.target.value) }, [1, 2, 3, 4, 5].map((v) => h('option', { value: v, selected: r.perWeek === v }, v)))),
+              h('td', null, h('select', { class: 'txt sm', 'aria-label': 'Usual room', onchange: (e) => setRequest(r.id, 'room', e.target.value) }, h('option', { value: '' }, 'Any room'), rooms.map((a) => h('option', { value: a.id, selected: r.room === a.id }, a.name)))),
+              h('td', null, h('input', { class: 'txt sm', value: r.note, placeholder: 'e.g. bike project', 'aria-label': 'Note', oninput: (e) => setRequest(r.id, 'note', e.target.value, true) })),
+              h('td', { class: 'num' }, str(r.subject) ? h('span', { class: 'gchip-week' + (n < r.perWeek ? ' short' : '') }, n + ' of ' + r.perWeek) : null),
+              h('td', null, h('button', { type: 'button', class: 'x-btn', title: 'Remove', 'aria-label': 'Remove ' + (r.subject || 'this lesson'), onclick: () => mutate((pp) => { pp.requests = pp.requests.filter((x) => x.id !== r.id); }) }, '×')));
+          })))) : null,
+        h('div', { class: 'row-btns' }, h('button', { type: 'button', class: 'btn small primary', onclick: () => addRequest(p.id, '') }, '+ Add a lesson'),
+          ['Therapy', 'Wellbeing', 'Intervention'].map((x) => h('button', { type: 'button', class: 'btn small', onclick: () => addRequest(p.id, x) }, '+ ' + x)))));
+    root.append(h('div', { class: 'page' }, head, h('div', { class: 'setup-wrap' }, nav, main)));
+  }
+
   // ----- Timetables (print) view -----
   function renderPrint(root) {
     const what = ui.printWhat;
@@ -2851,6 +3026,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       keys.forEach((k) => { const sp = groupSplit(g, slotOf(k)); if (sp) gi.push({ text: g.name + ' split on ' + slotLabel(k) + ': ' + names(sp.away) + ' elsewhere', go: goSlotItem(k, sp.place) }); });
     });
     cats.push({ title: 'Groups', items: gi });
+    cats.push({ title: 'Lessons to place', items: requestsLeft().map((r) => ({ text: requestLabel(r) + ': ' + requestPlaced(r) + ' of ' + r.perWeek + ' placed', go: () => { ui.pupilPage = r.pupil; go('pupils'); } })) });
     cats.push({ title: 'Staff PPA', items: staff().filter((p) => p.ppa > 0 && ppaCount(p.id) < p.ppa).map((p) => ({ text: p.name + ': ' + ppaCount(p.id) + ' of ' + p.ppa + ' PPA periods', go: () => { ui.setupTab = 'staff'; go('setup'); } })) });
     return cats.filter((c) => c.items.length);
   }
@@ -3828,6 +4004,9 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     const exGroups = [['Literacy set 1', 'Literacy', 2, 'A2', ['S01', 'S02', 'S03', 'S04', 'S05', 'T03']], ['Literacy set 2', 'Literacy', 2, 'A11', ['S06', 'S07', 'S08', 'S09', 'S10', 'T02']],
       ['Numeracy set 1', 'Numeracy', 2, 'A22', ['S01', 'S06', 'S11', 'S12', 'S13', 'T07']], ['Numeracy set 2', 'Numeracy', 2, 'A3', ['S02', 'S07', 'S14', 'S15', 'S16', 'T06']],
       ['D&D', 'D&D', 1, '', ['S17', 'S18', 'S19', 'S20', 'T21']], ['Woods', 'Forest school', 1, 'A9', ['S21', 'S08', 'S04', 'S09', 'T11']]];
+    p.requests = [['R1', 'S08', 'Therapy', 'T12', 1, 'A22', ''], ['R2', 'S03', 'Bike project', 'T19', 1, '', 'Theo has a bike to fix up with him'],
+      ['R3', 'S01', 'Wellbeing', '', 2, '', 'Open: whoever is free'], ['R4', 'S14', 'Therapy', 'T15', 2, '', '']]
+      .map(([id, pupil, subject, staff, perWeek, room, note]) => ({ id, pupil, subject, staff, perWeek, room, note }));
     p.groups = exGroups.map(([name, subject, perWeek, room, members], i) => ({ id: 'G' + (i + 1), name, subject, perWeek, room, members, colour: Object.keys(GROUP_COLOURS)[i] }));
     p.periods = PERIOD_TIMES.map((time, i) => ({ id: 'P' + (i + 1), label: 'P' + (i + 1), time }));
     const pupilNames = ['AB', 'CD', 'DR', 'FT', 'GW', 'HM', 'JP', 'KB', 'LR', 'MO', 'NP', 'OT', 'PJ', 'RS', 'SB', 'TW', 'VH', 'WP', 'YA', 'ZK', 'BM'];
@@ -3968,6 +4147,8 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       drag = Object.assign(base, { kind: handle ? 'resize' : 'move', area: a, el: room, rect: map.getBoundingClientRect(), orig: { x: a.x, y: a.y, w: a.w, h: a.h }, moved: false });
       return;
     }
+    const rc = e.target.closest('.rchip');
+    if (rc) { drag = Object.assign(base, { kind: 'request', request: project.requests.find((r) => r.id === rc.dataset.request), started: false }); return; }
     const c = e.target.closest('.chip');
     if (c) { drag = Object.assign(base, { kind: 'chip', pid: c.dataset.pid, started: false }); return; }
     const gc = e.target.closest('.gchip, .room-group');
@@ -3983,10 +4164,11 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     if (!drag || e.pointerId !== drag.id) return;
     const dist = Math.hypot(e.clientX - drag.x0, e.clientY - drag.y0);
     if (drag.kind === 'tap') { if (dist > 8) drag = null; return; }
-    if (drag.kind === 'chip' || drag.kind === 'group' || drag.kind === 'ppa' || drag.kind === 'support') {
+    if (drag.kind === 'chip' || drag.kind === 'group' || drag.kind === 'ppa' || drag.kind === 'support' || drag.kind === 'request') {
       if (!drag.started) {
         if (dist < 6) return;
-        if (drag.kind === 'group') startGroupDrag();
+        if (drag.kind === 'request') { drag.started = true; drag.ids = []; drag.ghost = h('div', { class: 'ghost' }, drag.request ? requestChip(drag.request, slotOf(curKey())) : null); document.body.append(drag.ghost); document.body.classList.add('dragging'); }
+        else if (drag.kind === 'group') startGroupDrag();
         else if (drag.kind === 'support') { drag.started = true; drag.ids = []; drag.ghost = h('div', { class: 'ghost' }, chip(person(drag.pid))); document.body.append(drag.ghost); document.body.classList.add('dragging'); }
         else if (drag.kind === 'ppa') { drag.started = true; drag.ids = []; drag.ghost = h('div', { class: 'ghost' }, ppaChip(null)); document.body.append(drag.ghost); document.body.classList.add('dragging'); }
         else startChipDrag();
@@ -4350,6 +4532,16 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       if (sel.size && z && z.dataset.zone === d.zone) placeMany([...sel], d.zone);
       return;
     }
+    if (d.kind === 'request') {
+      if (!d.request) return;
+      if (!d.started) { if (!cancelled) pickUpRequest(d.request); return; }
+      d.ghost.remove();
+      document.body.classList.remove('dragging');
+      if (d.hover) d.hover.classList.remove('drop-ok', 'drop-no');
+      const z = cancelled ? null : zoneFromPoint(e.clientX, e.clientY);
+      if (z) placeRequest(d.request, z.dataset.zone);
+      return;
+    }
     if (d.kind === 'support') {
       if (!d.started) {
         if (cancelled) return;
@@ -4428,6 +4620,8 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       return;
     }
     if (ui.view !== 'plan' || editLayout || e.detail !== 0) return;
+    const rq = e.target.closest('.rchip');
+    if (rq && !rq.closest('.ghost')) { const r = project.requests.find((x) => x.id === rq.dataset.request); if (r) pickUpRequest(r); return; }
     const c = e.target.closest('.chip');
     if (c && !c.closest('.ghost')) { toggleSelected(c.dataset.pid); return; }
     const gc = e.target.closest('.gchip, .room-group');
@@ -4497,7 +4691,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       project = Object.assign(fresh, { name: project.name, school: project.school, periods: project.periods });
     }
     if (!ZOOMS.includes(ui.zoom)) ui.zoom = 1;
-    if (!['plan', 'groups', 'week', 'print', 'setup'].includes(ui.view)) ui.view = 'plan';
+    if (!['plan', 'groups', 'pupils', 'week', 'print', 'setup'].includes(ui.view)) ui.view = 'plan';
     render();
     if (movedToRoomy) {
       saveNow();
