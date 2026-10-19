@@ -229,11 +229,16 @@ body.fs .slot-name b { font-size: 15px; }
 .pupil-nav { max-height: calc(100vh - 160px); overflow: auto; }
 .pupil-nav button small { display: block; font-size: 11px; font-weight: 500; color: var(--muted); }
 .pupil-week-wrap { overflow-x: auto; }
-table.pweek { border-collapse: collapse; width: 100%; max-width: 760px; table-layout: fixed; font-size: 12.5px; }
+table.pweek { border-collapse: collapse; width: 100%; max-width: 1100px; table-layout: fixed; font-size: 12.5px; }
 .pweek th, .pweek td { border: 1px solid var(--line); padding: 0; text-align: center; }
 .pweek thead th { padding: 4px; background: var(--surface-2); }
 .pweek tbody th { width: 84px; padding: 4px 6px; text-align: left; background: var(--surface-2); font-weight: 600; }
-.pweek td button { width: 100%; min-height: 34px; padding: 4px; border: 0; background: transparent; font-weight: 600; color: var(--ink); }
+.pweek td button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; width: 100%; min-height: 64px; padding: 5px 4px; border: 0; background: transparent; color: var(--ink); }
+.pweek td button b { font-size: 13.5px; }
+.pweek td button .pw-teacher { font-weight: 600; }
+.pweek td button i { color: var(--muted); }
+.pweek td.lt-wellbeing { background: var(--lesson-wellbeing); }
+.pweek td.lt-academic { background: var(--lesson-academic); }
 .pweek td button:hover { outline: 2px solid var(--accent); outline-offset: -2px; }
 .pweek td.gap button { color: var(--muted); font-weight: 400; font-style: italic; }
 .pweek td.out { background: repeating-linear-gradient(45deg, var(--surface) 0 6px, var(--surface-2) 6px 12px); }
@@ -288,7 +293,6 @@ body:not(.alerts-on) .room-foot.bad, body:not(.alerts-on) .room-foot.warn { back
 .tray .free-rooms { width: 370px; }
 .tray .room-pills { max-height: 80px; overflow: auto; }
 .tray .start-card { width: 330px; padding: 6px 8px; gap: 4px; font-size: 12px; }
-.tray .use-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); column-gap: 10px; max-height: 80px; overflow: auto; }
 .tray .hint { width: 270px; margin: 0; font-size: 11.5px; max-height: 104px; overflow: auto; }
 .tray .summary { width: 180px; align-content: flex-start; }
 .slot-title { display: flex; align-items: center; }
@@ -429,37 +433,12 @@ body.dragging, body.dragging * { cursor: grabbing !important; user-select: none 
 .room.special.cover .room-name, .room.special.cover .room-ic { color: var(--accent); }
 .room.special.free .room-people:empty::after { content: "Drop staff here"; font-size: 10.5px; color: var(--muted); }
 .special-tag { flex: none; font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
-.room.use.offsite { background: var(--off-bg); box-shadow: none; }
-.week td.cover { background: var(--accent-soft); color: var(--accent); font-weight: 700; }
 
 /* Free rooms, room use */
 .room-pills { display: flex; flex-wrap: wrap; gap: 4px; }
 .room-pill { border: 1px dashed var(--line-strong); background: var(--free); color: var(--ink); padding: 2px 7px; font-size: 11.5px; font-weight: 600; }
 .room-pill:hover { border-color: var(--accent); border-style: solid; }
 .map-tools .seg { background: var(--surface); }
-.room.use { overflow: hidden; }
-.room.use::before { content: ""; position: absolute; inset: 0; background: var(--accent); opacity: calc(var(--use) * .32); pointer-events: none; }
-.room.use > * { position: relative; }
-.room.use.unused { border: 2px dashed var(--warn); background: var(--warn-bg); box-shadow: none; }
-.room.use.staffonly { background: var(--free); box-shadow: none; color: var(--muted); }
-.use-num { padding: 0 6px; font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
-.use-num b { font-size: 15px; color: var(--ink); }
-.room.use.unused .use-num { color: var(--warn); font-weight: 700; }
-.use-grid { display: grid; gap: 2px; padding: 5px 6px 6px; margin-top: auto; max-width: 96px; }
-.use-cell { aspect-ratio: 1; min-width: 0; padding: 0; border: 1px solid var(--line-strong); background: var(--surface); }
-.use-cell.on { background: var(--accent); border-color: var(--accent); }
-.use-cell.now { outline: 2px solid var(--ink); outline-offset: 0; }
-.use-list { display: flex; flex-direction: column; gap: 2px; }
-.use-row { display: grid; grid-template-columns: minmax(0, 1fr) 56px 22px; align-items: center; gap: 6px; border: 0; background: transparent; padding: 3px 4px; text-align: left; font-size: 12.5px; }
-.use-row:hover { background: var(--surface-2); }
-.use-row.none .use-name, .use-row.none .use-n { color: var(--warn); font-weight: 700; }
-.use-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.use-n { text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); }
-.use-bar { display: inline-block; height: 6px; background: var(--line); overflow: hidden; vertical-align: middle; }
-.use-row .use-bar { width: 100%; }
-.use-bar i { display: block; height: 100%; background: var(--accent); }
-.use-td .use-bar { width: 40px; margin-right: 6px; }
-.week td.tot.muted { color: var(--muted); }
 
 /* Floor plan picture and building outlines */
 .map.has-plan { min-width: 0; min-height: 0; margin: 0 auto; background-color: var(--paper); }
@@ -524,30 +503,9 @@ details.issues summary { cursor: pointer; font-weight: 600; font-size: 13px; }
 .issue-list .check { cursor: pointer; }
 .issue-list .check b { color: var(--ink); margin-right: 4px; font-weight: 700; white-space: nowrap; }
 .table-scroll { overflow: auto; border: 1px solid var(--line); background: var(--surface); max-height: calc(100vh - 220px); min-height: 240px; }
-table.week { border-collapse: separate; border-spacing: 0; font-size: 11.5px; }
-.week th, .week td { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 4px 6px; vertical-align: top; text-align: left; }
-.week thead th { position: sticky; top: 0; z-index: 2; background: var(--surface-2); font-size: 11px; font-weight: 700; color: var(--muted); white-space: nowrap; }
-.week thead th .d { display: block; color: var(--ink); text-transform: uppercase; letter-spacing: .06em; min-height: 14px; }
-.week tbody th { position: sticky; left: 0; z-index: 1; background: var(--surface); font-weight: 700; white-space: nowrap; max-width: 170px; overflow: hidden; text-overflow: ellipsis; }
-.week thead th:first-child { left: 0; z-index: 3; }
-.week .ds { border-left: 2px solid var(--line-strong); }
-.week td { min-width: 82px; max-width: 128px; cursor: pointer; }
-.week td:hover { background: var(--accent-soft); }
-.week td.free { background: var(--free); }
-.week td.free:hover { background: var(--accent-soft); }
-.week tr.group th { background: var(--surface-2); text-transform: uppercase; letter-spacing: .06em; font-size: 10.5px; color: var(--muted); }
-.week tr.group td { background: var(--surface-2); cursor: default; }
 .c-title { display: block; font-weight: 700; }
 .c-staff { display: block; color: var(--staff); }
 .c-pupils { display: block; color: var(--pupil); }
-.week td.place { background: hsl(var(--h) var(--tint-s) var(--tint-l)); }
-.week td.place:hover { filter: brightness(.96); }
-.week td.none { background: var(--warn-bg); color: var(--warn); font-weight: 700; text-align: center; }
-.week td.out { color: var(--muted); text-align: center; }
-.week td.ppa { background: var(--ppa-bg); color: var(--ppa); font-weight: 700; }
-.week td.off { background: var(--off-bg); color: var(--off); }
-.week td.tot { cursor: default; font-variant-numeric: tabular-nums; white-space: nowrap; background: var(--surface); }
-.week td.tot:hover { background: var(--surface); }
 .tot.short { color: var(--warn); font-weight: 700; }
 
 /* ---------- Second screen: the day sheet, set out like the sugar paper sheets ---------- */
@@ -645,8 +603,6 @@ button.lg-cell:hover { outline: 2px solid var(--accent); outline-offset: -2px; }
 .l-3 { --lc: var(--lesson-3); --lb: var(--lesson-3-bg); } .l-4 { --lc: var(--lesson-4); --lb: var(--lesson-4-bg); }
 .lg-head { background: var(--lc); } .lg-cell { background: var(--lb); border-left-color: var(--lc); }
 .sheet-look button { white-space: nowrap; }
-.week-lessons { display: flex; height: max(480px, calc(100vh - 210px)); overflow: auto; flex-shrink: 0; }
-.week-lessons .lg-title { font-size: 17px; }
 .dg-cell.lt-academic { background: var(--lesson-academic); }
 .sheet .lt-wellbeing { background: #E3F4E3; }
 .sheet .lt-academic { background: #E2EDF9; }
@@ -821,7 +777,9 @@ table.tt { width: 100%; border-collapse: collapse; table-layout: fixed; font-siz
 /* The Groups screen */
 .gw-page { flex: 1; min-height: 0; }
 .gw-wrap { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 14px; align-items: start; }
-.gw-tray { position: sticky; top: 0; display: flex; flex-direction: column; gap: 8px; padding: 10px; background: var(--surface); border: 1px solid var(--line); min-height: 200px; }
+.gw-ppa-top { padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+.gw-ppa-row { display: flex; align-items: center; gap: 8px; }
+.gw-tray { max-height: calc(100vh - 190px); overflow: auto; position: sticky; top: 0; display: flex; flex-direction: column; gap: 8px; padding: 10px; background: var(--surface); border: 1px solid var(--line); min-height: 200px; }
 .gw-tray.drop-ok { outline: 3px solid var(--accent); outline-offset: -2px; }
 .gw-item { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
 .gw-grid { overflow: auto; }
@@ -840,17 +798,36 @@ table.gweek { width: 100%; border-collapse: collapse; table-layout: fixed; backg
 .gw-members li.staff { color: var(--staff); border-left-color: var(--staff); }
 .gw-members li.away { opacity: 0.45; text-decoration: line-through; }
 .gw-placed { margin-bottom: 4px; }
+.ru th small { font-weight: 400; color: var(--paper-muted); }
+.ru .ru-bar { display: inline-block; width: 80px; height: 8px; border: 1px solid var(--paper-line); vertical-align: middle; }
+.ru .ru-bar i { display: block; height: 100%; background: #2B4E80; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.ru td.ru-day { white-space: nowrap; }
+.ru .ru-cell { display: inline-block; width: 22px; height: 16px; margin-right: 2px; border: 1px solid var(--paper-line); font-size: 9px; line-height: 14px; text-align: center; }
+.ru .ru-cell.on { background: #2B4E80; color: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.ru tr.unused th { color: #A53A2A; }
+.name-pick { display: flex; flex-wrap: wrap; gap: 4px; margin: 0 0 8px; }
+.name-pick button { min-width: 44px; padding: 5px 10px; border: 1px solid var(--line-strong); border-left: 3px solid var(--line-strong); background: var(--surface); color: var(--ink); font-size: 13px; font-weight: 650; }
+.name-pick button.staff { border-left-color: var(--staff); }
+.name-pick button.pupil { border-left-color: var(--pupil); }
+.name-pick button:hover { background: var(--surface-2); }
+.name-pick button.on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.gw-lesson { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; width: 100%; padding: 4px 6px; border: 1px solid var(--line); border-left: 3px solid var(--staff); background: var(--surface-2); text-align: left; font-size: 12px; color: var(--ink); }
+.gw-lesson b { font-size: 13px; }
+.gw-lesson .gw-room { color: var(--muted); }
+.gw-lesson .gw-pupils { color: var(--pupil); font-weight: 650; }
+.gw-lesson .gw-with { color: var(--staff); font-weight: 600; }
+.gw-hint { margin: 0 0 10px; }
+.gw-note { display: block; font-size: 12.5px; font-weight: 700; color: var(--muted); }
+.room-create { margin-right: auto; padding: 0 6px; border: 1px solid var(--accent); background: var(--surface); color: var(--accent); font-size: 11px; font-weight: 700; line-height: 18px; visibility: hidden; }
+.room:hover .room-create, .room:focus-within .room-create { visibility: visible; }
+@media (hover: none) { .room-create { visibility: visible; } }
+.room-create:hover { background: var(--accent); color: var(--accent-ink); }
 .gw-members li .gw-sup { padding: 0; border: 0; background: none; font: inherit; color: inherit; cursor: grab; touch-action: none; }
 .gw-members li.support { font-style: italic; }
 .gw-staff-list { display: flex; flex-wrap: wrap; gap: 4px; }
 .gw-staff-list .chip { cursor: grab; touch-action: none; }
 .gw-staff-list .chip.sel, .gw-sup.sel { outline: 2px solid var(--accent); outline-offset: 1px; }
 .gw-placed .gw-members { font-size: 12px; }
-.lead-seg { flex-wrap: wrap; }
-.lead-controls { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; padding: 6px 10px; background: var(--surface); border: 1px solid var(--line); }
-.lead-controls .member-label { width: auto; margin-left: 10px; }
-.lead-controls .chip.off { background: var(--surface); color: var(--muted); border-color: var(--line); font-weight: 500; }
-.lead-hint { flex-basis: 100%; }
 .field.inline { flex-direction: row; align-items: center; gap: 6px; }
 .gw-teacher { display: block; margin-top: 3px; font-size: 11.5px; font-weight: 600; color: var(--staff); }
 .ppa-chip { display: inline-flex; align-items: center; gap: 5px; min-height: 26px; padding: 2px 8px; border: 1px solid var(--ppa); border-left: 5px solid var(--ppa); background: var(--ppa-bg); color: var(--ppa); font-size: 12.5px; font-weight: 700; cursor: grab; touch-action: none; user-select: none; margin: 0 4px 4px 0; }
@@ -1205,7 +1182,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
 
   // ---------- State ----------
   let project = null;
-  const ui = Object.assign({ view: 'plan', day: 'Mon', period: null, zoom: 1, weekMode: 'room', mapMode: 'people', printWhat: 'student', printWho: 'all', printTimes: true, sheetFollow: true, sheetDay: 'Mon' }, loadUI());
+  const ui = Object.assign({ view: 'plan', day: 'Mon', period: null, zoom: 1, printWhat: 'student', printWho: 'all', printTimes: true, sheetFollow: true, sheetDay: 'Mon' }, loadUI());
   const sel = new Set();
   let editLayout = false;
   let undoStack = [], redoStack = [];
@@ -1493,10 +1470,6 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     const [d, per] = key.split('|');
     return d + ' ' + periodOf(per).label;
   }
-  function areaHue(id) {
-    const i = project.areas.findIndex((a) => a.id === id);
-    return Math.round((i * 137.508) % 360);
-  }
 
   function slotStatus(key) {
     if (statusCache.has(key)) return statusCache.get(key);
@@ -1777,7 +1750,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       try {
         const g = JSON.parse(e.newValue);
         if (DAYS.some((d) => d.id === g.day) && project.periods.some((x) => x.id === g.period)) {
-          editLayout = false; ui.mapMode = 'people';
+          editLayout = false;
           goSlot(g.day, g.period, 'plan');
           if (g.place) setTimeout(() => flashZone(g.place), 60);
         }
@@ -2096,10 +2069,10 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     const st = view.scrollTop;
     view.replaceChildren();
     if (ui.view === 'plan') renderPlan(view);
-    else if (ui.view === 'week') renderWeek(view);
     else if (ui.view === 'print') renderPrint(view);
     else if (ui.view === 'groups') renderGroups(view);
     else if (ui.view === 'pupils') renderPupils(view);
+    else if (ui.view === 'lessons') renderLessonSetup(view);
     else renderSetup(view);
     sizeMap();
     view.scrollTop = st;
@@ -2110,7 +2083,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
   function renderTopbar() {
     if (SHEET_MODE) { renderSheetBar(); return; }
     const bar = $('#topbar');
-    const tabs = [['plan', 'Plan'], ['groups', 'Lead teachers'], ['pupils', 'Pupils'], ['week', 'Week'], ['print', 'Timetables'], ['setup', 'Setup']];
+    const tabs = [['plan', 'Plan'], ['groups', 'Staff timetables'], ['pupils', 'Pupil timetables'], ['lessons', 'Lesson setup'], ['print', 'Printables'], ['setup', 'Setup']];
     bar.replaceChildren(
       h('div', { class: 'brand' }, svg(ICONS.mark),
         h('div', { class: 'brand-text' },
@@ -2202,7 +2175,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
         h('button', { type: 'button', class: 'btn small', onclick: () => addRoom('room') }, 'Add a room'),
         h('button', { type: 'button', class: 'btn small', onclick: () => addRoom('offsite') }, 'Add an off-site place'),
         h('button', { type: 'button', class: 'btn small primary', onclick: () => { editLayout = false; render(); } }, 'Done')) : null,
-      h('div', { class: 'plan' + (editLayout ? ' editing' : '') }, ui.mapMode === 'use' && !editLayout ? renderUseTray() : renderTray(s, st), renderMap(s, st))
+      h('div', { class: 'plan' + (editLayout ? ' editing' : '') }, renderTray(s, st), renderMap(s, st))
     ].filter(Boolean));
   }
 
@@ -2259,12 +2232,10 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
   function renderMapTools() {
     const zi = ZOOMS.indexOf(ui.zoom);
     return h('div', { class: 'map-tools' },
-        editLayout || ui.mapMode !== 'people' ? null : h('label', { class: 'alerts-toggle', title: 'Fade the rooms that are not used for main lessons' },
+        editLayout ? null : h('label', { class: 'alerts-toggle', title: 'Fade the rooms that are not used for main lessons' },
           h('input', { type: 'checkbox', checked: !!ui.mapFocus, onchange: (e) => { ui.mapFocus = e.target.checked; saveUI(); render(); } }), 'Main lesson rooms'),
-        editLayout || ui.mapMode !== 'people' ? null : h('button', { type: 'button', class: 'link-btn focus-pick', onclick: chooseMainRooms }, 'Choose…'),
+        editLayout ? null : h('button', { type: 'button', class: 'link-btn focus-pick', onclick: chooseMainRooms }, 'Choose…'),
         editLayout ? null : alertsToggle(),
-        editLayout ? null : h('div', { class: 'seg', role: 'group', 'aria-label': 'What the map shows' },
-          [['people', 'People'], ['use', 'Room use']].map(([id, label]) => h('button', { type: 'button', class: ui.mapMode === id ? 'on' : '', 'aria-pressed': ui.mapMode === id ? 'true' : 'false', onclick: () => { ui.mapMode = id; sel.clear(); saveUI(); render(); } }, label))),
         h('button', { type: 'button', class: 'btn small' + (editLayout ? ' primary' : ''), onclick: () => { editLayout = !editLayout; sel.clear(); render(); } }, editLayout ? 'Finish layout' : 'Edit layout'),
         h('div', { class: 'zoom', role: 'group', 'aria-label': 'Zoom the map' },
           h('button', { type: 'button', 'aria-label': 'Zoom out', disabled: zi <= 0, onclick: () => setZoom(-1) }, '−'),
@@ -2295,10 +2266,10 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     const body = {
       groups: () => project.groups.length ? h('div', { class: 'tray-groups' }, project.groups.map((g) => trayGroup(g, s)))
         : h('div', { class: 'tray-empty' }, h('span', null, 'No groups yet. Set up the literacy and numeracy sets, D&D or the woods, then drag a whole group onto a room.'),
-          h('button', { type: 'button', class: 'btn small', onclick: () => { ui.setupTab = 'groups'; go('setup'); } }, 'Set up groups')),
+          h('button', { type: 'button', class: 'btn small', onclick: () => { ui.lessonTab = 'groups'; go('lessons'); } }, 'Set up groups')),
       lessons: () => reqs.length ? h('div', { class: 'tray-reqs' }, reqs.map((r) => requestChip(r, s)))
-        : h('div', { class: 'tray-empty' }, h('span', null, project.requests.length ? 'Every lesson set up on the pupils’ pages is placed.' : 'Lessons set up on a pupil’s page (therapy, a project with a member of staff, wellbeing) wait here to be placed.'),
-          h('button', { type: 'button', class: 'btn small', onclick: () => go('pupils') }, 'Pupils’ pages')),
+        : h('div', { class: 'tray-empty' }, h('span', null, project.requests.length ? 'Every lesson set up for one pupil is placed.' : 'Lessons for one pupil (therapy, a project with a member of staff, wellbeing), set up in Lesson setup, wait here to be placed.'),
+          h('button', { type: 'button', class: 'btn small', onclick: () => { ui.lessonTab = 'pupil'; go('lessons'); } }, 'Lesson setup')),
       left: () => h('div', { class: 'tray-left' },
         h('section', { class: 'zone grow' + (upPupils.length ? ' unplaced' : ''), 'data-zone': NONE },
           h('div', { class: 'zone-head' }, 'Pupils left', h('span', { class: 'n' }, upPupils.length || '')),
@@ -2373,32 +2344,6 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       a ? h('span', { class: 'gchip-at' }, '✓ ' + a.name) : null);
   }
 
-  function renderUseTray() {
-    const total = allSlotKeys().length;
-    const learning = project.areas.filter((a) => a.kind === 'room').map((a) => ({ a, u: roomUse(a.id) })).sort((x, y) => x.u.n - y.u.n || x.a.name.localeCompare(y.a.name));
-    const staffOnly = project.areas.filter((a) => a.kind === 'staff');
-    const offsite = project.areas.filter((a) => a.kind === 'offsite');
-    const usedSlots = learning.reduce((n, r) => n + r.u.n, 0);
-    const pct = learning.length ? Math.round((usedSlots / (learning.length * total)) * 100) : 0;
-    const never = learning.filter((r) => !r.u.n).length;
-    return h('aside', { class: 'tray', 'aria-label': 'How much each room is used' },
-      h('div', { class: 'slot-name' }, h('b', null, 'Room use this week'), h('span', null, 'Periods with pupils in, out of ' + total)),
-      h('div', { class: 'summary' },
-        h('span', { class: 'pill' }, pct + '% of room time used'),
-        never ? h('span', { class: 'pill warn' }, plural(never, 'room') + ' never used') : null),
-      h('section', { class: 'zone grow' },
-        h('div', { class: 'zone-head' }, 'Least used first'),
-        h('div', { class: 'use-list' }, learning.map((r) => h('button', { type: 'button', class: 'use-row' + (r.u.n ? '' : ' none'), onclick: () => flashZone(r.a.id), title: 'Show ' + r.a.name + ' on the map' },
-          h('span', { class: 'use-name' }, r.a.name),
-          h('span', { class: 'use-bar' }, h('i', { style: { width: Math.round((r.u.n / total) * 100) + '%' } })),
-          h('span', { class: 'use-n' }, r.u.n))))),
-      staffOnly.length || offsite.length ? h('p', { class: 'hint' }, [
-        staffOnly.length ? 'Staff spaces, not counted: ' + staffOnly.map((a) => a.name).join(', ') + '. ' : '',
-        offsite.length ? 'Off-site places, not counted: ' + offsite.map((a) => a.name + ' (' + roomUse(a.id).n + ')').join(', ') + '. ' : '',
-        'Change room types in Setup.'].join('')) : null,
-      h('p', { class: 'hint' }, 'Darker rooms are busier. The little grid in each room is its week: a row per day, a square per period. Click a square to plan that period.'));
-  }
-
   let mainSet = new Set();
   function renderMap(s, st) {
     const m = project.map;
@@ -2407,8 +2352,8 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     const map = h('div', { class: 'map' + (m.imageId ? ' has-plan' : ''), id: 'map' },
       m.imageId ? h('img', { class: 'plan-img', src: images.get(m.imageId), alt: '', draggable: 'false', style: { opacity: m.fade } }) : null,
       project.outlines.map(renderOutline),
-      project.areas.map((a) => (ui.mapMode === 'use' && !editLayout ? renderRoomUse(a) : renderRoom(a, s, st))),
-      ui.mapMode === 'use' && !editLayout ? null : [PPA, COVER].map((id) => renderSpecial(id, s)),
+      project.areas.map((a) => renderRoom(a, s, st)),
+      [PPA, COVER].map((id) => renderSpecial(id, s)),
       renderWalls());
     return h('div', { class: 'mapcol' },
       h('div', { class: 'mapwrap', id: 'mapwrap' }, map));
@@ -2513,7 +2458,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     const g = roomGeo.get(a.id) || { tone: null, open: new Set() };
     const icon = iconName(a.name, a.kind);
     const outdoors = a.kind !== 'offsite' && g.tone === 'out';
-    const dim = ui.mapFocus && !editLayout && ui.mapMode === 'people' && !mainSet.has(a.id);
+    const dim = ui.mapFocus && !editLayout && !mainSet.has(a.id);
     return h('div', {
       class: 'room' + (a.kind === 'offsite' ? ' offsite' + (g.tone === 'off' ? '' : ' alone') : a.kind === 'staff' ? ' staffspace' : '') + (outdoors ? ' t-out' : '')
         + [...g.open].map((side) => ' open-' + side).join('') + (free ? ' free' : '') + (noStaff ? ' alert' : '') + (over && !noStaff ? ' over' : '') + (dim ? ' dim' : ''),
@@ -2530,6 +2475,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       h('div', { class: 'room-people' }, st2.map((p) => chip(p)), pu.map((p) => chip(p))),
       !editLayout && here.length ? h('div', { class: 'room-foot' + (noStaff ? ' bad' : over ? ' warn' : '') },
         noStaff ? h('span', { class: 'room-flag' }, 'No staff') : over ? h('span', { class: 'room-flag' }, 'Room for ' + a.cap) : null,
+        uncovered(a.id, s).length && a.kind !== 'staff' ? h('button', { type: 'button', class: 'room-create', title: 'Make what is in ' + a.name + ' into a lesson, so it is set up in Lesson setup', onclick: () => createLessonDialog(a) }, 'Create') : null,
         h('button', { type: 'button', class: 'room-count', title: plural(pu.length, 'pupil') + ', ' + st2.length + ' staff. Click to pick them all up.', 'data-select-room': a.id },
           roomIcon('person', ''), h('span', { class: 'cp' }, pu.length), '/', h('span', { class: 'cs' }, st2.length))) : null,
       editLayout ? [
@@ -2537,6 +2483,54 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
         h('button', { type: 'button', class: 'room-del', title: 'Remove ' + a.name, 'aria-label': 'Remove ' + a.name, onclick: () => removeAreaDialog(a) }, '×')
       ] : null
     );
+  }
+  // Pupils in a room who are not there as part of a group or a lesson that is set up.
+  function uncovered(place, sl) {
+    const kids = peopleAt(sl, place).filter(isPupil);
+    if (!kids.length) return [];
+    if (project.groups.some((g) => groupPlace(g, sl) === place && kids.every((k) => g.members.includes(k.id)))) return [];
+    return kids.filter((k) => !project.groups.some((g) => groupPlace(g, sl) === place && g.members.includes(k.id)) && !project.requests.some((r) => r.pupil === k.id && requestHere(r, sl) === place));
+  }
+  // After dragging pupils and staff into a room by hand: one pupil makes a lesson just for them, two or more make a group lesson.
+  function createLessonDialog(a) {
+    const key = curKey(), sl = slotOf(key);
+    const kids = uncovered(a.id, sl), adults = peopleAt(sl, a.id).filter(isStaff);
+    const lead = adults.find((x) => x.lead) || adults[0];
+    const name = h('input', { class: 'txt', value: str(sl.titles[a.id]), placeholder: 'e.g. Therapy, Bike project', 'aria-label': 'Lesson name' });
+    const per = h('select', { class: 'txt', 'aria-label': 'Lessons a week' }, [1, 2, 3, 4, 5].map((v) => h('option', { value: v }, v)));
+    const one = kids.length === 1;
+    dialog({
+      title: 'Create a lesson',
+      body: [
+        h('p', null, h('b', null, names(kids)), adults.length ? ' with ' + names(adults) : '', ' in ' + a.name + '.'),
+        h('label', { class: 'field' }, 'Lesson', name),
+        h('label', { class: 'field' }, 'How many a week', per),
+        h('p', { class: 'hint' }, one ? 'This makes a lesson just for ' + kids[0].name + (lead ? ' with ' + lead.name : '') + '. It goes in Lesson setup under Lessons for one pupil, and counts this period as one of them.'
+          : 'This makes a group lesson with these pupils' + (adults.length ? ' and staff' : '') + '. It goes in Lesson setup under Group lessons, and counts this period as one of them.')
+      ],
+      actions: [{ label: 'Cancel' }, { label: 'Create', kind: 'primary', run: () => {
+        const subject = str(name.value);
+        if (!subject) { toast('Give the lesson a name first.'); name.focus(); return false; }
+        const perWeek = +per.value;
+        mutate((pp) => {
+          const sl2 = slotOf(key, true);
+          if (!str(sl2.titles[a.id])) sl2.titles[a.id] = subject;
+          if (one) {
+            let n = pp.requests.length + 1;
+            while (pp.requests.some((r) => r.id === 'R' + n)) n++;
+            pp.requests.push({ id: 'R' + n, pupil: kids[0].id, subject, staff: lead ? lead.id : '', perWeek, room: a.id, note: '' });
+          } else {
+            let n = pp.groups.length + 1;
+            while (pp.groups.some((g) => g.id === 'G' + n)) n++;
+            const used = new Set(pp.groups.map((g) => g.colour));
+            const colour = Object.keys(GROUP_COLOURS).find((c) => !used.has(c)) || Object.keys(GROUP_COLOURS)[pp.groups.length % 8];
+            pp.groups.push({ id: 'G' + n, name: subject, subject, perWeek, room: a.id, colour, members: kids.map((k) => k.id).concat(adults.map((x) => x.id)) });
+          }
+        });
+        toast((one ? 'Lesson created for ' + kids[0].name : 'Group lesson “' + subject + '” created') + '. It’s in Lesson setup.', { label: 'Undo', run: undo });
+      } }]
+    });
+    setTimeout(() => name.focus(), 30);
   }
   function renderSpecial(id, s) {
     const z = project.specials[id];
@@ -2549,27 +2543,6 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       h('div', { class: 'room-head' }, roomIcon(id === PPA ? 'clock' : 'person'), h('span', { class: 'room-name' }, SPECIAL_NAMES[id]), h('span', { class: 'special-tag' }, 'staff')),
       h('div', { class: 'room-people' }, here.map((p) => chip(p))),
       editLayout ? h('span', { class: 'resize', 'data-resize': id, title: 'Drag to resize' }) : null);
-  }
-  function renderRoomUse(a) {
-    const u = roomUse(a.id);
-    const cur = curKey();
-    return h('div', {
-      class: 'room use' + (a.kind === 'room' ? (u.n ? '' : ' unused') : a.kind === 'offsite' ? ' offsite' : ' staffonly'), 'data-area': a.id, 'data-zone-show': a.id,
-      style: { left: a.x + '%', top: a.y + '%', width: a.w + '%', height: a.h + '%', '--use': a.kind === 'room' ? u.n / u.total : 0 }
-    },
-      h('div', { class: 'room-head' }, h('span', { class: 'room-name', title: a.name }, a.name)),
-      h('div', { class: 'use-num' }, a.kind === 'staff' ? 'Staff space' : u.n ? [h('b', null, u.n), ' of ' + u.total] : a.kind === 'offsite' ? 'Off-site' : 'Not used'),
-      a.kind !== 'staff' ? h('div', { class: 'use-grid', style: { gridTemplateColumns: 'repeat(' + project.periods.length + ', 1fr)' } }, DAYS.map((d) => project.periods.map((per) => {
-        const k = slotKey(d.id, per.id);
-        const s = slotOf(k);
-        const t = s.titles[a.id];
-        return h('button', {
-          type: 'button', class: 'use-cell' + (u.used.has(k) ? ' on' : '') + (k === cur ? ' now' : ''),
-          title: d.name + ' ' + per.label + ': ' + (u.used.has(k) ? (t ? t + ', ' : '') + plural(peopleAt(s, a.id).filter(isPupil).length, 'pupil') : 'free'),
-          'aria-label': d.name + ' ' + per.label,
-          onclick: () => { ui.mapMode = 'people'; goSlot(d.id, per.id); setTimeout(() => flashZone(a.id), 30); }
-        });
-      }))) : null);
   }
   // Building outlines are boxes with a name tab in the building's colour; labels are just words placed on the map.
   function renderOutline(o) {
@@ -2767,134 +2740,6 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
   }
 
   // ----- Week view -----
-  function renderWeek(root) {
-    const keys = allSlotKeys();
-    const statuses = keys.map(slotStatus);
-    const done = statuses.filter((s) => s.state === 'done').length;
-    const issues = [];
-    statuses.forEach((s) => s.issues.forEach((i) => { if (i.level !== 'info') issues.push(Object.assign({ key: s.key }, i)); }));
-    staff().filter((p) => p.ppa > 0).forEach((p) => {
-      const n = ppaCount(p.id);
-      if (n < p.ppa) issues.push({ level: 'warn', key: null, text: p.name + ' has ' + n + ' of ' + p.ppa + ' PPA periods' });
-    });
-    pupils().forEach((p) => {
-      const sh = shortNeeds(p);
-      if (sh.length) issues.push({ level: 'warn', key: null, pid: p.id, text: p.name + ' is short of ' + sh.map((n) => n.subject + ' (' + n.has + ' of ' + n.perWeek + ')').join(', ') });
-    });
-    requestsLeft().forEach((r) => issues.push({ level: 'warn', key: null, pupilPage: r.pupil, text: requestLabel(r) + ': ' + requestPlaced(r) + ' of ' + r.perWeek + ' placed' }));
-    project.groups.filter((g) => g.perWeek > 0).forEach((g) => {
-      const n = groupLessons(g);
-      if (n < g.perWeek) issues.push({ level: 'warn', key: null, text: g.name + ' has ' + n + ' of ' + g.perWeek + ' lessons this week' });
-    });
-
-    const neverUsed = project.people.length ? project.areas.filter((a) => a.kind === 'room' && !roomUse(a.id).n).length : 0;
-    if (!WEEK_MODES.some(([id]) => id === ui.weekMode)) ui.weekMode = 'room';
-    const lessonMode = ui.weekMode === 'staff' || ui.weekMode === 'rooms';
-    const weekDay = DAYS.find((d) => d.id === ui.weekDay) || DAYS.find((d) => d.id === ui.day) || DAYS[0];
-    const openSlot = (day, period, place) => { goSlot(day, period, 'plan'); if (place) setTimeout(() => flashZone(place), 50); };
-    root.append(h('div', { class: 'page' },
-      h('div', { class: 'page-head' },
-        h('h2', null, 'The week'),
-        h('div', { class: 'seg', role: 'group', 'aria-label': 'Show the week' }, WEEK_MODES.map(([id, label]) =>
-          h('button', { type: 'button', class: ui.weekMode === id ? 'on' : '', 'aria-pressed': ui.weekMode === id ? 'true' : 'false', onclick: () => { ui.weekMode = id; saveUI(); render(); } }, label))),
-        lessonMode ? h('div', { class: 'seg', role: 'group', 'aria-label': 'Which day' }, DAYS.map((d) =>
-          h('button', { type: 'button', class: weekDay.id === d.id ? 'on' : '', 'aria-pressed': weekDay.id === d.id ? 'true' : 'false', onclick: () => { ui.weekDay = d.id; saveUI(); render(); } }, d.name))) : null,
-        h('div', { class: 'summary' },
-          h('span', { class: 'pill ' + (done === keys.length ? 'ok' : '') }, done + ' of ' + keys.length + ' periods complete'),
-          issues.length ? h('button', { type: 'button', class: 'pill warn', title: 'Show them', onclick: () => { ui.showAlerts = true; saveUI(); render(); } }, plural(issues.length, 'thing') + ' to check') : h('span', { class: 'pill ok' }, 'Nothing to check'),
-          neverUsed ? h('button', { type: 'button', class: 'pill warn', onclick: () => { ui.mapMode = 'use'; go('plan'); }, title: 'See room use on the map' }, plural(neverUsed, 'room') + ' never used') : null),
-        alertsToggle(),
-        h('button', { type: 'button', class: 'btn primary', onclick: generateDialog }, 'Generate timetables…'),
-        h('span', { class: 'hint' }, 'Click any cell to open that period on the map.')),
-      issues.length ? h('details', { class: 'issues', open: issues.length <= 8 ? true : null },
-        h('summary', null, 'Things to check (' + issues.length + ')'),
-        h('div', { class: 'issue-list' }, issues.map((i) => h('button', {
-          type: 'button', class: 'check ' + i.level,
-          onclick: () => { if (i.key) { const [d, p] = i.key.split('|'); goSlot(d, p, 'plan'); setTimeout(() => flashZone(i.zone), 50); } else if (i.pupilPage) { ui.pupilPage = i.pupilPage; go('pupils'); } else { if (i.pid) ui.setupTab = 'pupils'; go('setup'); } }
-        }, h('span', null, i.key ? h('b', null, slotLabel(i.key)) : null, i.text))))) : null,
-      lessonMode ? h('div', { class: 'week-lessons' }, lessonsGrid(weekDay, ui.day === weekDay.id ? ui.period : null, ui.weekMode, openSlot))
-        : ui.weekMode === 'room' ? weekByRoom(keys) : weekByPerson(keys)
-    ));
-  }
-  // The Week view's ways of looking: the whole week by room or by person, or one day as on the second screen.
-  const WEEK_MODES = [['room', 'By room'], ['person', 'By person'], ['staff', 'Lessons by staff'], ['rooms', 'Lessons by room']];
-  function weekHead(keys, first) {
-    return h('thead', null, h('tr', null, h('th', null, first), keys.map((k) => {
-      const [d, p] = k.split('|');
-      const ds = p === project.periods[0].id;
-      return h('th', { class: ds ? 'ds' : null }, h('span', { class: 'd' }, ds ? d : ''), periodOf(p).label);
-    })));
-  }
-  function cellClick(k) { return () => { const [d, p] = k.split('|'); goSlot(d, p, 'plan'); }; }
-  function weekByRoom(keys) {
-    const byName = (a, b) => a.name.localeCompare(b.name);
-    const places = project.areas.filter((a) => a.kind !== 'offsite').map((a) => ({ id: a.id, name: a.name })).sort(byName)
-      .concat(project.areas.filter((a) => a.kind === 'offsite').map((a) => ({ id: a.id, name: a.name + ' (off-site)' })).sort(byName))
-      .concat([{ id: PPA, name: 'PPA' }, { id: COVER, name: 'Cover' }]);
-    const rows = places.map((pl) => h('tr', null, h('th', { title: pl.name }, pl.name), useCell(pl), keys.map((k) => {
-      const s = slotOf(k);
-      const here = peopleAt(s, pl.id);
-      const t = STAFF_ONLY.has(pl.id) ? '' : s.titles[pl.id] || '';
-      const ds = k.split('|')[1] === project.periods[0].id;
-      if (!here.length && !t) return h('td', { class: 'free' + (ds ? ' ds' : ''), onclick: cellClick(k), title: pl.name + ' is free ' + slotLabel(k) });
-      return h('td', { class: ds ? 'ds' : null, onclick: cellClick(k), title: pl.name + ', ' + slotLabel(k) },
-        t ? h('span', { class: 'c-title' }, t) : null,
-        here.some(isStaff) ? h('span', { class: 'c-staff' }, names(here.filter(isStaff))) : null,
-        here.some(isPupil) ? h('span', { class: 'c-pupils' }, names(here.filter(isPupil))) : null);
-    })));
-    const head = weekHead(keys, 'Room');
-    head.firstChild.firstChild.after(h('th', { title: 'Periods in the week with pupils in this room' }, h('span', { class: 'd' }, ''), 'Pupils in'));
-    return h('div', { class: 'table-scroll' }, h('table', { class: 'week' }, head, h('tbody', null, rows)),
-      h('p', { class: 'hint', style: { padding: '8px 10px', margin: 0 } }, h('span', { class: 'legend' },
-        h('span', null, h('i', { style: { background: 'var(--free)' } }), 'Free'),
-        h('span', { class: 'c-staff' }, 'Staff names'),
-        h('span', { class: 'c-pupils' }, 'Pupils'))));
-  }
-  function useCell(pl) {
-    const a = areaById.get(pl.id);
-    if (!a) return h('td', { class: 'tot' }, '');
-    if (a.kind === 'staff') return h('td', { class: 'tot muted' }, 'staff');
-    const u = roomUse(a.id);
-    return h('td', { class: 'tot use-td' + (u.n || a.kind === 'offsite' ? '' : ' short') }, h('span', { class: 'use-bar' }, h('i', { style: { width: Math.round((u.n / u.total) * 100) + '%' } })), u.n + '/' + u.total);
-  }
-  function weekByPerson(keys) {
-    const group = (label, list) => {
-      if (!list.length) return [];
-      return [h('tr', { class: 'group' }, h('th', null, label), h('td', { colspan: keys.length + 1 }))].concat(list.map((p) => {
-        let placed = 0;
-        const cells = keys.map((k) => {
-          const s = slotOf(k), place = s.at[p.id];
-          const ds = k.split('|')[1] === project.periods[0].id;
-          const cls = (c) => c + (ds ? ' ds' : '');
-          if (!place) return h('td', { class: cls('none'), onclick: cellClick(k), title: p.name + ' is not placed ' + slotLabel(k) }, '—');
-          if (place === OUT) return h('td', { class: cls('out'), onclick: cellClick(k), title: p.name + ' is not in ' + slotLabel(k) }, 'not in');
-          placed++;
-          if (place === PPA) return h('td', { class: cls('ppa'), onclick: cellClick(k) }, 'PPA');
-          if (place === COVER) return h('td', { class: cls('cover'), onclick: cellClick(k) }, 'Cover');
-          const t = s.titles[place] || '';
-          const offsite = (areaById.get(place) || {}).kind === 'offsite';
-          return h('td', { class: cls(offsite ? 'off' : 'place'), style: { '--h': areaHue(place) }, onclick: cellClick(k), title: placeName(place) + (t ? ': ' + t : '') + ', ' + slotLabel(k) },
-            h('span', { class: 'c-title' }, placeName(place)), t);
-        });
-        const expected = keys.filter((k) => slotOf(k).at[p.id] !== OUT).length;
-        let tot = placed + ' / ' + expected;
-        let short = placed < expected;
-        if (isStaff(p) && p.ppa) { const n = ppaCount(p.id); tot += ' · PPA ' + n + '/' + p.ppa; short = short || n < p.ppa; }
-        return h('tr', null, h('th', { title: p.full || p.name }, p.name), cells, h('td', { class: 'tot' + (short ? ' short' : '') }, tot));
-      }));
-    };
-    const head = weekHead(keys, 'Person');
-    head.firstChild.append(h('th', null, h('span', { class: 'd' }, ''), 'Placed'));
-    return h('div', { class: 'table-scroll' }, h('table', { class: 'week' }, head,
-      h('tbody', null, group('Pupils', pupils()), group('Staff', staff()))),
-      h('p', { class: 'hint', style: { padding: '8px 10px', margin: 0 } }, h('span', { class: 'legend' },
-        h('span', null, h('i', { style: { background: 'var(--warn-bg)' } }), '— not placed yet'),
-        h('span', null, h('i', { style: { background: 'var(--ppa-bg)' } }), 'PPA'),
-        h('span', null, h('i', { style: { background: 'var(--accent-soft)' } }), 'Cover'),
-        h('span', null, h('i', { style: { background: 'var(--off-bg)' } }), 'Off-site'),
-        h('span', null, 'Each room has its own colour'))));
-  }
-
   // ----- Pupils: a page for each pupil, to set up the lessons they should have -----
   // Their group lessons come from the groups; other lessons (therapy, a member of staff's project, wellbeing) are added here
   // and wait in the Plan's tray to be placed. What every pupil needs as standard stays in Setup → Pupils, to check for gaps.
@@ -2911,45 +2756,46 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
   function setRequest(id, key, value, merge) {
     mutate((p) => { const r = p.requests.find((x) => x.id === id); if (r) r[key] = value; }, merge ? { merge: 'req|' + key + '|' + id, render: false } : {});
   }
+  // Pupil timetables: one pupil's week, chosen from their names: the subject, the teacher, then Group, Paired or 1:1.
   function renderPupils(root) {
     const list = pupils();
-    const head = h('div', { class: 'page-head' }, h('h2', null, 'Pupils'),
-      h('span', { class: 'hint' }, 'Set up the lessons each pupil should have. Group lessons come from their groups; add the rest here, such as therapy or a project a member of staff has asked for. They wait in the Plan’s tray, under Lessons, to be placed.'));
+    const head = h('div', { class: 'page-head' }, h('h2', null, 'Pupil timetables'));
     if (!list.length) { root.append(h('div', { class: 'page' }, head, h('p', { class: 'hint' }, 'No pupils yet. Add them in Setup.'))); return; }
     const p = person(ui.pupilPage) && isPupil(person(ui.pupilPage)) ? person(ui.pupilPage) : list[0];
-    const left = (q) => project.requests.filter((r) => r.pupil === q.id && str(r.subject) && requestPlaced(r) < r.perWeek).length;
-    const nav = h('nav', { class: 'setup-nav pupil-nav', 'aria-label': 'Pupils' }, list.map((q) => {
-      const n = left(q);
-      return h('button', { type: 'button', class: q.id === p.id ? 'on' : '', 'aria-current': q.id === p.id ? 'page' : null, onclick: () => { ui.pupilPage = q.id; saveUI(); render(); } },
-        h('span', null, q.name, q.full ? h('small', null, q.full) : null), n ? h('span', { class: 'n', title: plural(n, 'lesson') + ' still to place' }, n) : null);
-    }));
-    // Their week, to see what's planned and where the gaps are
-    const lessonRows = dayRows().filter((r) => r.kind === 'period');
-    const week = h('table', { class: 'pweek' }, h('thead', null, h('tr', null, h('th', null, ''), DAYS.map((d) => h('th', { scope: 'col' }, d.name.slice(0, 3))))),
-      h('tbody', null, lessonRows.map((r) => h('tr', null, h('th', { scope: 'row' }, r.label), DAYS.map((d) => {
-        const sl = slotOf(slotKey(d.id, r.period)), pl = sl.at[p.id], a = pl && areaById.get(pl);
-        const txt = pl === OUT ? 'Not in' : a ? (str(sl.titles[pl]) || a.name) : '';
-        return h('td', { class: pl === OUT ? 'out' : a ? '' : 'gap' }, h('button', { type: 'button', title: 'Open ' + d.name + ' ' + r.label + ' on the map', onclick: () => goSlot(d.id, r.period, 'plan') }, txt || 'Free'));
+    const rows = dayRows().filter((r) => r.kind === 'period');
+    const week = h('table', { class: 'pweek' }, h('thead', null, h('tr', null, h('th', null, ''), DAYS.map((d) => h('th', { scope: 'col' }, d.name)))),
+      h('tbody', null, rows.map((r) => h('tr', null, h('th', { scope: 'row' }, r.label), DAYS.map((d) => {
+        const c = pupilLesson(p, slotOf(slotKey(d.id, r.period)));
+        return h('td', { class: c.kind === 'out' ? 'out' : c.kind === 'lesson' ? 'lt-' + c.type : 'gap' }, h('button', { type: 'button', title: 'Open ' + d.name + ' ' + r.label + ' on the map', onclick: () => goSlot(d.id, r.period, 'plan') },
+          c.kind === 'out' ? 'Not in' : c.kind !== 'lesson' ? 'Free' : [h('b', null, c.subject), c.teachers ? h('span', { class: 'pw-teacher' }, c.teachers) : null, c.group ? h('i', null, c.group) : null]));
       })))));
+    const left = project.requests.filter((r) => r.pupil === p.id && str(r.subject) && requestPlaced(r) < r.perWeek);
+    root.append(h('div', { class: 'page' }, head,
+      namePicker(list, p.id, (id) => { ui.pupilPage = id; saveUI(); render(); }, 'Whose timetable'),
+      h('section', { class: 'card' }, h('h3', null, p.full || p.name, p.full ? h('span', { class: 'n' }, p.name) : null),
+        h('div', { class: 'pupil-week-wrap' }, week),
+        left.length ? h('p', { class: 'hint' }, 'Still to place: ' + left.map((r) => requestLabel(r).replace(/ · [^ ]+/, '') + ' (' + requestPlaced(r) + ' of ' + r.perWeek + ')').join(', ') + '. ',
+          h('button', { type: 'button', class: 'link-btn', onclick: () => { ui.lessonTab = 'pupil'; go('lessons'); } }, 'See them in Lesson setup')) : null)));
+  }
+  // Lesson setup: the group lessons, and lessons for one pupil (therapy, a staff member's project, wellbeing).
+  function renderLessonSetup(root) {
+    const tab = ui.lessonTab === 'pupil' ? 'pupil' : 'groups';
+    const head = h('div', { class: 'page-head' }, h('h2', null, 'Lesson setup'),
+      h('div', { class: 'seg', role: 'group', 'aria-label': 'Which lessons' }, [['groups', 'Group lessons'], ['pupil', 'Lessons for one pupil']].map(([id, label]) =>
+        h('button', { type: 'button', class: tab === id ? 'on' : '', 'aria-pressed': tab === id ? 'true' : 'false', onclick: () => { ui.lessonTab = id; saveUI(); render(); } }, label))));
+    if (tab === 'groups') { root.append(h('div', { class: 'page' }, head, groupsCard())); return; }
+    const list = pupils();
+    if (!list.length) { root.append(h('div', { class: 'page' }, head, h('p', { class: 'hint' }, 'No pupils yet. Add them in Setup.'))); return; }
+    const p = person(ui.pupilPage) && isPupil(person(ui.pupilPage)) ? person(ui.pupilPage) : list[0];
     const groups = project.groups.filter((g) => g.members.includes(p.id));
     const reqs = project.requests.filter((r) => r.pupil === p.id);
     const subjects = [...new Set([...project.needs.map((n) => n.subject), ...subjectsInUse().filter((x) => !x.band).map((x) => x.name), 'Therapy', 'Wellbeing', 'Intervention'])].sort((a, b) => a.localeCompare(b));
     const rooms = project.areas.filter((a) => a.kind !== 'staff').slice().sort((a, b) => a.name.localeCompare(b.name));
-    const main = h('div', { class: 'setup-main' },
+    root.append(h('div', { class: 'page' }, head,
+      namePicker(list, p.id, (id) => { ui.pupilPage = id; saveUI(); render(); }, 'Which pupil'),
       h('section', { class: 'card' },
-        h('h3', null, p.full || p.name, p.full ? h('span', { class: 'n' }, p.name) : null),
-        h('div', { class: 'pupil-week-wrap' }, week)),
-      h('section', { class: 'card' },
-        h('h3', null, 'From their groups', h('span', { class: 'n' }, groups.length)),
-        groups.length ? h('ul', { class: 'pgroups' }, groups.map((g) => {
-          const n = groupLessons(g), st = g.members.map(person).filter((x) => x && isStaff(x));
-          return h('li', { style: { '--gc': groupColour(g) } }, h('b', null, g.name), h('span', null, g.subject || ''), st.length ? h('span', { class: 'staff-ink' }, names(st)) : null,
-            g.perWeek ? h('span', { class: 'gchip-week' + (n < g.perWeek ? ' short' : '') }, n + ' of ' + g.perWeek + ' placed') : null);
-        })) : h('p', { class: 'hint' }, 'Not in any groups yet.'),
-        h('button', { type: 'button', class: 'link-btn', onclick: () => { ui.setupTab = 'groups'; go('setup'); } }, 'Change groups in Setup → Groups')),
-      h('section', { class: 'card' },
-        h('h3', null, 'Lessons to place', h('span', { class: 'n' }, reqs.length)),
-        h('p', { class: 'hint' }, 'Therapy, a project a member of staff has in mind, wellbeing time, or anything else just for ' + p.name + '. Choose who it’s with if it matters, and how many a week. It counts as placed when ' + p.name + ' is in a lesson with this name (and with that member of staff).'),
+        h('h3', null, 'Lessons just for ' + p.name, h('span', { class: 'n' }, reqs.length)),
+        h('p', { class: 'hint' }, 'Therapy, a project a member of staff has in mind, wellbeing time, or anything else just for ' + p.name + '. Choose who it’s with if it matters, and how many a week. They wait in the Plan’s tray under Lessons to be placed, and count as placed when ' + p.name + ' is in a lesson with this name (and with that member of staff).'),
         h('datalist', { id: 'req-subjects' }, subjects.map((x) => h('option', { value: x }))),
         reqs.length ? h('div', { class: 'table-box' }, h('table', { class: 'edit-table reqs' },
           h('thead', null, h('tr', null, h('th', null, 'Lesson'), h('th', null, 'With'), h('th', null, 'A week'), h('th', null, 'Usual room'), h('th', null, 'Note'), h('th', null, 'Placed'), h('th', null, ''))),
@@ -2965,14 +2811,22 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
               h('td', null, h('button', { type: 'button', class: 'x-btn', title: 'Remove', 'aria-label': 'Remove ' + (r.subject || 'this lesson'), onclick: () => mutate((pp) => { pp.requests = pp.requests.filter((x) => x.id !== r.id); }) }, '×')));
           })))) : null,
         h('div', { class: 'row-btns' }, h('button', { type: 'button', class: 'btn small primary', onclick: () => addRequest(p.id, '') }, '+ Add a lesson'),
-          ['Therapy', 'Wellbeing', 'Intervention'].map((x) => h('button', { type: 'button', class: 'btn small', onclick: () => addRequest(p.id, x) }, '+ ' + x)))));
-    root.append(h('div', { class: 'page' }, head, h('div', { class: 'setup-wrap' }, nav, main)));
+          ['Therapy', 'Wellbeing', 'Intervention'].map((x) => h('button', { type: 'button', class: 'btn small', onclick: () => addRequest(p.id, x) }, '+ ' + x)))),
+      h('section', { class: 'card' },
+        h('h3', null, p.name + '’s groups', h('span', { class: 'n' }, groups.length)),
+        groups.length ? h('ul', { class: 'pgroups' }, groups.map((g) => {
+          const n = groupLessons(g), st = g.members.map(person).filter((x) => x && isStaff(x));
+          return h('li', { style: { '--gc': groupColour(g) } }, h('b', null, g.name), h('span', null, g.subject || ''), st.length ? h('span', { class: 'staff-ink' }, names(st)) : null,
+            g.perWeek ? h('span', { class: 'gchip-week' + (n < g.perWeek ? ' short' : '') }, n + ' of ' + g.perWeek + ' placed') : null);
+        })) : h('p', { class: 'hint' }, 'Not in any groups yet.'),
+        h('button', { type: 'button', class: 'link-btn', onclick: () => { ui.lessonTab = 'groups'; saveUI(); render(); } }, 'Change groups under Group lessons'))));
   }
 
   // ----- Timetables (print) view -----
   function renderPrint(root) {
     const what = ui.printWhat;
-    const pool = what === 'student' ? pupils() : what === 'staff' ? staff() : what === 'room' ? project.areas.slice().sort((a, b) => a.name.localeCompare(b.name)) : DAYS;
+    if (ui.printWhat === 'day') ui.printWhat = 'student';
+    const pool = what === 'student' ? pupils() : what === 'staff' ? staff() : what === 'room' ? project.areas.slice().sort((a, b) => a.name.localeCompare(b.name)) : what === 'use' ? [] : DAYS;
     const wide = what === 'staffday';
     const bundle = what === 'bundle' ? (ui.printBundle || []) : null;
     if (ui.printWho !== 'all' && !pool.some((x) => x.id === ui.printWho)) ui.printWho = 'all';
@@ -2988,23 +2842,24 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     const style = ui.pupilStyle || 'book';
     if (bundle) sheets = bundle.flatMap((k) => k === 'pupils' ? pupils().map((p) => bookSheet(p)) : k === 'words' ? pupils().map((p) => pupilSheet(p, false)) : k === 'pictures' ? pupils().map((p) => pupilSheet(p, true))
       : k === 'staff' ? staff().map((p) => pupilSheet(p, false)) : k === 'days' ? DAYS.map((d) => staffDaySheet(d)) : []);
-    else if (what === 'day') sheets = chosen.map((d) => daySheet(d));
+    else if (what === 'use') sheets = [roomUseSheet()];
     else if (wide) sheets = chosen.map((d) => staffDaySheet(d));
     else if (what === 'room') sheets = chosen.map((a) => roomSheet(a));
     else if (what === 'student') sheets = chosen.map((p) => style === 'book' ? bookSheet(p) : pupilSheet(p, style === 'pictures'));
     else sheets = chosen.map((p) => pupilSheet(p, false));
 
     root.append(h('div', { class: 'page' },
-      h('div', { class: 'page-head' }, h('h2', null, 'Timetables to print'), h('button', { type: 'button', class: 'btn primary', onclick: generateDialog }, 'Generate timetables…')),
+      h('div', { class: 'page-head' }, h('h2', null, 'Printables'), h('button', { type: 'button', class: 'btn primary', onclick: generateDialog }, 'Generate timetables…'),
+        h('button', { type: 'button', class: 'btn' + (what === 'use' ? ' on' : ''), onclick: () => { ui.printWhat = 'use'; saveUI(); render(); } }, 'Room use report')),
       h('div', { class: 'print-controls' },
-        h('div', { class: 'seg', role: 'group', 'aria-label': 'Which timetables' }, [['student', 'Pupils'], ['staff', 'Staff'], ['room', 'Rooms'], ['day', 'Days by room'], ['staffday', 'Days by staff']].concat(ui.printBundle ? [['bundle', 'Generated set']] : []).map(([id, label]) =>
+        h('div', { class: 'seg', role: 'group', 'aria-label': 'Which timetables' }, [['student', 'Pupils'], ['staff', 'Staff'], ['room', 'Rooms'], ['staffday', 'Days by staff']].concat(ui.printBundle ? [['bundle', 'Generated set']] : []).concat(what === 'use' ? [['use', 'Room use report']] : []).map(([id, label]) =>
           h('button', { type: 'button', class: what === id ? 'on' : '', 'aria-pressed': what === id ? 'true' : 'false', onclick: () => { ui.printWhat = id; ui.printWho = 'all'; saveUI(); render(); } }, label))),
-        bundle ? null : h('label', null, 'Show', whoSelect),
+        bundle || what === 'use' ? null : h('label', null, 'Show', whoSelect),
         what === 'student' ? h('div', { class: 'seg', role: 'group', 'aria-label': 'Which design' }, [['book', 'Book'], ['words', 'Words'], ['pictures', 'Pictures']].map(([v, label]) =>
           h('button', { type: 'button', class: style === v ? 'on' : '', 'aria-pressed': style === v ? 'true' : 'false', onclick: () => { ui.pupilStyle = v; saveUI(); render(); } }, label))) : null,
         h('label', null, h('input', { type: 'checkbox', id: 'print-times', checked: ui.printTimes, onchange: (e) => { ui.printTimes = e.target.checked; saveUI(); render(); } }), 'Show times'),
         h('button', { type: 'button', class: 'btn primary', onclick: () => window.print(), disabled: !sheets.length }, 'Print ' + plural(sheets.length, 'page')),
-        h('span', { class: 'hint print-hint' }, bundle ? 'Everything from Generate timetables, each on its own page size.' : (wide ? 'Each day is a strip 10cm tall, two to an A3 landscape page.' : what === 'student' && style === 'book' ? 'One A4 page each, with a wider margin on the right and bottom for the guillotine, to stick in their books.' : what === 'student' && style === 'words' ? 'One A4 portrait page each, to go in their books.' : what === 'staff' ? 'One A4 portrait page each.' : 'One A4 landscape page each.') + ' To email them, choose “Save as PDF” as the printer.')),
+        h('span', { class: 'hint print-hint' }, bundle ? 'Everything from Generate timetables, each on its own page size.' : (what === 'use' ? 'Each place, least used first: how many of the week’s periods had pupils in it.' : wide ? 'Each day is a strip 10cm tall, two to an A3 landscape page.' : what === 'student' && style === 'book' ? 'One A4 page each, with a wider margin on the right and bottom for the guillotine, to stick in their books.' : what === 'student' && style === 'words' ? 'One A4 portrait page each, to go in their books.' : what === 'staff' ? 'One A4 portrait page each.' : 'One A4 landscape page each.') + ' To email them, choose “Save as PDF” as the printer.')),
       sheets.length ? h('div', { class: 'sheets' }, sheets) : h('p', { class: 'hint' }, 'Nobody to show yet. Add pupils and staff in Setup.')
     ));
   }
@@ -3022,11 +2877,11 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     const gi = [];
     project.groups.forEach((g) => {
       const n = groupLessons(g);
-      if (g.perWeek && n < g.perWeek) gi.push({ text: g.name + ': ' + n + ' of ' + g.perWeek + ' lessons', go: () => { ui.leadView = (leadViews().find((v) => !v.all && v.subjects.includes(g.subject || 'Other')) || {}).id || 'all'; go('groups'); } });
+      if (g.perWeek && n < g.perWeek) gi.push({ text: g.name + ': ' + n + ' of ' + g.perWeek + ' lessons', go: () => { ui.lessonTab = 'groups'; go('lessons'); } });
       keys.forEach((k) => { const sp = groupSplit(g, slotOf(k)); if (sp) gi.push({ text: g.name + ' split on ' + slotLabel(k) + ': ' + names(sp.away) + ' elsewhere', go: goSlotItem(k, sp.place) }); });
     });
     cats.push({ title: 'Groups', items: gi });
-    cats.push({ title: 'Lessons to place', items: requestsLeft().map((r) => ({ text: requestLabel(r) + ': ' + requestPlaced(r) + ' of ' + r.perWeek + ' placed', go: () => { ui.pupilPage = r.pupil; go('pupils'); } })) });
+    cats.push({ title: 'Lessons to place', items: requestsLeft().map((r) => ({ text: requestLabel(r) + ': ' + requestPlaced(r) + ' of ' + r.perWeek + ' placed', go: () => { ui.pupilPage = r.pupil; ui.lessonTab = 'pupil'; go('lessons'); } })) });
     cats.push({ title: 'Staff PPA', items: staff().filter((p) => p.ppa > 0 && ppaCount(p.id) < p.ppa).map((p) => ({ text: p.name + ': ' + ppaCount(p.id) + ' of ' + p.ppa + ' PPA periods', go: () => { ui.setupTab = 'staff'; go('setup'); } })) });
     return cats.filter((c) => c.items.length);
   }
@@ -3217,23 +3072,23 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     }))));
     return sheetFrame('roomsheet', a.name, 'Room timetable' + (project.name ? ' · ' + project.name : ''), h('table', { class: 'tt' }, head, body), a.cap ? 'Room for ' + a.cap + ' pupils' : '');
   }
-  function daySheet(d) {
-    const keys = project.periods.map((p) => slotKey(d.id, p.id));
-    const used = project.areas.filter((a) => keys.some((k) => { const s = slotOf(k); return s.titles[a.id] || Object.values(s.at).includes(a.id); }))
-      .sort((a, b) => a.name.localeCompare(b.name)).map((a) => ({ id: a.id, name: a.name }));
-    [PPA, COVER].forEach((id) => { if (keys.some((k) => Object.values(slotOf(k).at).includes(id))) used.push({ id, name: SPECIAL_NAMES[id] }); });
-    const head = h('thead', null, h('tr', null, h('th', null, 'Room'), project.periods.map((per) => h('th', { scope: 'col' }, per.label, ui.printTimes && per.time ? h('small', { style: { display: 'block', fontWeight: 500 } }, per.time) : null))));
-    const body = h('tbody', null, used.length ? used.map((pl) => h('tr', null, h('th', { scope: 'row' }, pl.name), keys.map((k) => {
-      const s = slotOf(k), here = peopleAt(s, pl.id), t = STAFF_ONLY.has(pl.id) ? '' : s.titles[pl.id] || '';
-      if (!here.length && !t) return h('td', null, '');
-      return h('td', null, t ? h('span', { class: 't' }, t) : null,
-        here.some(isStaff) ? h('span', { class: 'w' }, names(here.filter(isStaff))) : null,
-        here.some(isPupil) ? h('span', { class: 'p' }, names(here.filter(isPupil))) : null);
-    }))) : h('tr', null, h('td', { colspan: keys.length + 1 }, h('span', { class: 'na' }, 'Nothing planned for ' + d.name + ' yet.'))));
-    const notIn = project.people.filter((p) => keys.every((k) => slotOf(k).at[p.id] === OUT));
-    return sheetFrame('day', d.name, 'Whole school' + (project.name ? ' · ' + project.name : ''), h('table', { class: 'tt' }, head, body), notIn.length ? 'Not in all day: ' + names(notIn) : '');
+  // How the school's spaces were used across the week: an evaluation, least used first.
+  function roomUseSheet() {
+    const total = allSlotKeys().length;
+    const rows = project.areas.filter((a) => a.kind !== 'staff').map((a) => ({ a, u: roomUse(a.id) })).sort((x, y) => (x.a.kind === 'offsite') - (y.a.kind === 'offsite') || x.u.n - y.u.n || x.a.name.localeCompare(y.a.name));
+    const learning = rows.filter((r) => r.a.kind === 'room');
+    const used = learning.reduce((n, r) => n + r.u.n, 0);
+    const pct = learning.length ? Math.round((used / (learning.length * total)) * 100) : 0;
+    const head = h('thead', null, h('tr', null, h('th', null, 'Place'), h('th', null, 'Periods used'), h('th', null, 'Of the week'), DAYS.map((d) => h('th', { scope: 'col' }, d.name))));
+    const body = h('tbody', null, rows.map(({ a, u }) => h('tr', { class: u.n ? '' : 'unused' },
+      h('th', { scope: 'row' }, a.name, a.kind === 'offsite' ? h('small', null, ' (off-site)') : null),
+      h('td', { class: 'num' }, u.n + ' of ' + total),
+      h('td', null, h('span', { class: 'ru-bar' }, h('i', { style: { width: Math.round((u.n / total) * 100) + '%' } })), ' ', Math.round((u.n / total) * 100) + '%'),
+      DAYS.map((d) => h('td', { class: 'ru-day' }, project.periods.map((per) => { const k = slotKey(d.id, per.id); return h('span', { class: 'ru-cell' + (u.used.has(k) ? ' on' : ''), title: per.label + (u.used.has(k) ? ': used' : ': free') }, u.used.has(k) ? per.label : ''); }))))));
+    const never = learning.filter((r) => !r.u.n);
+    return sheetFrame('usesheet', 'Room use', 'How the spaces were used this week' + (project.name ? ' · ' + project.name : ''), h('table', { class: 'tt ru' }, head, body),
+      pct + '% of learning space time used' + (never.length ? '. Never used: ' + never.map((r) => r.a.name).join(', ') : '') + '. Staff spaces are left out.');
   }
-
   // ----- Day sheets: one day as a column per member of staff, set out like the sugar paper sheets -----
   // What one member of staff is doing in one period.
   function dayCellParts(p, s) {
@@ -3622,14 +3477,13 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
 
   // ----- Setup view -----
   // Setup is split into sections, one shown at a time, chosen from the list on the left.
-  const SETUP_SECTIONS = [['pupils', 'Pupils'], ['staff', 'Staff'], ['groups', 'Groups'], ['subjects', 'Subjects'], ['day', 'School day'], ['rooms', 'Rooms and map'], ['plan', 'Plan and files']];
+  const SETUP_SECTIONS = [['pupils', 'Pupils'], ['staff', 'Staff'], ['subjects', 'Subjects'], ['day', 'School day'], ['rooms', 'Rooms and map'], ['plan', 'Plan and files']];
   function renderSetup(root) {
     const tab = SETUP_SECTIONS.some(([id]) => id === ui.setupTab) ? ui.setupTab : 'pupils';
-    const counts = { pupils: pupils().length, staff: staff().length, groups: project.groups.length, rooms: project.areas.length };
+    const counts = { pupils: pupils().length, staff: staff().length, rooms: project.areas.length };
     const body = {
       pupils: () => [peopleCard('student'), reducedCard(), needsCard()],
       staff: () => [peopleCard('staff')],
-      groups: () => [groupsCard()],
       subjects: () => [symbolsCard()],
       day: () => [h('div', { class: 'setup-pair' }, schoolDayCard(), periodsCard())],
       rooms: () => [roomsCard()],
@@ -4272,106 +4126,60 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
   }
   // ----- The Groups screen: a subject lead's week, days across, lessons down; groups are dragged onto it -----
   // Subjects with the most groups first (literacy and numeracy sets), then by name.
-  function groupSubjects() {
-    const n = {};
-    project.groups.forEach((g) => { const k = g.subject || 'Other'; n[k] = (n[k] || 0) + 1; });
-    return Object.keys(n).sort((a, b) => (a === 'Other') - (b === 'Other') || n[b] - n[a] || a.localeCompare(b));
+  // Names across the top, as buttons: one is chosen, and its timetable shows below.
+  function namePicker(list, chosen, pick, label) {
+    return h('div', { class: 'name-pick', role: 'group', 'aria-label': label }, list.map((x) =>
+      h('button', { type: 'button', class: (isStaff(x) ? 'staff' : 'pupil') + (x.id === chosen ? ' on' : ''), 'aria-pressed': x.id === chosen ? 'true' : 'false', title: x.full || x.name, onclick: () => pick(x.id) }, x.name)));
   }
-  // The pages on the Lead teachers screen: the ones set up, or one per subject to start with, and All groups at the end.
-  function leadViews() {
-    const list = project.leadViews.length ? project.leadViews.slice() : groupSubjects().map((x) => ({ id: 'auto:' + x, staff: '', subjects: [x], auto: true }));
-    return list.concat([{ id: 'all', staff: '', subjects: null, all: true }]);
-  }
-  const leadLabel = (v) => v.all ? 'All groups' : (v.staff && person(v.staff) ? person(v.staff).name + ' · ' : '') + (v.subjects.length ? v.subjects.join(', ') : 'No subjects') + (v.staff ? '' : ' lead');
-  // Changing a starting page saves the whole list, so it stays as set up.
-  function editLeadView(id, fn) {
-    mutate((p) => {
-      if (!p.leadViews.length) p.leadViews = leadViews().filter((v) => !v.all).map((v) => ({ id: v.id.replace('auto:', 'L-'), staff: '', subjects: v.subjects.slice() }));
-      const v = p.leadViews.find((x) => x.id === id || x.id === id.replace('auto:', 'L-'));
-      if (v) fn(v, p);
-    });
-    if (ui.leadView && ui.leadView.startsWith('auto:')) { ui.leadView = ui.leadView.replace('auto:', 'L-'); saveUI(); }
-  }
-  function addLeadDialog() {
-    const pick = h('select', { class: 'txt' }, h('option', { value: '' }, 'Choose a teacher…'), staff().map((p) => h('option', { value: p.id }, p.full ? p.full + ' (' + p.name + ')' : p.name)));
-    const boxes = groupSubjects().map((x) => h('label', { class: 'choice' }, h('input', { type: 'checkbox', value: x }), h('span', null, x)));
-    dialog({
-      title: 'Add a teacher’s page',
-      body: [h('label', { class: 'field' }, 'Teacher', pick), h('p', { class: 'hint' }, 'Which groups do they plan? Tick their subjects.'), h('div', { class: 'gen-outputs' }, boxes)],
-      actions: [{ label: 'Cancel' }, { label: 'Add page', kind: 'primary', run: () => {
-        if (!pick.value) { toast('Choose a teacher first.'); return false; }
-        const subjects = boxes.map((b) => b.querySelector('input')).filter((i) => i.checked).map((i) => i.value);
-        let newId = 'L-' + Date.now().toString(36);
-        if (!project.leadViews.length) editLeadView('none', () => {});
-        mutate((p) => { p.leadViews.push({ id: newId, staff: pick.value, subjects }); });
-        ui.leadView = newId; saveUI(); render();
-      } }]
-    });
-  }
+  // Staff timetables: one member of staff's week. Groups dragged on take them with them; support staff and PPA are dragged on too.
   function renderGroups(root) {
-    const views = leadViews();
-    const view = views.find((v) => v.id === ui.leadView) || views[0];
-    const list = view.all ? project.groups : project.groups.filter((g) => view.subjects.includes(g.subject || 'Other'));
-    const teacher = view.staff ? person(view.staff) : null;
-    gwTeacher = teacher ? teacher.id : null;
-    const head = h('div', { class: 'page-head' }, h('h2', null, 'Lead teachers'),
-      h('div', { class: 'seg lead-seg', role: 'group', 'aria-label': 'Whose page' }, views.map((v) =>
-        h('button', { type: 'button', class: v.id === view.id ? 'on' : '', 'aria-pressed': v.id === view.id ? 'true' : 'false', onclick: () => { ui.leadView = v.id; saveUI(); render(); } }, leadLabel(v)))),
-      h('button', { type: 'button', class: 'btn small', onclick: addLeadDialog }, '+ Add a teacher'),
-      alertsToggle());
-    if (!project.groups.length) {
-      root.append(h('div', { class: 'page' }, head, h('div', { class: 'start-card', style: { maxWidth: '520px' } },
-        h('b', null, 'No groups yet'), h('span', null, 'Set up the literacy and numeracy sets, D&D or the woods first: who is in each, their lesson and how many a week.'),
-        h('div', { class: 'row' }, h('button', { type: 'button', class: 'btn small primary', onclick: () => { ui.setupTab = 'groups'; go('setup'); } }, 'Set up groups')))));
-      return;
-    }
-    // Who this page belongs to and which subjects it covers
-    const controls = view.all ? h('p', { class: 'hint' }, 'Every group. Drag a group onto the week; drag it to another lesson to move it, or back to the list to take it out.')
-      : h('div', { class: 'lead-controls' },
-        h('label', { class: 'field inline' }, 'Teacher', h('select', { class: 'txt sm', 'aria-label': 'Teacher for this page', onchange: (e) => editLeadView(view.id, (v) => { v.staff = e.target.value; }) },
-          h('option', { value: '' }, 'Not chosen'), staff().map((p) => h('option', { value: p.id, selected: view.staff === p.id }, p.name)))),
-        h('span', { class: 'member-label' }, 'Subjects'),
-        groupSubjects().map((x) => {
-          const on = view.subjects.includes(x);
-          return h('button', { type: 'button', class: 'chip pupil' + (on ? '' : ' off'), 'aria-pressed': on ? 'true' : 'false', onclick: () => editLeadView(view.id, (v) => { v.subjects = on ? v.subjects.filter((y) => y !== x) : v.subjects.concat(x); }) }, x);
-        }),
-        project.leadViews.length ? h('button', { type: 'button', class: 'link-btn', style: { marginLeft: 'auto' }, onclick: () => { mutate((p) => { p.leadViews = p.leadViews.filter((v) => v.id !== view.id); }); ui.leadView = null; saveUI(); render(); } }, 'Remove this page') : null,
-        h('span', { class: 'hint lead-hint' }, teacher ? teacher.name + ' goes in with each group placed here, and PPA can be dragged onto the week.' : 'Choose the teacher to put them in with each group and plan their PPA.'));
-    const ppaN = teacher ? ppaCount(teacher.id) : 0;
-    const tray = h('aside', { class: 'gw-tray', 'data-cell': 'tray', 'aria-label': 'Groups for this page' },
-      h('div', { class: 'zone-head' }, 'Groups', h('span', { class: 'n' }, list.length)),
-      list.length ? list.map((g) => {
+    const list = staff();
+    const head = h('div', { class: 'page-head' }, h('h2', null, 'Staff timetables'), alertsToggle());
+    if (!list.length) { root.append(h('div', { class: 'page' }, head, h('p', { class: 'hint' }, 'No staff yet. Add them in Setup.'))); return; }
+    const teacher = person(ui.staffPage) && isStaff(person(ui.staffPage)) ? person(ui.staffPage) : (list.find((x) => x.lead) || list[0]);
+    gwTeacher = teacher.id;
+    // Their own groups first, then the rest
+    const groups = project.groups.slice().sort((a, b) => b.members.includes(teacher.id) - a.members.includes(teacher.id) || (a.subject || '').localeCompare(b.subject || '') || a.name.localeCompare(b.name));
+    const ppaN = ppaCount(teacher.id);
+    const tray = h('aside', { class: 'gw-tray', 'data-cell': 'tray', 'aria-label': 'Groups to drag onto ' + teacher.name + '’s week' },
+      h('div', { class: 'gw-item gw-ppa-top' }, h('div', { class: 'zone-head' }, 'PPA'),
+        h('div', { class: 'gw-ppa-row' }, ppaChip(null), h('span', { class: 'hint' }, ppaN + (teacher.ppa ? ' of ' + teacher.ppa : '') + ' PPA this week'))),
+      h('div', { class: 'zone-head' }, 'Groups', h('span', { class: 'n' }, groups.length)),
+      groups.length ? groups.map((g) => {
         const n = groupLessons(g);
         return h('div', { class: 'gw-item' }, gweekChip(g, null), groupMembers(g),
           h('span', { class: 'hint' }, g.perWeek ? n + ' of ' + g.perWeek + ' a week' : plural(n, 'lesson') + ' this week',
             ' · ' + (g.room ? (areaById.get(g.room) || {}).name : 'no usual room')));
-      }) : h('p', { class: 'hint' }, 'No groups for these subjects yet.'),
-      list.length ? h('div', { class: 'gw-item gw-ppa' }, h('div', { class: 'zone-head' }, 'Support staff'),
-        h('div', { class: 'gw-staff-list' }, staff().filter((p) => !teacher || p.id !== teacher.id).map((p) => gwStaffChip(p, null))),
-        h('span', { class: 'hint' }, 'Drag onto a group on the week to put them in with it; drag back here to take them out.')) : null,
-      teacher ? h('div', { class: 'gw-item gw-ppa' }, h('div', { class: 'zone-head' }, 'PPA'),
-        ppaChip(null), h('span', { class: 'hint' }, ppaN + (teacher.ppa ? ' of ' + teacher.ppa : '') + ' PPA this week')) : null,
-      h('p', { class: 'hint' }, 'Change groups in Setup → Groups.'));
+      }) : h('p', { class: 'hint' }, 'No groups yet.'),
+      h('div', { class: 'gw-item gw-ppa' }, h('div', { class: 'zone-head' }, 'Support staff'),
+        h('div', { class: 'gw-staff-list' }, list.filter((p) => p.id !== teacher.id).map((p) => gwStaffChip(p, null))),
+        h('span', { class: 'hint' }, 'Drag onto a group on the week to put them in with it; drag back here to take them out.')),
+      h('button', { type: 'button', class: 'link-btn', onclick: () => { ui.lessonTab = 'groups'; go('lessons'); } }, 'Change groups in Lesson setup'));
     const grid = h('table', { class: 'gweek' },
       h('thead', null, h('tr', null, h('th', { class: 'gw-corner' }, ''), DAYS.map((d) => h('th', { scope: 'col' }, d.name)))),
       h('tbody', null, project.periods.map((per) => h('tr', null,
         h('th', { scope: 'row' }, h('b', null, per.label), per.time ? h('small', null, per.time) : null),
         DAYS.map((d) => {
-          const key = slotKey(d.id, per.id), s = slotOf(key);
-          const mine = list.filter((g) => groupPlace(g, s));
-          const split = list.map((g) => ({ g, sp: groupSplit(g, s) })).filter((x) => x.sp);
-          // Where this page's teacher is, when it isn't with one of the groups shown
-          const tAt = teacher && s.at[teacher.id];
-          const tNote = !tAt || tAt === PPA || mine.some((g) => groupPlace(g, s) === tAt) ? null
-            : h('span', { class: 'gw-teacher' }, teacher.name + ': ' + (tAt === OUT ? 'not in' : placeName(tAt)));
+          const key = slotKey(d.id, per.id), sl = slotOf(key);
+          const at = sl.at[teacher.id], a = at && areaById.get(at);
+          const mine = a ? project.groups.filter((g) => groupPlace(g, sl) === at) : [];
+          const split = groups.filter((g) => g.members.includes(teacher.id)).map((g) => ({ g, sp: groupSplit(g, sl) })).filter((x) => x.sp);
+          const here = a ? peopleAt(sl, at) : [];
           return h('td', { 'data-cell': key, 'aria-label': d.name + ' ' + per.label, tabindex: gwPicked ? '0' : null, onkeydown: (e) => { if ((e.key === 'Enter' || e.key === ' ') && gwPicked && e.target === e.currentTarget) { e.preventDefault(); dropPicked(key); } } },
-            mine.map((g) => h('div', { class: 'gw-placed', 'data-group': g.id }, gweekChip(g, key), groupMembers(g, s, key))),
-            tAt === PPA ? ppaChip(key) : null,
-            tNote,
-            split.map(({ g, sp }) => h('span', { class: 'gw-split', title: g.name + ' is split: ' + names(sp.away) + ' elsewhere' }, '! ' + g.name + ': ' + names(sp.away) + ' elsewhere')),
-            null);
+            mine.map((g) => h('div', { class: 'gw-placed', 'data-group': g.id }, gweekChip(g, key), groupMembers(g, sl, key))),
+            a && !mine.length ? h('button', { type: 'button', class: 'gw-lesson', title: 'Open ' + d.name + ' ' + per.label + ' on the map', onclick: () => { goSlot(d.id, per.id, 'plan'); setTimeout(() => flashZone(at), 50); } },
+              h('b', null, str(sl.titles[at]) || a.name), h('span', { class: 'gw-room' }, a.name),
+              here.some(isPupil) ? h('span', { class: 'gw-pupils' }, names(here.filter(isPupil))) : null,
+              here.some((x) => isStaff(x) && x.id !== teacher.id) ? h('span', { class: 'gw-with' }, 'With ' + names(here.filter((x) => isStaff(x) && x.id !== teacher.id))) : null) : null,
+            at === PPA ? ppaChip(key) : null,
+            at === COVER ? h('span', { class: 'gw-note' }, 'Cover') : null,
+            at === OUT ? h('span', { class: 'gw-note' }, 'Not in') : null,
+            split.map(({ g, sp }) => h('span', { class: 'gw-split', title: g.name + ' is split: ' + names(sp.away) + ' elsewhere' }, '! ' + g.name + ': ' + names(sp.away) + ' elsewhere')));
         })))));
-    root.append(h('div', { class: 'page gw-page' }, head, controls, h('div', { class: 'gw-wrap' }, tray, h('div', { class: 'gw-grid' }, grid))));
+    root.append(h('div', { class: 'page gw-page' }, head,
+      namePicker(list, teacher.id, (id) => { ui.staffPage = id; saveUI(); render(); }, 'Whose timetable'),
+      h('p', { class: 'hint gw-hint' }, 'Drag a group onto ' + teacher.name + '’s week and they go in with it. Drag support staff onto a group, and PPA onto a free lesson. Drag anything back to the list to take it off.'),
+      h('div', { class: 'gw-wrap' }, tray, h('div', { class: 'gw-grid' }, grid))));
   }
   // The people in a group, listed down under its chip: pupils, then staff. In a lesson, anyone not with the group then is faded.
   // In a lesson, support staff put in with the group (not members, not the page's teacher) follow, and can be dragged off again.
@@ -4438,7 +4246,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     render();
     scheduleGroup(pk.group, cell, pk.from);
   }
-  // A group on the Groups screen: in the list (key null), or in a lesson, where it shows its room.
+  // A group on the Staff timetables screen: in the list (key null), or in a lesson, where it shows its room.
   function gweekChip(g, key) {
     const s = key ? slotOf(key) : null, at = s && groupPlace(g, s), a = at && areaById.get(at);
     const n = groupLessons(g);
@@ -4691,7 +4499,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       project = Object.assign(fresh, { name: project.name, school: project.school, periods: project.periods });
     }
     if (!ZOOMS.includes(ui.zoom)) ui.zoom = 1;
-    if (!['plan', 'groups', 'pupils', 'week', 'print', 'setup'].includes(ui.view)) ui.view = 'plan';
+    if (!['plan', 'groups', 'pupils', 'lessons', 'print', 'setup'].includes(ui.view)) ui.view = 'plan';
     render();
     if (movedToRoomy) {
       saveNow();
