@@ -1369,13 +1369,41 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
         if (STAFF_ONLY.has(place) && roleOf.get(pid) !== 'staff') continue;
         if (areaIds.has(place) || STAFF_ONLY.has(place) || place === OUT) at[pid] = place;
       }
-      if (Object.keys(titles).length || Object.keys(at).length) out.slots[key] = { titles, at };
+      const groupIds = new Set(out.groups.map((g) => g.id));
+      const groups = {};
+      if (s.groups && typeof s.groups === 'object') {
+        for (const [gid, pl] of Object.entries(s.groups)) if (groupIds.has(gid) && areaIds.has(pl)) groups[gid] = pl;
+      } else Object.assign(groups, guessGroups(out.groups, roleOf, at, titles));
+      if (Object.keys(titles).length || Object.keys(at).length) out.slots[key] = { titles, at, groups };
     }
     const m = p.meta || {};
     out.meta = { created: m.created || nowIso(), changedAt: m.changedAt || null, backedUpAt: m.backedUpAt || null };
     return out;
   }
 
+  // For plans saved before groups were recorded: a group is in a room when all its pupils who are in are there.
+  // Where groups sharing pupils would all fit one room, the one whose subject is the room's lesson wins, then the biggest.
+  function guessGroups(groups, roleOf, at, titles) {
+    const byPlace = {};
+    groups.forEach((g) => {
+      const kids = g.members.filter((id) => roleOf.get(id) === 'student' && at[id] !== OUT);
+      if (!kids.length) return;
+      const pl = at[kids[0]];
+      if (!pl || STAFF_ONLY.has(pl) || pl === OUT || !kids.every((id) => at[id] === pl)) return;
+      const t = subjectKey(titles[pl] || '');
+      (byPlace[pl] = byPlace[pl] || []).push({ g, kids, match: !!(g.subject && t && (t.includes(subjectKey(g.subject)) || t.includes(subjectKey(g.name)))) });
+    });
+    const out = {};
+    for (const [pl, list] of Object.entries(byPlace)) {
+      const taken = new Set();
+      list.sort((a, b) => b.match - a.match || b.kids.length - a.kids.length).forEach((c) => {
+        if (c.kids.some((id) => taken.has(id))) return;
+        c.kids.forEach((id) => taken.add(id));
+        out[c.g.id] = pl;
+      });
+    }
+    return out;
+  }
   // Converts the earlier map/grid prototypes' saved state (P1–P4, no days) into this format.
   // The day sheet's rows: every period exactly once, plus any coloured rows for the rest of the day.
   function cleanDayRows(rows, periods) {
@@ -1566,10 +1594,13 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     sel.clear();
     const pr = pendingRequest && valid.includes(pendingRequest.pupil) && areaById.get(zone) ? pendingRequest : null;
     pendingRequest = null;
+    const pg = pendingGroup && areaById.get(zone) && groupHere(pendingGroup, slotOf(key)).every((id) => valid.includes(id)) ? pendingGroup : null;
+    pendingGroup = null;
     mutate(() => {
       const s = slotOf(key, true);
       valid.forEach((id) => { if (zone === NONE) delete s.at[id]; else s.at[id] = zone; });
       if (pr && !str(s.titles[zone]) && areaById.get(zone).kind !== 'staff') s.titles[zone] = pr.subject;
+      if (pg) { if (pg.subject && !str(s.titles[zone]) && areaById.get(zone).kind !== 'staff') s.titles[zone] = pg.subject; recordGroup(s, pg, zone); }
     });
     if (rejected) toast(plural(rejected, 'pupil') + ' left where they were: ' + SPECIAL_NAMES[zone] + ' is for staff only');
   }
@@ -1650,23 +1681,35 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
   // ----- Groups -----
   // Members of a group who are in this period (not marked "not in").
   const groupHere = (g, s) => g.members.filter((id) => person(id) && s.at[id] !== OUT);
-  // Where the group is in a period: the place all its pupils (who are in) share, or nothing.
+  // Where the group is in a period: the room it was put in, while all its pupils (who are in) are there.
+  // Groups that share pupils don't follow each other in: only a group placed in a lesson counts as there.
   function groupPlace(g, s) {
+    const pl = s.groups && s.groups[g.id];
+    if (!pl || !areaById.has(pl)) return null;
     const kids = groupHere(g, s).filter((id) => isPupil(person(id)));
-    if (!kids.length) return null;
-    const pl = s.at[kids[0]];
-    return pl && areaById.has(pl) && kids.every((id) => s.at[id] === pl) ? pl : null;
+    return kids.length && kids.every((id) => s.at[id] === pl) ? pl : null;
+  }
+  // Records a group in a room for a period. A group already recorded in that room that shares pupils with it is replaced.
+  function recordGroup(s, g, place) {
+    s.groups = Object.assign({}, s.groups);
+    for (const [gid, pl] of Object.entries(s.groups)) {
+      const o = gid !== g.id && pl === place && project.groups.find((x) => x.id === gid);
+      if (o && o.members.some((id) => g.members.includes(id) && isPupil(person(id)))) delete s.groups[gid];
+    }
+    s.groups[g.id] = place;
+  }
+  function unrecordGroup(s, g) {
+    if (s.groups && s.groups[g.id]) { s.groups = Object.assign({}, s.groups); delete s.groups[g.id]; }
   }
   const groupLessons = (g) => allSlotKeys().filter((k) => groupPlace(g, slotOf(k))).length;
-  // A group that is mostly together but has someone elsewhere, because they were moved into another group.
+  // A group placed in a lesson that has someone elsewhere, because they were moved into another group.
   function groupSplit(g, s) {
+    const pl = s.groups && s.groups[g.id];
+    if (!pl || !areaById.has(pl)) return null;
     const kids = groupHere(g, s).filter((id) => isPupil(person(id)));
-    if (kids.length < 2 || groupPlace(g, s)) return null;
-    const n = {};
-    kids.forEach((id) => { const pl = s.at[id]; if (pl && areaById.has(pl)) n[pl] = (n[pl] || 0) + 1; });
-    const top = Object.keys(n).sort((a, b) => n[b] - n[a])[0];
-    if (!top || n[top] * 2 < kids.length) return null;
-    return { place: top, away: kids.filter((id) => s.at[id] !== top).map(person) };
+    const away = kids.filter((id) => s.at[id] !== pl);
+    if (!away.length || away.length === kids.length) return null;
+    return { place: pl, away: away.map(person) };
   }
   // Other groups on at this time that would lose pupils if this group moved in.
   function groupClashes(g, s) {
@@ -1689,6 +1732,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       const s = slotOf(key, true);
       ids.forEach((id) => { if (zone === NONE) delete s.at[id]; else s.at[id] = zone; });
       if (a && a.kind !== 'staff' && g.subject && !str(s.titles[zone])) s.titles[zone] = g.subject;
+      if (a) recordGroup(s, g, zone); else unrecordGroup(s, g);
     });
     if (a) toast(g.name + ' in ' + a.name + (away ? '. ' + plural(away, 'member') + ' not in this period' : '') + (clashes.length ? '. Clash: ' + clashText(clashes) + ', now split' : ''), { label: 'Undo', run: undo });
   }
@@ -1712,6 +1756,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     }
     dst.at = at;
     dst.titles = Object.assign({}, src.titles);
+    dst.groups = Object.assign({}, src.groups);
     return skipped;
   }
   function clearSlot(key) {
@@ -1720,6 +1765,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     for (const [id, place] of Object.entries(s.at)) if (place === OUT) at[id] = OUT;
     s.at = at;
     s.titles = {};
+    s.groups = {};
   }
 
   // ---------- Saving ----------
@@ -1829,7 +1875,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       const sl = project.slots[k] || { titles: {}, at: {} };
       const at = {};
       for (const [pid, v] of Object.entries(sl.at)) if (ids.has(pid) && v !== OUT) at[pid] = v;
-      next.slots[k] = { titles: Object.assign({}, sl.titles), at };
+      next.slots[k] = { titles: Object.assign({}, sl.titles), at, groups: Object.assign({}, sl.groups) };
     });
     for (const [pid, keys] of Object.entries(notIn)) if (ids.has(pid) && Array.isArray(keys)) keys.forEach((k) => { if (next.slots[k]) next.slots[k].at[pid] = OUT; });
     const incoming = sanitize(next);
@@ -2525,6 +2571,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
             const used = new Set(pp.groups.map((g) => g.colour));
             const colour = Object.keys(GROUP_COLOURS).find((c) => !used.has(c)) || Object.keys(GROUP_COLOURS)[pp.groups.length % 8];
             pp.groups.push({ id: 'G' + n, name: subject, subject, perWeek, room: a.id, colour, members: kids.map((k) => k.id).concat(adults.map((x) => x.id)) });
+            sl2.groups = Object.assign({}, sl2.groups, { ['G' + n]: a.id });
           }
         });
         toast((one ? 'Lesson created for ' + kids[0].name : 'Group lesson “' + subject + '” created') + '. It’s in Lesson setup.', { label: 'Undo', run: undo });
@@ -4273,6 +4320,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
           ids.forEach((id) => { s.at[id] = room; });
           if (t && s.at[t.id] !== OUT) s.at[t.id] = room;
           if (g.subject && !str(s.titles[room])) s.titles[room] = g.subject;
+          recordGroup(s, g, room);
         });
         toast(g.name + ': ' + slotLabel(key) + ', ' + a.name + (sharing.length ? '. Shares the room with ' + names(sharing) : ''), { label: 'Undo', run: undo });
       };
@@ -4311,6 +4359,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     if (!place) return;
     g.members.forEach((id) => { if (s.at[id] === place) delete s.at[id]; });
     if (s.titles[place] === g.subject && !Object.values(s.at).includes(place)) delete s.titles[place];
+    unrecordGroup(s, g);
   }
   // Takes a group out of the room it's in this period (dragged back to the tray).
   function removeGroupHere(g) {
@@ -4321,10 +4370,12 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     mutate(() => takeGroupOut(g, key));
     toast(g.name + ' taken out of ' + (areaById.get(place) || {}).name, { label: 'Undo', run: undo });
   }
+  let pendingGroup = null;
   function pickUpGroup(g) {
     const ids = groupHere(g, slotOf(curKey()));
     sel.clear();
     ids.forEach((id) => sel.add(id));
+    pendingGroup = g;
     render();
     toast(g.name + ': ' + plural(ids.length, 'person', 'people') + ' picked up. Tap a room to move them all.');
   }

@@ -781,6 +781,29 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
     await p12.mouse.up();
     await p12.waitForTimeout(150);
   };
+  // Groups that share pupils don't follow each other into a room
+  await p12.waitForTimeout(500);
+  await p12.evaluate(() => {
+    const k = 'lifehouse_timetabler_v2', j = JSON.parse(localStorage.getItem(k));
+    j.groups.push({ id: 'G7', name: 'Overlap A', subject: 'Woods walk', members: ['S01', 'S02', 'S03', 'T05'], perWeek: 1, room: '', colour: 'teal' },
+      { id: 'G8', name: 'Overlap B', subject: 'Chaos', members: ['S01', 'S02', 'S03', 'S04'], perWeek: 1, room: '', colour: 'coral' });
+    const sl = j.slots['Mon|P1'];
+    ['S01', 'S02', 'S03', 'S04', 'S05', 'T03'].forEach((id) => { sl.at[id] = 'A22'; });
+    sl.titles.A22 = 'Literacy';
+    Object.values(j.slots).forEach((x) => { delete x.groups; });
+    localStorage.setItem(k, JSON.stringify(j));
+  });
+  await p12.reload();
+  await p12.locator('.strip-btn[aria-label^="Monday P1"]').click();
+  check((await p12.locator('.room[data-area="A22"] .room-group').allInnerTexts()).join('|') === 'Literacy set 1', 'a plan saved before: only the group whose subject is the lesson counts as in the room, not the others sharing its pupils');
+  await p12.locator('.tray-tabs button', { hasText: 'Groups' }).click();
+  await dragBox12(p12.locator('.tgroup .gchip', { hasText: 'Overlap A' }), p12.locator('.room[data-area="A3"] .room-people'));
+  check((await p12.locator('.room[data-area="A3"] .room-group').allInnerTexts()).join('|') === 'Overlap A' && await p12.locator('.room .room-group', { hasText: 'Overlap B' }).count() === 0
+    && await p12.locator('.room[data-area="A22"] .room-group').count() === 0, 'dragging one group in doesn’t bring other groups with the same pupils');
+  await p12.keyboard.press('Control+z');
+  await p12.waitForTimeout(500);
+  await p12.evaluate(() => { const k = 'lifehouse_timetabler_v2', j = JSON.parse(localStorage.getItem(k)); j.groups = j.groups.filter((g) => g.id !== 'G7' && g.id !== 'G8'); localStorage.setItem(k, JSON.stringify(j)); });
+  await p12.reload();
   // Lesson setup: lessons for one pupil, placed from the tray
   await p12.getByRole('button', { name: 'Lesson setup', exact: true }).click();
   await p12.getByRole('button', { name: 'Lessons for one pupil' }).click();
