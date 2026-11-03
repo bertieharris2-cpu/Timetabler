@@ -535,6 +535,8 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   check(await p11.locator('td[data-cell="Tue|P2"] .gchip').count() === 0 && await p11.locator('td[data-cell="Thu|P3"] .gchip', { hasText: 'Literacy set 1' }).count() === 1, 'drag it to another lesson to move it');
   await dragBox(p11.locator('td[data-cell="Thu|P3"] .gchip', { hasText: 'Literacy set 1' }), p11.locator('.gw-tray'));
   check(await p11.locator('td[data-cell="Thu|P3"] .gchip').count() === 0, 'or back to the list to take it out');
+  check(await p11.locator('.gw-tray .gchip', { hasText: 'Numeracy set 1' }).count() === 0 && await p11.locator('.gw-tray .zone-head', { hasText: 'Carys’s groups' }).count() === 1, 'just the groups set up for that teacher');
+  await p11.getByRole('button', { name: /^Show all groups/ }).click();
   await dragBox(p11.locator('.gw-tray .gchip', { hasText: 'Numeracy set 1' }), p11.locator('td[data-cell="Mon|P1"]'));
   check(await p11.locator('dialog').innerText().then((t) => /Clash/.test(t) && /AB is also in Literacy set 1/.test(t)), 'asks before splitting another group');
   await p11.getByRole('button', { name: 'Move them anyway' }).click();
@@ -570,6 +572,23 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   await p11.waitForTimeout(400);
   sup = await p11.evaluate(() => JSON.parse(localStorage.getItem('lifehouse_timetabler_v2')));
   check(!sup.slots['Wed|P3'].at.T23 && await p11.locator('td[data-cell="Wed|P3"] .gw-sup', { hasText: 'Zac' }).count() === 0, 'and dragged back out');
+  // A one-to-one lesson made on a teacher's timetable and dragged onto their week
+  await p11.getByRole('button', { name: '+ One-to-one lesson' }).click();
+  await p11.locator('dialog select[aria-label="Pupil"]').selectOption({ label: 'KB' });
+  await p11.locator('dialog input[aria-label="Lesson name"]').fill('Reading 1:1');
+  await p11.locator('dialog select[aria-label="Usual room"]').selectOption({ label: 'Small Room 2' });
+  await p11.locator('dialog').getByRole('button', { name: 'Create' }).click();
+  const oneChip = p11.locator('.gw-ones .rchip', { hasText: 'Reading 1:1' });
+  check(await oneChip.count() === 1 && /KB/.test(await oneChip.innerText()), 'a one-to-one lesson is set up from the teacher’s timetable');
+  const oneCell = await p11.evaluate(() => [...document.querySelectorAll('td[data-cell]')].find((td) => td.dataset.cell !== 'tray' && !td.querySelector('.gw-lesson, .gchip, .ppa-chip, .gw-note, .rchip')).dataset.cell);
+  await dragBox(oneChip, p11.locator('td[data-cell="' + oneCell + '"]'));
+  await p11.waitForTimeout(400);
+  const one = await p11.evaluate((k) => JSON.parse(localStorage.getItem('lifehouse_timetabler_v2')).slots[k], oneCell);
+  const smallRoom2 = await p11.evaluate(() => [...document.querySelectorAll('dialog')].length) === 0;
+  check(smallRoom2 && one.at.S08 === one.at.T03 && /Reading 1:1/.test(one.titles[one.at.S08]) && await p11.locator('td[data-cell="' + oneCell + '"] .rchip', { hasText: 'Reading 1:1' }).count() === 1, 'dragged onto the week, the pupil and teacher go to its room');
+  await dragBox(p11.locator('td[data-cell="' + oneCell + '"] .rchip', { hasText: 'Reading 1:1' }), p11.locator('.gw-tray'));
+  await p11.waitForTimeout(400);
+  check(await p11.locator('td[data-cell="' + oneCell + '"] .rchip').count() === 0, 'and dragged back off');
   await p11.getByRole('button', { name: 'Printables', exact: true }).click();
   console.log('Generate timetables');
   await p11.getByRole('button', { name: 'Generate timetables…' }).click();

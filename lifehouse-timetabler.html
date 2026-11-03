@@ -817,6 +817,10 @@ table.gweek { width: 100%; border-collapse: collapse; table-layout: fixed; backg
 .gw-lesson .gw-pupils { color: var(--pupil); font-weight: 650; }
 .gw-lesson .gw-with { color: var(--staff); font-weight: 600; }
 .gw-hint { margin: 0 0 10px; }
+.gw-ones { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; margin-bottom: 4px; }
+.gw-ones .rchip, .gw-placed .rchip { white-space: normal; flex-wrap: wrap; row-gap: 2px; }
+.gw-item.gw-other { opacity: 0.75; }
+.gw-all { align-self: flex-start; font-size: 12.5px; }
 .gw-note { display: block; font-size: 12.5px; font-weight: 700; color: var(--muted); }
 .room-create { margin-right: auto; padding: 0 6px; border: 1px solid var(--accent); background: var(--surface); color: var(--accent); font-size: 11px; font-weight: 700; line-height: 18px; visibility: hidden; }
 .room:hover .room-create, .room:focus-within .room-create { visibility: visible; }
@@ -2379,15 +2383,89 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
   }
 
   // A lesson to place in the tray: drag it onto a room, or tap it then tap a room.
-  function requestChip(r, sl) {
-    const n = requestPlaced(r), at = requestHere(r, sl), a = at && areaById.get(at), p = person(r.pupil), t = r.staff && person(r.staff);
-    const notIn = sl.at[r.pupil] === OUT;
-    return h('button', { type: 'button', class: 'rchip' + (at ? ' here' : '') + (notIn ? ' faded' : '') + (pendingRequest === r ? ' sel' : ''), 'data-request': r.id,
+  function requestChip(r, sl, key) {
+    const n = requestPlaced(r), at = sl ? requestHere(r, sl) : null, a = at && areaById.get(at), p = person(r.pupil), t = r.staff && person(r.staff);
+    const notIn = !!sl && sl.at[r.pupil] === OUT;
+    const picked = pendingRequest === r || (gwPicked && gwPicked.request === r && gwPicked.from === (key || null));
+    return h('button', { type: 'button', class: 'rchip' + (at && !key ? ' here' : '') + (notIn ? ' faded' : '') + (picked ? ' sel' : ''), 'data-request': r.id, 'data-from': key || null,
       title: requestLabel(r) + (r.note ? '. ' + r.note : '') + (r.room ? '. Usually ' + (areaById.get(r.room) || {}).name : '') + (notIn ? '. ' + p.name + ' is not in this period.' : a ? '. In ' + a.name + ' this period.' : '. Drag onto a room, or tap then tap a room.') },
       lessonSymbol(r.subject, '', '', 'gchip-ic'), h('b', null, r.subject),
       h('span', { class: 'rchip-who' }, p ? p.name : ''), t ? h('span', { class: 'rchip-staff' }, t.name) : null,
       h('span', { class: 'gchip-week' + (n < r.perWeek ? ' short' : ''), 'aria-label': n + ' of ' + r.perWeek + ' this week' }, n + '/' + r.perWeek),
-      a ? h('span', { class: 'gchip-at' }, '✓ ' + a.name) : null);
+      a ? h('span', { class: 'gchip-at' }, (key ? '' : '✓ ') + a.name) : null);
+  }
+  // Staff timetables: set up a one-to-one lesson with this member of staff.
+  function oneToOneDialog(t) {
+    const pick = h('select', { class: 'txt', 'aria-label': 'Pupil' }, h('option', { value: '' }, 'Choose a pupil…'), pupils().map((p) => h('option', { value: p.id }, p.full ? p.full + ' (' + p.name + ')' : p.name)));
+    const subjects = [...new Set([...project.needs.map((n) => n.subject), ...subjectsInUse().filter((x) => !x.band).map((x) => x.name), 'Therapy', 'Wellbeing', 'Intervention'])].sort((a, b) => a.localeCompare(b));
+    const name = h('input', { class: 'txt', list: 'one-subjects', placeholder: 'e.g. Therapy, Reading', 'aria-label': 'Lesson name' });
+    const per = h('select', { class: 'txt', 'aria-label': 'Lessons a week' }, [1, 2, 3, 4, 5].map((v) => h('option', { value: v }, v)));
+    const room = h('select', { class: 'txt', 'aria-label': 'Usual room' }, h('option', { value: '' }, 'Any room'), project.areas.filter((a) => a.kind !== 'staff').slice().sort((a, b) => a.name.localeCompare(b.name)).map((a) => h('option', { value: a.id }, a.name)));
+    dialog({
+      title: 'One-to-one lesson with ' + t.name,
+      body: [h('datalist', { id: 'one-subjects' }, subjects.map((x) => h('option', { value: x }))),
+        h('label', { class: 'field' }, 'Pupil', pick), h('label', { class: 'field' }, 'Lesson', name),
+        h('label', { class: 'field' }, 'How many a week', per), h('label', { class: 'field' }, 'Usual room', room),
+        h('p', { class: 'hint' }, 'It goes beside ' + t.name + '’s week to drag on, and in Lesson setup under Lessons for one pupil.')],
+      actions: [{ label: 'Cancel' }, { label: 'Create', kind: 'primary', run: () => {
+        if (!pick.value) { toast('Choose a pupil first.'); return false; }
+        if (!str(name.value)) { toast('Give the lesson a name first.'); name.focus(); return false; }
+        mutate((pp) => {
+          let n = pp.requests.length + 1;
+          while (pp.requests.some((r) => r.id === 'R' + n)) n++;
+          pp.requests.push({ id: 'R' + n, pupil: pick.value, subject: str(name.value), staff: t.id, perWeek: +per.value, room: room.value, note: '' });
+        });
+        toast('One-to-one lesson created: ' + str(name.value) + ' for ' + person(pick.value).name + ' with ' + t.name + '. Drag it onto the week.');
+      } }]
+    });
+  }
+  // Puts a one-to-one lesson into a period on Staff timetables (moving it from another one if it came from there).
+  function scheduleRequest(r, key, fromKey) {
+    if (key === fromKey) return;
+    const p = person(r.pupil), t = r.staff && person(r.staff);
+    const sl = slotOf(key);
+    if (!p) return;
+    if (sl.at[p.id] === OUT) { toast(p.name + ' is not in on ' + slotLabel(key)); render(); return; }
+    if (t && sl.at[t.id] === OUT) { toast(t.name + ' is not in on ' + slotLabel(key)); render(); return; }
+    const go2 = (room) => {
+      const a = areaById.get(room);
+      mutate(() => {
+        if (fromKey) unscheduleRequest(r, fromKey, true);
+        const s2 = slotOf(key, true);
+        s2.at[p.id] = room;
+        if (t) s2.at[t.id] = room;
+        if (!str(s2.titles[room])) s2.titles[room] = r.subject;
+      });
+      const title = str(slotOf(key).titles[room]);
+      toast(requestLabel(r) + ': ' + slotLabel(key) + ', ' + a.name + (subjectKey(title).includes(subjectKey(r.subject)) ? '' : '. The room’s lesson is “' + title + '”, so it won’t count until it’s renamed'), { label: 'Undo', run: undo });
+    };
+    if (r.room && areaById.has(r.room)) { go2(r.room); return; }
+    const rooms = project.areas.filter((a) => a.kind !== 'staff').map((a) => ({ a, busy: peopleAt(sl, a.id).filter(isPupil).length }))
+      .sort((x, y) => (x.busy > 0) - (y.busy > 0) || x.a.name.localeCompare(y.a.name));
+    const radios = rooms.map((x, i) => h('label', { class: 'choice' }, h('input', { type: 'radio', name: 'one-room', value: x.a.id, checked: i === 0 }),
+      h('span', null, x.a.name, h('small', null, x.busy ? plural(x.busy, 'pupil') + ' there already' : 'Free'))));
+    const remember = h('input', { type: 'checkbox', checked: true });
+    dialog({
+      title: 'Which room for ' + r.subject + ' on ' + slotLabel(key) + '?',
+      body: [h('div', { class: 'room-choices' }, radios), h('label', { class: 'choice' }, remember, h('span', null, 'Always use this room for it', h('small', null, 'You can change it in Lesson setup.')))],
+      actions: [{ label: 'Cancel' }, { label: 'Put it there', kind: 'primary', run: () => {
+        const room = radios.map((x) => x.querySelector('input')).find((x) => x.checked).value;
+        if (remember.checked) mutate((pp) => { const rr = pp.requests.find((x) => x.id === r.id); if (rr) rr.room = room; }, { render: false });
+        go2(room);
+      } }]
+    });
+  }
+  // Takes a one-to-one lesson off a period: the pupil and the member of staff go back to not placed.
+  function unscheduleRequest(r, key, inside) {
+    const run = () => {
+      const s2 = slotOf(key, true), pl = requestHere(r, s2);
+      if (!pl) return;
+      [r.pupil, r.staff].forEach((id) => { if (id && s2.at[id] === pl) delete s2.at[id]; });
+      if (s2.titles[pl] === r.subject && !Object.values(s2.at).includes(pl)) delete s2.titles[pl];
+    };
+    if (inside) { run(); return; }
+    mutate(run);
+    toast(requestLabel(r) + ' taken off ' + slotLabel(key), { label: 'Undo', run: undo });
   }
 
   let mainSet = new Set();
@@ -4028,6 +4106,8 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       if (gc) { drag = { x0: e.clientX, y0: e.clientY, id: e.pointerId, kind: 'group', group: project.groups.find((g) => g.id === gc.dataset.group), from: gc.dataset.from || null, started: false }; return; }
       const pc = e.target.closest('.ppa-chip');
       if (pc) { drag = { x0: e.clientX, y0: e.clientY, id: e.pointerId, kind: 'ppa', from: pc.dataset.from || null, started: false }; return; }
+      const rq = e.target.closest('.rchip');
+      if (rq && !rq.closest('.ghost')) { drag = { x0: e.clientX, y0: e.clientY, id: e.pointerId, kind: 'request', request: project.requests.find((r) => r.id === rq.dataset.request), from: rq.dataset.from || null, started: false }; return; }
       const sc = e.target.closest('[data-pid]');
       if (sc && !sc.closest('.ghost')) { drag = { x0: e.clientX, y0: e.clientY, id: e.pointerId, kind: 'support', pid: sc.dataset.pid, from: sc.dataset.from || null, started: false }; return; }
       const cell = e.target.closest('[data-cell]');
@@ -4185,19 +4265,28 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     if (!list.length) { root.append(h('div', { class: 'page' }, head, h('p', { class: 'hint' }, 'No staff yet. Add them in Setup.'))); return; }
     const teacher = person(ui.staffPage) && isStaff(person(ui.staffPage)) ? person(ui.staffPage) : (list.find((x) => x.lead) || list[0]);
     gwTeacher = teacher.id;
-    // Their own groups first, then the rest
-    const groups = project.groups.slice().sort((a, b) => b.members.includes(teacher.id) - a.members.includes(teacher.id) || (a.subject || '').localeCompare(b.subject || '') || a.name.localeCompare(b.name));
+    // Just the groups set up for this member of staff, unless all are asked for
+    const sortG = (a, b) => (a.subject || '').localeCompare(b.subject || '') || a.name.localeCompare(b.name);
+    const theirs = project.groups.filter((g) => g.members.includes(teacher.id)).sort(sortG);
+    const groups = ui.allGroups ? theirs.concat(project.groups.filter((g) => !g.members.includes(teacher.id)).sort(sortG)) : theirs;
+    const others = project.groups.length - theirs.length;
+    const ones = project.requests.filter((r) => r.staff === teacher.id && str(r.subject));
     const ppaN = ppaCount(teacher.id);
     const tray = h('aside', { class: 'gw-tray', 'data-cell': 'tray', 'aria-label': 'Groups to drag onto ' + teacher.name + '’s week' },
       h('div', { class: 'gw-item gw-ppa-top' }, h('div', { class: 'zone-head' }, 'PPA'),
         h('div', { class: 'gw-ppa-row' }, ppaChip(null), h('span', { class: 'hint' }, ppaN + (teacher.ppa ? ' of ' + teacher.ppa : '') + ' PPA this week'))),
-      h('div', { class: 'zone-head' }, 'Groups', h('span', { class: 'n' }, groups.length)),
+      h('div', { class: 'zone-head' }, ui.allGroups ? 'Groups' : teacher.name + '’s groups', h('span', { class: 'n' }, groups.length)),
       groups.length ? groups.map((g) => {
         const n = groupLessons(g);
-        return h('div', { class: 'gw-item' }, gweekChip(g, null), groupMembers(g),
+        return h('div', { class: 'gw-item' + (ui.allGroups && !g.members.includes(teacher.id) ? ' gw-other' : '') }, gweekChip(g, null), groupMembers(g),
           h('span', { class: 'hint' }, g.perWeek ? n + ' of ' + g.perWeek + ' a week' : plural(n, 'lesson') + ' this week',
             ' · ' + (g.room ? (areaById.get(g.room) || {}).name : 'no usual room')));
-      }) : h('p', { class: 'hint' }, 'No groups yet.'),
+      }) : h('p', { class: 'hint' }, 'No groups set up for ' + teacher.name + ' yet.'),
+      others ? h('button', { type: 'button', class: 'link-btn gw-all', onclick: () => { ui.allGroups = !ui.allGroups; saveUI(); render(); } }, ui.allGroups ? 'Just ' + teacher.name + '’s groups' : 'Show all groups (' + others + ' more)') : null,
+      h('div', { class: 'gw-item gw-ppa' }, h('div', { class: 'zone-head' }, 'One-to-one lessons', h('span', { class: 'n' }, ones.length)),
+        ones.length ? h('div', { class: 'gw-ones' }, ones.map((r) => requestChip(r, null))) : null,
+        h('button', { type: 'button', class: 'btn small', onclick: () => oneToOneDialog(teacher) }, '+ One-to-one lesson'),
+        ones.length ? h('span', { class: 'hint' }, 'Drag onto ' + teacher.name + '’s week to place it; drag it back here to take it off.') : null),
       h('div', { class: 'gw-item gw-ppa' }, h('div', { class: 'zone-head' }, 'Support staff'),
         h('div', { class: 'gw-staff-list' }, list.filter((p) => p.id !== teacher.id).map((p) => gwStaffChip(p, null))),
         h('span', { class: 'hint' }, 'Drag onto a group on the week to put them in with it; drag back here to take them out.')),
@@ -4212,9 +4301,11 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
           const mine = a ? project.groups.filter((g) => groupPlace(g, sl) === at) : [];
           const split = groups.filter((g) => g.members.includes(teacher.id)).map((g) => ({ g, sp: groupSplit(g, sl) })).filter((x) => x.sp);
           const here = a ? peopleAt(sl, at) : [];
+          const oneHere = a && !mine.length ? ones.find((r) => requestHere(r, sl) === at) : null;
           return h('td', { 'data-cell': key, 'aria-label': d.name + ' ' + per.label, tabindex: gwPicked ? '0' : null, onkeydown: (e) => { if ((e.key === 'Enter' || e.key === ' ') && gwPicked && e.target === e.currentTarget) { e.preventDefault(); dropPicked(key); } } },
             mine.map((g) => h('div', { class: 'gw-placed', 'data-group': g.id }, gweekChip(g, key), groupMembers(g, sl, key))),
-            a && !mine.length ? h('button', { type: 'button', class: 'gw-lesson', title: 'Open ' + d.name + ' ' + per.label + ' on the map', onclick: () => { goSlot(d.id, per.id, 'plan'); setTimeout(() => flashZone(at), 50); } },
+            oneHere ? h('div', { class: 'gw-placed' }, requestChip(oneHere, sl, key)) : null,
+            a && !mine.length && !oneHere ? h('button', { type: 'button', class: 'gw-lesson', title: 'Open ' + d.name + ' ' + per.label + ' on the map', onclick: () => { goSlot(d.id, per.id, 'plan'); setTimeout(() => flashZone(at), 50); } },
               h('b', null, str(sl.titles[at]) || a.name), h('span', { class: 'gw-room' }, a.name),
               here.some(isPupil) ? h('span', { class: 'gw-pupils' }, names(here.filter(isPupil))) : null,
               here.some((x) => isStaff(x) && x.id !== teacher.id) ? h('span', { class: 'gw-with' }, 'With ' + names(here.filter((x) => isStaff(x) && x.id !== teacher.id))) : null) : null,
@@ -4225,7 +4316,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
         })))));
     root.append(h('div', { class: 'page gw-page' }, head,
       namePicker(list, teacher.id, (id) => { ui.staffPage = id; saveUI(); render(); }, 'Whose timetable'),
-      h('p', { class: 'hint gw-hint' }, 'Drag a group onto ' + teacher.name + '’s week and they go in with it. Drag support staff onto a group, and PPA onto a free lesson. Drag anything back to the list to take it off.'),
+      h('p', { class: 'hint gw-hint' }, 'Drag a group or a one-to-one lesson onto ' + teacher.name + '’s week and they go in with it. Drag support staff onto a group, and PPA onto a free lesson. Drag anything back to the side to take it off.'),
       h('div', { class: 'gw-wrap' }, tray, h('div', { class: 'gw-grid' }, grid))));
   }
   // The people in a group, listed down under its chip: pupils, then staff. In a lesson, anyone not with the group then is faded.
@@ -4288,6 +4379,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     const pk = gwPicked;
     gwPicked = null;
     if (!pk) return;
+    if (pk.request) { if (cell === 'tray') { if (pk.from) unscheduleRequest(pk.request, pk.from); else render(); } else scheduleRequest(pk.request, cell, pk.from); return; }
     if (pk.pid) { if (cell === 'tray') { if (pk.from) placeSupport(pk.pid, null, null, pk.from); else render(); } else placeSupport(pk.pid, cell, null, pk.from); return; }
     if (cell === 'tray') { if (pk.from) { mutate(() => takeGroupOutWithTeacher(pk.group, pk.from)); toast(pk.group.name + ' taken out of ' + slotLabel(pk.from), { label: 'Undo', run: undo }); } else render(); return; }
     render();
@@ -4393,10 +4485,25 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     }
     if (d.kind === 'request') {
       if (!d.request) return;
-      if (!d.started) { if (!cancelled) pickUpRequest(d.request); return; }
+      if (!d.started) {
+        if (cancelled) return;
+        if (ui.view === 'groups') {
+          gwPicked = gwPicked && gwPicked.request === d.request && gwPicked.from === d.from ? null : { request: d.request, from: d.from };
+          render();
+          if (gwPicked) toast(requestLabel(d.request) + ' picked up. Tap a lesson to put it there' + (d.from ? ', or tap the side to take it off.' : '.'));
+        } else pickUpRequest(d.request);
+        return;
+      }
       d.ghost.remove();
       document.body.classList.remove('dragging');
       if (d.hover) d.hover.classList.remove('drop-ok', 'drop-no');
+      if (ui.view === 'groups') {
+        const c = cancelled ? null : cellFromPoint(e.clientX, e.clientY);
+        if (!c) return;
+        if (c.dataset.cell === 'tray') { if (d.from) unscheduleRequest(d.request, d.from); }
+        else scheduleRequest(d.request, c.dataset.cell, d.from);
+        return;
+      }
       const z = cancelled ? null : zoneFromPoint(e.clientX, e.clientY);
       if (z) placeRequest(d.request, z.dataset.zone);
       return;
