@@ -250,6 +250,7 @@ ul.pgroups li { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; 
 .row-btns { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
 .tgroup { flex: none; width: 168px; display: flex; flex-direction: column; gap: 4px; min-height: 0; border: 1px solid var(--line); border-top: 4px solid var(--gc); background: var(--surface-2); padding: 4px; }
 .tgroup > .gchip { flex: none; width: 100%; flex-wrap: wrap; white-space: normal; row-gap: 2px; }
+.tgroup.tbc { --gc: var(--line-strong); border-style: dashed; border-top-style: solid; }
 .tgroup-list { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; overflow: auto; min-height: 0; padding: 1px; }
 .tray-left { display: flex; gap: 8px; height: 100%; }
 .tray-left .zone, .tray-body > .zone { height: 100%; min-height: 0; }
@@ -603,6 +604,22 @@ button.lg-cell:hover { outline: 2px solid var(--accent); outline-offset: -2px; }
 .l-3 { --lc: var(--lesson-3); --lb: var(--lesson-3-bg); } .l-4 { --lc: var(--lesson-4); --lb: var(--lesson-4-bg); }
 .lg-head { background: var(--lc); } .lg-cell { background: var(--lb); border-left-color: var(--lc); }
 .sheet-look button { white-space: nowrap; }
+.lg-cell.editable { cursor: text; }
+.lg-title { flex-direction: column; align-items: flex-start; justify-content: flex-end; }
+.lg-title .lg-hint { font-size: 11.5px; font-weight: 500; color: var(--muted); }
+.lg-cell.editable:hover { outline: 2px dashed var(--accent); outline-offset: -2px; }
+.lg-cell .lg-tbc-note { font-size: 11px; }
+.lg-tbc { display: block; padding: 2px 0; }
+.lg-tbc + .lg-tbc { border-top: 1px dashed var(--line-strong); margin-top: 3px; padding-top: 4px; }
+.lg-tbc b, .lg-tbc span { display: block; }
+.le-chips { display: flex; flex-wrap: wrap; gap: 4px; min-height: 4px; margin: -4px 0 8px; }
+.le-unknown { padding: 1px 6px; background: var(--warn-bg); color: var(--warn); font-size: 12px; font-weight: 700; }
+.le-pick { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin: 0 0 10px; }
+.le-pick .chip { cursor: pointer; }
+.le-group { padding: 3px 8px; border: 1px solid var(--line-strong); border-left: 5px solid var(--gc); background: var(--surface); font-size: 12.5px; font-weight: 650; color: var(--ink); }
+.le-group.on { background: var(--accent-soft); border-color: var(--accent); }
+.le-make { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 4px 0 8px; }
+.le-make .txt { width: auto; }
 .dg-cell.lt-academic { background: var(--lesson-academic); }
 .sheet .lt-wellbeing { background: #E3F4E3; }
 .sheet .lt-academic { background: #E2EDF9; }
@@ -980,6 +997,9 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
   const NONE = 'NONE', OFF = 'OFF', PPA = 'PPA', COVER = 'COVER', OUT = 'OUT';
   // PPA and Cover are boxes on the map that only staff can go in.
   const STAFF_ONLY = new Set([PPA, COVER]);
+  // A lesson written in on the second screen has no room until one is chosen on the Plan: its people share a holding place, TBC1, TBC2…
+  const TBC_MAX = 60;
+  const isTbc = (id) => /^TBC\d+$/.test(id || '') && +id.slice(3) >= 1 && +id.slice(3) <= TBC_MAX;
   const SPECIAL_NAMES = { PPA: 'PPA', COVER: 'Cover' };
   const DEFAULT_SPECIALS = {"PPA": {"x": 38.3, "y": 54.55, "w": 7.44, "h": 42.72}, "COVER": {"x": 38.3, "y": 9.09, "w": 7.44, "h": 42.43}};
   // Room types: a learning space, a staff-only space (office, reception), or a place off site.
@@ -1365,18 +1385,19 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       const titles = {}, at = {};
       for (const [aid0, t] of Object.entries(s.titles || {})) {
         const aid = aid0 === OFF ? offId : aid0;
-        if (areaIds.has(aid) && str(t)) titles[aid] = String(t);
+        if ((areaIds.has(aid) || isTbc(aid)) && str(t)) titles[aid] = String(t);
       }
       for (const [pid, place0] of Object.entries(s.at || {})) {
         const place = place0 === OFF ? offId : place0;
         if (!roleOf.has(pid)) continue;
         if (STAFF_ONLY.has(place) && roleOf.get(pid) !== 'staff') continue;
-        if (areaIds.has(place) || STAFF_ONLY.has(place) || place === OUT) at[pid] = place;
+        if (areaIds.has(place) || STAFF_ONLY.has(place) || place === OUT || isTbc(place)) at[pid] = place;
       }
+      for (const aid of Object.keys(titles)) if (isTbc(aid) && !Object.values(at).includes(aid)) delete titles[aid];
       const groupIds = new Set(out.groups.map((g) => g.id));
       const groups = {};
       if (s.groups && typeof s.groups === 'object') {
-        for (const [gid, pl] of Object.entries(s.groups)) if (groupIds.has(gid) && areaIds.has(pl)) groups[gid] = pl;
+        for (const [gid, pl] of Object.entries(s.groups)) if (groupIds.has(gid) && (areaIds.has(pl) || isTbc(pl))) groups[gid] = pl;
       } else Object.assign(groups, guessGroups(out.groups, roleOf, at, titles));
       if (Object.keys(titles).length || Object.keys(at).length) out.slots[key] = { titles, at, groups };
     }
@@ -1498,6 +1519,22 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     return a ? a.name : '?';
   }
   function peopleAt(s, place) { return project.people.filter((p) => s.at[p.id] === place); }
+  // The lessons in a period that have no room yet.
+  function tbcLessons(sl) {
+    return [...new Set(Object.values(sl.at).filter(isTbc))].sort((a, b) => +a.slice(3) - +b.slice(3))
+      .map((place) => ({ place, title: str(sl.titles[place]), people: peopleAt(sl, place).sort((a, b) => isPupil(a) - isPupil(b)) }));
+  }
+  function newTbc(sl) {
+    const used = new Set([...Object.values(sl.at), ...Object.keys(sl.titles), ...Object.values(sl.groups || {})]);
+    for (let n = 1; n <= TBC_MAX; n++) if (!used.has('TBC' + n)) return 'TBC' + n;
+    return null;
+  }
+  // Tidies a period: a holding place nobody is in any more loses its lesson name and group.
+  function pruneTbc(sl) {
+    const inUse = new Set(Object.values(sl.at));
+    for (const k of Object.keys(sl.titles)) if (isTbc(k) && !inUse.has(k)) delete sl.titles[k];
+    if (sl.groups) for (const [gid, pl] of Object.entries(sl.groups)) if (isTbc(pl) && !inUse.has(pl)) delete sl.groups[gid];
+  }
   function slotLabel(key) {
     const [d, per] = key.split('|');
     return d + ' ' + periodOf(per).label;
@@ -1600,11 +1637,18 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     pendingRequest = null;
     const pg = pendingGroup && areaById.get(zone) && groupHere(pendingGroup, slotOf(key)).every((id) => valid.includes(id)) ? pendingGroup : null;
     pendingGroup = null;
+    const pt = pendingTbc && project.areas.some((x) => x.id === zone) && peopleAt(slotOf(key), pendingTbc).every((x) => valid.includes(x.id)) ? pendingTbc : null;
+    pendingTbc = null;
     mutate(() => {
       const s = slotOf(key, true);
       valid.forEach((id) => { if (zone === NONE) delete s.at[id]; else s.at[id] = zone; });
       if (pr && !str(s.titles[zone]) && areaById.get(zone).kind !== 'staff') s.titles[zone] = pr.subject;
       if (pg) { if (pg.subject && !str(s.titles[zone]) && areaById.get(zone).kind !== 'staff') s.titles[zone] = pg.subject; recordGroup(s, pg, zone); }
+      if (pt) {
+        if (str(s.titles[pt]) && !str(s.titles[zone]) && areaById.get(zone).kind !== 'staff') s.titles[zone] = s.titles[pt];
+        if (s.groups) for (const [gid, pl] of Object.entries(s.groups)) if (pl === pt) s.groups[gid] = zone;
+      }
+      pruneTbc(s);
     });
     if (rejected) toast(plural(rejected, 'pupil') + ' left where they were: ' + SPECIAL_NAMES[zone] + ' is for staff only');
   }
@@ -1780,9 +1824,10 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
   function saveNow() {
     clearTimeout(saveTimer);
     saveTimer = null;
-    if (SHEET_MODE) return;
     try {
-      localStorage.setItem(STORE_KEY, JSON.stringify(exportProject()));
+      const json = JSON.stringify(exportProject());
+      localStorage.setItem(STORE_KEY, json);
+      if (SHEET_MODE) sheetSeen.plan = json;
       storageOk = true;
       lastSavedAt = new Date();
     } catch (e) {
@@ -1809,10 +1854,12 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     }
     if (e.key !== STORE_KEY || !e.newValue) return;
     try {
-      project = sanitize(JSON.parse(e.newValue));
-      undoStack = []; redoStack = []; sel.clear();
+      const next = sanitize(JSON.parse(e.newValue));
+      pushUndo();
+      project = next;
+      lastMerge = null; sel.clear();
       render();
-      toast('Updated with changes made in another window');
+      toast('Updated with changes made on the other screen', { label: 'Undo', run: undo });
     } catch (err) { /* ignore */ }
   });
 
@@ -2099,6 +2146,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
   function rebuildIndexes() {
     peopleById = new Map(project.people.map((p) => [p.id, p]));
     areaById = new Map(project.areas.map((a) => [a.id, a]));
+    for (let n = 1; n <= TBC_MAX; n++) areaById.set('TBC' + n, { id: 'TBC' + n, name: 'No room yet', kind: 'tbc' });
     statusCache = new Map();
     useCache = new Map();
     if (!project.periods.some((p) => p.id === ui.period)) ui.period = project.periods[0].id;
@@ -2309,7 +2357,9 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     const out = peopleAt(s, OUT);
     const noPeople = !project.people.length;
     const reqs = project.requests.filter((r) => str(r.subject) && (requestPlaced(r) < r.perWeek || requestHere(r, s)));
-    const tabs = [['groups', 'Groups', project.groups.length], ['lessons', 'Lessons', requestsLeft().length], ['left', 'Left to place', unplaced.length], ['out', 'Not in', out.length]];
+    const tbcs = tbcLessons(s);
+    const tabs = [['groups', 'Groups', project.groups.length], ['lessons', 'Lessons', requestsLeft().length]].concat(tbcs.length ? [['norooms', 'No room yet', tbcs.length]] : [])
+      .concat([['left', 'Left to place', unplaced.length], ['out', 'Not in', out.length]]);
     const tab = tabs.some(([id]) => id === ui.trayTab) ? ui.trayTab : project.groups.length ? 'groups' : 'left';
     const issues = st.started ? st.issues : [];
     const howTo = 'Drag names onto the map. Or tap several names, then tap a room to move them together. Tap a room’s numbers to pick up everyone in it. Left and right arrow keys change period; Ctrl+Z undoes.';
@@ -2317,6 +2367,10 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       groups: () => project.groups.length ? h('div', { class: 'tray-groups' }, project.groups.map((g) => trayGroup(g, s)))
         : h('div', { class: 'tray-empty' }, h('span', null, 'No groups yet. Set up the literacy and numeracy sets, D&D or the woods, then drag a whole group onto a room.'),
           h('button', { type: 'button', class: 'btn small', onclick: () => { ui.lessonTab = 'groups'; go('lessons'); } }, 'Set up groups')),
+      norooms: () => h('div', { class: 'tray-groups' }, tbcs.map((t) => h('div', { class: 'tgroup tbc' },
+        h('button', { type: 'button', class: 'gchip tbc-chip' + (pendingTbc === t.place ? ' sel' : ''), 'data-tbc': t.place, title: (t.title || 'Lesson') + ': ' + names(t.people) + '. Drag onto a room to put everyone there, or tap then tap a room.' },
+          roomIcon('door', 'gchip-ic'), h('span', { class: 'gchip-name' }, t.title || 'Lesson'), h('span', { class: 'gchip-n' }, t.people.length)),
+        h('div', { class: 'tgroup-list' }, t.people.map((x) => chip(x)))))),
       lessons: () => reqs.length ? h('div', { class: 'tray-reqs' }, reqs.map((r) => requestChip(r, s)))
         : h('div', { class: 'tray-empty' }, h('span', null, project.requests.length ? 'Every lesson set up for one pupil is placed.' : 'Lessons for one pupil (therapy, a project with a member of staff, wellbeing), set up in Lesson setup, wait here to be placed.'),
           h('button', { type: 'button', class: 'btn small', onclick: () => { ui.lessonTab = 'pupil'; go('lessons'); } }, 'Lesson setup')),
@@ -2382,6 +2436,30 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       sp ? h('span', { class: 'gchip-split' }, '! ' + names(sp.away) + ' elsewhere') : null);
   }
 
+  // Moves everyone in a lesson that has no room yet into a room (or back to not placed), with its lesson name and group.
+  let pendingTbc = null;
+  function moveTbc(place, zone) {
+    const key = curKey(), s0 = slotOf(key), ppl = peopleAt(s0, place), title = str(s0.titles[place]);
+    const a = project.areas.find((x) => x.id === zone);
+    if (STAFF_ONLY.has(zone) || zone === OUT || (!a && zone !== NONE)) { toast('Drop it onto a room.'); return; }
+    sel.clear(); pendingTbc = null;
+    mutate(() => {
+      const sl = slotOf(key, true);
+      ppl.forEach((x) => { if (zone === NONE) delete sl.at[x.id]; else sl.at[x.id] = zone; });
+      if (a && title && !str(sl.titles[zone]) && a.kind !== 'staff') sl.titles[zone] = title;
+      if (sl.groups) for (const [gid, pl] of Object.entries(sl.groups)) if (pl === place) { if (a) sl.groups[gid] = zone; else delete sl.groups[gid]; }
+      pruneTbc(sl);
+    });
+    toast((title || 'Lesson') + (a ? ' in ' + a.name : ' taken off the timetable'), { label: 'Undo', run: undo });
+  }
+  function pickUpTbc(place) {
+    const ppl = peopleAt(slotOf(curKey()), place);
+    sel.clear();
+    ppl.forEach((x) => sel.add(x.id));
+    pendingTbc = place;
+    render();
+    toast(plural(ppl.length, 'person', 'people') + ' picked up. Tap a room to put them there.');
+  }
   // A lesson to place in the tray: drag it onto a room, or tap it then tap a room.
   function requestChip(r, sl, key) {
     const n = requestPlaced(r), at = sl ? requestHere(r, sl) : null, a = at && areaById.get(at), p = person(r.pupil), t = r.staff && person(r.staff);
@@ -3273,8 +3351,9 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     const lessons = dayRows().filter((r) => r.kind === 'period');
     const slots = lessons.map((r) => slotOf(slotKey(d.id, r.period)));
     const tone = (i) => ' l-' + ((i % 4) + 1);
-    const cell = (i, kind, kids, place, label) => h('button', { type: 'button', class: 'lg-cell k-' + kind + tone(i) + (lessons[i].period === nowPeriod ? ' now' : ''),
-      'aria-label': label, title: pick ? 'Open ' + d.name + ' ' + lessons[i].label + ' on the map' : 'Show ' + d.name + ' ' + lessons[i].label + ' on the main screen', onclick: () => show(d.id, lessons[i].period, place) }, kids);
+    const cell = (i, kind, kids, place, label, edit) => h('button', { type: 'button', class: 'lg-cell k-' + kind + tone(i) + (lessons[i].period === nowPeriod ? ' now' : '') + (edit ? ' editable' : ''),
+      'aria-label': label + (edit ? '. Click to write in it.' : ''), title: edit ? 'Click to write in this lesson' : pick ? 'Open ' + d.name + ' ' + lessons[i].label + ' on the map' : 'Show ' + d.name + ' ' + lessons[i].label + ' on the main screen',
+      onclick: () => edit ? edit() : show(d.id, lessons[i].period, place) }, kids);
     const cols = [];
     if (by === 'rooms') {
       const used = project.areas.filter((a) => slots.some((s) => peopleAt(s, a.id).length || str(s.titles[a.id]))).sort((a, b) => a.name.localeCompare(b.name));
@@ -3284,6 +3363,12 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
         return cell(i, 'place', [h('b', { class: lgLong(t) }, t || 'Lesson'), here.some(isStaff) ? h('span', { class: 'lg-staff' }, names(here.filter(isStaff))) : null,
           here.some(isPupil) ? h('span', { class: 'lg-pupils' }, names(here.filter(isPupil))) : null], a.id, a.name + ', ' + lessons[i].label + ': ' + (t || 'lesson'));
       })]));
+      const tbcIn = slots.map((sl) => tbcLessons(sl));
+      if (tbcIn.some((l) => l.length)) cols.push([h('div', { class: 'lg-name' }, 'No room yet', h('small', null, 'Written in')), slots.map((sl, i) => tbcIn[i].length
+        ? cell(i, 'place', tbcIn[i].map((t) => h('span', { class: 'lg-tbc' }, h('b', null, t.title || 'Lesson'),
+          t.people.some(isStaff) ? h('span', { class: 'lg-staff' }, names(t.people.filter(isStaff))) : null,
+          t.people.some(isPupil) ? h('span', { class: 'lg-pupils' }, names(t.people.filter(isPupil))) : null)), null, 'No room yet, ' + lessons[i].label)
+        : cell(i, 'free', h('span', { class: 'lg-quiet' }, '–'), null, 'No room yet, ' + lessons[i].label + ': none'))]);
       [[PPA, 'PPA'], [COVER, 'Cover']].forEach(([id, name]) => {
         if (!slots.some((s) => peopleAt(s, id).length)) return;
         cols.push([h('div', { class: 'lg-name' }, name, h('small', null, 'Staff only')), slots.map((s, i) => cell(i, id === PPA ? 'ppa' : 'cover', h('span', { class: 'lg-staff' }, names(peopleAt(s, id))), id, name + ', ' + lessons[i].label))]);
@@ -3291,10 +3376,13 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     } else {
       staff().forEach((p) => cols.push([h('div', { class: 'lg-name staff', title: p.full || p.name }, p.name), slots.map((s, i) => {
         const c = dayCellParts(p, s), lab = p.name + ', ' + lessons[i].label + ': ';
-        if (c.kind === 'out') return cell(i, 'out', h('span', { class: 'lg-quiet' }, 'Not in'), null, lab + 'not in');
-        if (c.kind === 'none') return cell(i, 'none', h('span', { class: 'lg-quiet' }, 'Not placed'), null, lab + 'not placed');
-        if (c.text) return cell(i, c.kind, h('b', null, c.text), c.place, lab + c.text);
-        return cell(i, c.kind, [h('b', { class: lgLong(c.subject) }, c.subject), c.pupils ? h('span', { class: 'lg-pupils' }, c.pupils) : null], c.place, lab + c.subject);
+        const edit = () => editLessonDialog(p.id, d.id, lessons[i].period);
+        if (c.kind === 'out') return cell(i, 'out', h('span', { class: 'lg-quiet' }, 'Not in'), null, lab + 'not in', edit);
+        if (c.kind === 'none') return cell(i, 'none', h('span', { class: 'lg-quiet' }, 'Not placed'), null, lab + 'not placed', edit);
+        if (c.text) return cell(i, c.kind, h('b', null, c.text), c.place, lab + c.text, edit);
+        const others = peopleAt(s, c.place).filter((x) => isStaff(x) && x.id !== p.id);
+        return cell(i, c.kind, [h('b', { class: lgLong(c.subject) }, c.subject), others.length ? h('span', { class: 'lg-staff' }, 'with ' + names(others)) : null,
+          c.pupils ? h('span', { class: 'lg-pupils' }, c.pupils) : null, isTbc(c.place) ? h('span', { class: 'lg-quiet lg-tbc-note' }, 'No room yet') : null], c.place, lab + c.subject, edit);
       })]));
     }
     if (slots.some((s) => unplacedPupilsIn(s).length)) cols.push([h('div', { class: 'lg-name' }, 'Pupils not placed'),
@@ -3303,9 +3391,145 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     // Names along the top, then a row per lesson with its coloured name down the side.
     return h('div', { class: 'lgrid', style: { gridTemplateColumns: '112px repeat(' + cols.length + ', minmax(74px, 1fr))', gridTemplateRows: 'auto repeat(' + lessons.length + ', minmax(max-content, 1fr))' },
       'aria-label': d.name + ', a column for each ' + (by === 'rooms' ? 'room' : 'member of staff') },
-      h('div', { class: 'lg-title' }, d.name),
+      h('div', { class: 'lg-title' }, d.name, by === 'rooms' ? null : h('small', { class: 'lg-hint' }, 'Click a lesson to write in it')),
       cols.map((c) => c[0]),
       lessons.map((r, i) => [h('div', { class: 'lg-head' + tone(i) }, r.label, r.period === nowPeriod ? h('span', { class: 'now-tag' }, 'Now') : null), cols.map((c) => c[1][i])]));
+  }
+  // Reads names typed in a box ("FL, RPM, HG" or "Liz and Owen") against a list of people: map name, full name, or first name.
+  function parseNames(text, pool) {
+    const found = [], unknown = [];
+    str(text).split(/[,;\n]+|\s+and\s+|\s+/i).map((t) => t.trim()).filter(Boolean).forEach((t) => {
+      const k = t.toLowerCase();
+      const hit = pool.find((x) => x.name.toLowerCase() === k) || pool.find((x) => str(x.full).toLowerCase() === k)
+        || (pool.filter((x) => str(x.full).split(' ')[0].toLowerCase() === k).length === 1 ? pool.find((x) => str(x.full).split(' ')[0].toLowerCase() === k) : null);
+      if (hit) { if (!found.includes(hit)) found.push(hit); } else unknown.push(t);
+    });
+    return { found, unknown };
+  }
+  // The second screen: write in one member of staff's lesson: what it is, the children, and the other staff with them.
+  // A lesson written in with no room yet waits on the Plan, under No room yet, to be dragged into a room.
+  function editLessonDialog(staffId, dayId, periodId) {
+    const t = person(staffId);
+    if (!t) return;
+    const key = slotKey(dayId, periodId), sl = slotOf(key);
+    const per = (dayRows().find((r) => r.period === periodId) || periodOf(periodId)).label;
+    const now = sl.at[t.id], here = now && areaById.get(now);
+    const kidsNow = here ? peopleAt(sl, now).filter(isPupil) : [];
+    const withNow = here ? peopleAt(sl, now).filter((x) => isStaff(x) && x.id !== t.id) : [];
+    let chosen = here ? project.groups.find((g) => groupPlace(g, sl) === now) || null : null;
+    const subjects = [...new Set([...project.needs.map((n) => n.subject), ...subjectsInUse().filter((x) => !x.band).map((x) => x.name)])].sort((a, b) => a.localeCompare(b));
+    const lesson = h('input', { class: 'txt', value: here ? str(sl.titles[now]) : '', list: 'le-subjects', placeholder: 'e.g. Literacy', 'aria-label': 'Lesson' });
+    const kidsIn = h('input', { class: 'txt', value: names(kidsNow), placeholder: 'e.g. FL, RPM, HG', 'aria-label': 'Children' });
+    const withIn = h('input', { class: 'txt', value: names(withNow), placeholder: 'e.g. Owen', 'aria-label': 'Other staff' });
+    const kidsShow = h('div', { class: 'le-chips' }), withShow = h('div', { class: 'le-chips' });
+    const pupilPool = pupils(), staffPool = staff().filter((x) => x.id !== t.id);
+    const show = (input, box, pool) => {
+      const r = parseNames(input.value, pool);
+      box.replaceChildren(...r.found.map((x) => h('span', { class: 'chip ' + (isStaff(x) ? 'staff' : 'pupil') + (sl.at[x.id] === OUT ? ' faded' : ''), title: sl.at[x.id] === OUT ? x.name + ' is not in this lesson' : placeName(sl.at[x.id]) }, x.name + (sl.at[x.id] === OUT ? ' (not in)' : ''))),
+        ...r.unknown.map((u) => h('span', { class: 'le-unknown', title: 'Nobody called ' + u }, '? ' + u)));
+    };
+    const toggle = (input, box, pool, x) => {
+      const r = parseNames(input.value, pool);
+      const list = r.found.includes(x) ? r.found.filter((y) => y !== x) : r.found.concat(x);
+      input.value = names(list) + (r.unknown.length ? ', ' + r.unknown.join(', ') : '');
+      show(input, box, pool);
+    };
+    kidsIn.addEventListener('input', () => { chosen = null; show(kidsIn, kidsShow, pupilPool); });
+    withIn.addEventListener('input', () => show(withIn, withShow, staffPool));
+    show(kidsIn, kidsShow, pupilPool); show(withIn, withShow, staffPool);
+    // Quick picks: who isn't in a lesson yet, and the groups (this person's first)
+    const freeKids = pupilPool.filter((x) => !sl.at[x.id]), freeStaff = staffPool.filter((x) => !sl.at[x.id]);
+    const groupList = project.groups.slice().sort((a, b) => b.members.includes(t.id) - a.members.includes(t.id) || a.name.localeCompare(b.name));
+    const groupBtns = groupList.map((g) => {
+      const btn = h('button', { type: 'button', class: 'le-group' + (chosen === g ? ' on' : ''), style: { '--gc': groupColour(g) }, title: names(g.members.map(person).filter(Boolean)), onclick: () => {
+        chosen = g;
+        if (!str(lesson.value)) lesson.value = g.subject || g.name;
+        kidsIn.value = names(groupHere(g, sl).map(person).filter(isPupil));
+        withIn.value = names(g.members.map(person).filter((x) => x && isStaff(x) && x.id !== t.id && sl.at[x.id] !== OUT));
+        show(kidsIn, kidsShow, pupilPool); show(withIn, withShow, staffPool);
+        groupBtns.forEach((x) => x.classList.toggle('on', x === btn));
+      } }, g.name);
+      return btn;
+    });
+    const makeGroup = h('input', { type: 'checkbox' });
+    const groupName = h('input', { class: 'txt sm', placeholder: 'Group name', 'aria-label': 'Group name' });
+    const groupWeek = h('select', { class: 'txt sm', 'aria-label': 'Lessons a week' }, [1, 2, 3, 4, 5].map((v) => h('option', { value: v }, v + ' a week')));
+    makeGroup.addEventListener('change', () => { if (makeGroup.checked && !str(groupName.value)) groupName.value = str(lesson.value); });
+    const save = () => {
+      const subject = str(lesson.value);
+      const kidsR = parseNames(kidsIn.value, pupilPool), withR = parseNames(withIn.value, staffPool);
+      const notIn = kidsR.found.filter((x) => sl.at[x.id] === OUT).concat(withR.found.filter((x) => sl.at[x.id] === OUT));
+      const kids = kidsR.found.filter((x) => sl.at[x.id] !== OUT), adults = [t].concat(withR.found.filter((x) => sl.at[x.id] !== OUT));
+      const unknown = kidsR.unknown.concat(withR.unknown);
+      if (makeGroup.checked && !str(groupName.value)) { toast('Give the group a name first.'); groupName.focus(); return false; }
+      if (!subject && !kids.length && adults.length === 1) { clearIt(); return; }
+      const moved = kids.concat(adults).filter((x) => sl.at[x.id] && sl.at[x.id] !== OUT && sl.at[x.id] !== now && x !== t);
+      let place = here ? now : null, newGroup = null;
+      mutate((pp) => {
+        const s2 = slotOf(key, true);
+        if (!place) place = newTbc(s2);
+        if (!place) return;
+        peopleAt(s2, place).forEach((x) => { if (!kids.includes(x) && !adults.includes(x)) delete s2.at[x.id]; });
+        kids.concat(adults).forEach((x) => { s2.at[x.id] = place; });
+        if (subject) s2.titles[place] = subject; else delete s2.titles[place];
+        // The group it is (picked above, or the one whose children these exactly are) counts as there
+        const kidSet = new Set(kids.map((x) => x.id));
+        const g = chosen && groupHere(chosen, s2).filter((id) => isPupil(person(id))).every((id) => kidSet.has(id)) ? chosen
+          : pp.groups.find((x) => { const gk = groupHere(x, s2).filter((id) => isPupil(person(id))); return gk.length && gk.length === kidSet.size && gk.every((id) => kidSet.has(id)); });
+        if (g) recordGroup(s2, g, place);
+        if (makeGroup.checked) {
+          let n = pp.groups.length + 1;
+          while (pp.groups.some((x) => x.id === 'G' + n)) n++;
+          const used = new Set(pp.groups.map((x) => x.colour));
+          newGroup = { id: 'G' + n, name: str(groupName.value), subject: subject || str(groupName.value), perWeek: +groupWeek.value, room: isTbc(place) ? '' : place,
+            colour: Object.keys(GROUP_COLOURS).find((c) => !used.has(c)) || Object.keys(GROUP_COLOURS)[pp.groups.length % 8], members: kids.concat(adults).map((x) => x.id) };
+          pp.groups.push(newGroup);
+          recordGroup(s2, newGroup, place);
+        }
+        pruneTbc(s2);
+      });
+      if (!place) { toast('Too many lessons without a room this period. Give some a room on the Plan first.'); return; }
+      const notes = [];
+      if (moved.length) notes.push(names(moved) + ' moved from ' + 'their other lesson');
+      if (notIn.length) notes.push(names(notIn) + ' not in then, so left out');
+      if (unknown.length) notes.push('nobody called ' + unknown.join(', '));
+      if (newGroup) notes.push('group “' + newGroup.name + '” made');
+      toast(t.name + ', ' + dayName(dayId) + ' ' + per + ': ' + (subject || 'lesson') + ' saved' + (notes.filter(Boolean).length ? '. ' + notes.filter(Boolean).join('; ') : '') + '.', { label: 'Undo', run: undo });
+    };
+    const clearIt = () => {
+      mutate(() => {
+        const s2 = slotOf(key, true), pl = s2.at[t.id];
+        if (!pl || pl === OUT) return;
+        delete s2.at[t.id];
+        // A lesson with no room and nobody leading it any more goes altogether
+        if (isTbc(pl) && !peopleAt(s2, pl).some(isStaff)) peopleAt(s2, pl).forEach((x) => { delete s2.at[x.id]; });
+        pruneTbc(s2);
+      });
+      toast(t.name + ' taken out of ' + dayName(dayId) + ' ' + per, { label: 'Undo', run: undo });
+    };
+    dialog({
+      title: t.name + ' · ' + dayName(dayId) + ' ' + per,
+      wide: true,
+      body: [
+        h('datalist', { id: 'le-subjects' }, subjects.map((x) => h('option', { value: x }))),
+        now === OUT ? h('p', { class: 'hint' }, t.name + ' is marked not in for this lesson. Saving a lesson puts them in.')
+          : now === PPA || now === COVER ? h('p', { class: 'hint' }, t.name + ' has ' + placeName(now) + ' this lesson. Saving a lesson takes them off it.')
+          : here ? h('p', { class: 'hint' }, isTbc(now) ? 'No room yet: choose one later on the Plan.' : 'In ' + here.name + '.') : null,
+        h('label', { class: 'field' }, 'Lesson', lesson),
+        h('label', { class: 'field' }, 'Children', kidsIn), kidsShow,
+        freeKids.length ? h('div', { class: 'le-pick' }, h('span', { class: 'hint' }, 'Not in a lesson yet:'), freeKids.map((x) => h('button', { type: 'button', class: 'chip pupil', onclick: () => toggle(kidsIn, kidsShow, pupilPool, x) }, x.name))) : null,
+        h('label', { class: 'field' }, 'Other staff with ' + t.name, withIn), withShow,
+        freeStaff.length ? h('div', { class: 'le-pick' }, h('span', { class: 'hint' }, 'Free:'), freeStaff.map((x) => h('button', { type: 'button', class: 'chip staff', onclick: () => toggle(withIn, withShow, staffPool, x) }, x.name))) : null,
+        groupBtns.length ? h('div', { class: 'le-pick' }, h('span', { class: 'hint' }, 'Or fill it from a group:'), groupBtns) : null,
+        h('div', { class: 'le-make' }, h('label', { class: 'choice' }, makeGroup, h('span', null, 'Save these children and staff as a group')), groupName, groupWeek),
+        h('p', { class: 'hint' }, 'Type the children’s and staff’s names as they appear on the timetable, with commas between. Anyone in another lesson then moves into this one.')
+      ],
+      actions: [{ label: 'Cancel' },
+        { label: 'PPA', run: () => { mutate(() => { const s2 = slotOf(key, true); s2.at[t.id] = PPA; pruneTbc(s2); }); toast(t.name + ': PPA, ' + dayName(dayId) + ' ' + per, { label: 'Undo', run: undo }); } },
+        here || now === PPA || now === COVER ? { label: 'Take ' + t.name + ' out', run: clearIt } : null,
+        { label: 'Save', kind: 'primary', run: save }].filter(Boolean)
+    });
+    setTimeout(() => lesson.focus(), 30);
   }
   // The same day on paper: A3 landscape, as the sugar paper sheets are set out.
   function staffDaySheet(d) {
@@ -4128,6 +4352,8 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       drag = Object.assign(base, { kind: handle ? 'resize' : 'move', area: a, el: room, rect: map.getBoundingClientRect(), orig: { x: a.x, y: a.y, w: a.w, h: a.h }, moved: false });
       return;
     }
+    const tc = e.target.closest('.tbc-chip');
+    if (tc) { drag = Object.assign(base, { kind: 'tbc', place: tc.dataset.tbc, started: false }); return; }
     const rc = e.target.closest('.rchip');
     if (rc) { drag = Object.assign(base, { kind: 'request', request: project.requests.find((r) => r.id === rc.dataset.request), started: false }); return; }
     const c = e.target.closest('.chip');
@@ -4145,9 +4371,11 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     if (!drag || e.pointerId !== drag.id) return;
     const dist = Math.hypot(e.clientX - drag.x0, e.clientY - drag.y0);
     if (drag.kind === 'tap') { if (dist > 8) drag = null; return; }
-    if (drag.kind === 'chip' || drag.kind === 'group' || drag.kind === 'ppa' || drag.kind === 'support' || drag.kind === 'request') {
+    if (drag.kind === 'chip' || drag.kind === 'group' || drag.kind === 'ppa' || drag.kind === 'support' || drag.kind === 'request' || drag.kind === 'tbc') {
       if (!drag.started) {
         if (dist < 6) return;
+        if (drag.kind === 'tbc') { drag.started = true; drag.ids = []; const src = document.querySelector('.tbc-chip[data-tbc="' + drag.place + '"]'); drag.ghost = h('div', { class: 'ghost' }, src ? src.cloneNode(true) : null); document.body.append(drag.ghost); document.body.classList.add('dragging'); }
+        else
         if (drag.kind === 'request') { drag.started = true; drag.ids = []; drag.ghost = h('div', { class: 'ghost' }, drag.request ? requestChip(drag.request, slotOf(curKey())) : null); document.body.append(drag.ghost); document.body.classList.add('dragging'); }
         else if (drag.kind === 'group') startGroupDrag();
         else if (drag.kind === 'support') { drag.started = true; drag.ids = []; drag.ghost = h('div', { class: 'ghost' }, chip(person(drag.pid))); document.body.append(drag.ghost); document.body.classList.add('dragging'); }
@@ -4483,6 +4711,15 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       if (sel.size && z && z.dataset.zone === d.zone) placeMany([...sel], d.zone);
       return;
     }
+    if (d.kind === 'tbc') {
+      if (!d.started) { if (!cancelled) pickUpTbc(d.place); return; }
+      d.ghost.remove();
+      document.body.classList.remove('dragging');
+      if (d.hover) d.hover.classList.remove('drop-ok', 'drop-no');
+      const z = cancelled ? null : zoneFromPoint(e.clientX, e.clientY);
+      if (z) moveTbc(d.place, z.dataset.zone);
+      return;
+    }
     if (d.kind === 'request') {
       if (!d.request) return;
       if (!d.started) {
@@ -4586,6 +4823,8 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       return;
     }
     if (ui.view !== 'plan' || editLayout || e.detail !== 0) return;
+    const tq = e.target.closest('.tbc-chip');
+    if (tq && !tq.closest('.ghost')) { pickUpTbc(tq.dataset.tbc); return; }
     const rq = e.target.closest('.rchip');
     if (rq && !rq.closest('.ghost')) { const r = project.requests.find((x) => x.id === rq.dataset.request); if (r) pickUpRequest(r); return; }
     const c = e.target.closest('.chip');
