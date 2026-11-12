@@ -3515,8 +3515,8 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
             const desc = c.kind === 'out' ? 'not in' : c.kind === 'none' ? 'not placed' : c.text || [c.subject, c.teacher, c.pupils].filter(Boolean).join(', ');
             return h('button', {
               type: 'button', class: 'dg-cell k-' + c.kind + (c.type ? ' lt-' + c.type : '') + (now ? ' now' : ''),
-              title: (c.lesson ? c.lesson + ' in ' + c.room + '. ' : c.room ? c.room + '. ' : '') + 'Show ' + d.name + ' ' + per.label + ' on the main screen', 'aria-label': p.name + ', ' + r.label + ': ' + desc,
-              onclick: () => askMainToShow(d.id, r.period, c.place)
+              title: (c.lesson ? c.lesson + ' in ' + c.room + '. ' : c.room ? c.room + '. ' : '') + 'Click to write in this lesson', 'aria-label': p.name + ', ' + r.label + ': ' + desc,
+              onclick: () => editLessonDialog(p.id, d.id, r.period)
             }, c.kind === 'none' ? 'Not placed' : c.text ? c.text : [
               h('span', { class: 'ds-subj' }, c.subject),
               c.teacher ? h('span', { class: 'ds-teacher' }, c.teacher) : null,

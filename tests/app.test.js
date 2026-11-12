@@ -348,8 +348,8 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   await sheet.waitForTimeout(1800);
   check(/Spelling/.test(await sheet.locator('.dg-cell.k-place[title^="Spelling"]').first().getAttribute('title') || ''), 'picks up changes made on the main screen');
   await sheet.locator('.dg-cell.k-place').nth(2).click();
-  await p10.waitForTimeout(400);
-  check(/^Wednesday · P1$/.test(await p10.locator('.slot-name b').innerText()), 'clicking a cell shows that period on the main screen');
+  check(await sheet.locator('dialog input[aria-label="Lesson"]').count() === 1, 'clicking a cell on the paper sheet opens it to write in');
+  await sheet.locator('dialog').getByRole('button', { name: 'Cancel' }).click();
   await sheet.getByRole('tab', { name: 'Friday' }).click().catch(() => sheet.getByRole('button', { name: 'Friday' }).click());
   check(await sheet.locator('.tab.on').innerText() === 'Friday' && !(await sheet.locator('#sheet-follow').isChecked()), 'choosing a day stops following');
   const [xl] = await Promise.all([sheet.waitForEvent('download'), sheet.getByRole('button', { name: 'Export for Excel' }).click()]);
