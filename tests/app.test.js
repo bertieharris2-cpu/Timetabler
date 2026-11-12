@@ -912,6 +912,47 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   check(err12.length === 0, 'no errors' + (err12.length ? ': ' + err12.join(' | ') : ''));
   await ctx12.close();
 
+  console.log('Name the lessons');
+  const ctx13 = await browser.newContext({ viewport: { width: 1600, height: 950 } });
+  const p13 = await ctx13.newPage();
+  const err13 = [];
+  p13.on('pageerror', (e) => err13.push(e.message));
+  await p13.goto(APP);
+  await p13.getByRole('button', { name: 'Or try the example school (made-up people)' }).click();
+  await p13.waitForTimeout(500);
+  // As the head did it: everyone placed, but no lesson names
+  await p13.evaluate(() => { const k = 'lifehouse_timetabler_v2', j = JSON.parse(localStorage.getItem(k)); Object.values(j.slots).forEach((x) => { x.titles = {}; }); localStorage.setItem(k, JSON.stringify(j)); });
+  await p13.reload();
+  await p13.getByRole('button', { name: 'Lesson setup', exact: true }).click();
+  await p13.getByRole('button', { name: /Name the lessons/ }).click();
+  const left0 = +(await p13.locator('.nl-progress b').innerText()).split(' ')[0];
+  check(left0 > 50 && /0 of \d+ named/.test(await p13.locator('.nl-progress').innerText()), 'Name the lessons counts the lessons with no name (' + left0 + ')');
+  await p13.getByRole('button', { name: /^Fill in the \d+ suggestion/ }).click();
+  check(await p13.locator('input[aria-label="Science Room usual lesson"]').inputValue() === 'Science', 'rooms that hold one thing get a usual lesson suggested');
+  await p13.getByRole('button', { name: /^Name \d+ lessons? from these/ }).click();
+  await p13.waitForTimeout(400);
+  let j13 = await p13.evaluate(() => JSON.parse(localStorage.getItem('lifehouse_timetabler_v2')));
+  const sci = Object.values(j13.slots).filter((x) => Object.values(x.at).includes('A15') && Object.keys(x.at).some((id) => id.startsWith('S') && x.at[id] === 'A15'));
+  const left1 = +(await p13.locator('.nl-progress b').innerText()).split(' ')[0];
+  check(sci.length > 0 && sci.every((x) => x.titles.A15 === 'Science') && left1 < left0, 'one click names every lesson in those rooms (' + left0 + ' → ' + left1 + ')');
+  await p13.locator('.nl-pick button', { hasText: /^Carys/ }).click();
+  const nlBefore = await p13.locator('.nl-cell.on').innerText();
+  check(await p13.locator('.nl-panel .nl-sug').count() > 0 && await p13.locator('.nl-cell.todo').count() > 0, 'a member of staff’s lessons, with suggestions for the one being named');
+  await p13.locator('#nl-input').fill('Phonics');
+  await p13.locator('#nl-input').press('Enter');
+  await p13.waitForTimeout(400);
+  j13 = await p13.evaluate(() => JSON.parse(localStorage.getItem('lifehouse_timetabler_v2')));
+  check(Object.values(j13.slots).some((x) => x.at.T03 && x.titles[x.at.T03] === 'Phonics') && await p13.locator('.nl-cell.on').innerText() !== nlBefore, 'typing a name and Enter names it and moves on to the next');
+  await p13.locator('.nl-panel .nl-sug').first().click();
+  await p13.waitForTimeout(300);
+  check(+(await p13.locator('.nl-progress b').innerText()).split(' ')[0] < left1 - 1, 'a suggestion names it in one click');
+  await p13.getByRole('button', { name: 'Printables', exact: true }).click();
+  await p13.getByRole('button', { name: 'Generate timetables…' }).click();
+  check(/Lessons with no name/.test(await p13.locator('dialog .gen-checks').innerText()), 'Generate timetables lists lessons with no name');
+  await p13.locator('dialog').getByRole('button', { name: 'Cancel' }).click();
+  check(err13.length === 0, 'no errors' + (err13.length ? ': ' + err13.join(' | ') : ''));
+  await ctx13.close();
+
   if (SHOTS) {
     console.log('Screenshots');
     for (const [name, opts] of [['06-plan-1920-dark', { viewport: { width: 1920, height: 1080 }, colorScheme: 'dark' }], ['07-plan-1366-light', { viewport: { width: 1366, height: 768 } }]]) {
