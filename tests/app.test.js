@@ -68,7 +68,7 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   await page.setInputFiles('#file-open', PEOPLE_CSV);
   await page.waitForSelector('[data-zone="NONE"] .chip');
   check(await page.locator('[data-zone="NONE"] .chip').count() === 7, '7 people waiting to be placed');
-  check(await page.locator('.strip-btn.empty').count() === 20, 'every period "not started"');
+  check(await page.locator('.strip-btn.empty').count() === 18 && (await page.locator('.strip-btn[aria-label^="Friday P3"]').getAttribute('aria-label')).includes('Champion time (whole school)'), 'every period "not started", except Friday afternoon’s Champion time');
 
   console.log('Drag and drop with a mouse');
   await dragTo(page, chipIn(page, 'NONE', 'AB'), roomPeople(page, 'A15'));
@@ -106,7 +106,7 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   await page.getByRole('button', { name: 'Copy period to…' }).click();
   await page.getByRole('button', { name: 'Same period every day' }).click();
   await page.locator('dialog .btn.primary').click();
-  check(await page.locator('.strip-btn.done').count() === 5, 'P1 complete on all five days');
+  check(await page.locator('.strip-btn.done').count() === 7, 'P1 complete on all five days (and Friday afternoon is Champion time)');
   await page.locator('.strip-btn[aria-label^="Tuesday P1"]').click();
   check(await chipIn(page, 'A15', 'AB').count() === 1 && await page.inputValue('#lesson-A15') === 'Maths', 'Tuesday P1 has AB in Science doing Maths');
 
@@ -580,11 +580,12 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   await p11.getByRole('button', { name: 'Move them anyway' }).click();
   check(/Literacy set 1: AB elsewhere/.test((await p11.locator('td[data-cell="Mon|P1"] .gw-split').allInnerTexts()).join(' ')), 'the split group is flagged');
   await p11.locator('.gw-tray .gchip', { hasText: 'D&D' }).click();
-  await p11.locator('td[data-cell="Fri|P4"]').click();
+  const ddCell = await p11.evaluate(() => [...document.querySelectorAll('td[data-cell]')].find((td) => td.dataset.cell !== 'tray' && !td.querySelector('.gw-lesson, .gchip, .ppa-chip, .gw-note, .rchip')).dataset.cell);
+  await p11.locator('td[data-cell="' + ddCell + '"]').click();
   check(await p11.locator('dialog').innerText().then((t) => /Which room for D&D/.test(t)), 'tap a group then a lesson; with no usual room it asks which');
   await p11.locator('dialog input[name="gw-room"]').nth(2).check();
   await p11.getByRole('button', { name: 'Put it there' }).click();
-  check(await p11.locator('td[data-cell="Fri|P4"] .gchip', { hasText: 'D&D' }).count() === 1, 'and puts it there, with Carys');
+  check(await p11.locator('td[data-cell="' + ddCell + '"] .gchip', { hasText: 'D&D' }).count() === 1, 'and puts it there, with Carys');
   const lit2 = p11.locator('.gw-tray .gchip', { hasText: 'Literacy set 2' });
   const lb = await lit2.boundingBox();
   await p11.mouse.move(lb.x + 20, lb.y + 10); await p11.mouse.down(); await p11.mouse.move(lb.x + 120, lb.y + 60, { steps: 5 });
@@ -756,7 +757,7 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   await p4.getByRole('button', { name: 'Or try the example school (made-up people)' }).click();
   check(await p4.locator('.chip.pupil').count() >= 18 && await p4.locator('.chip.staff').count() >= 20, 'example pupils and staff placed on Monday P1');
   check(await p4.locator('.strip-btn.done').count() >= 15, 'most example periods complete (' + await p4.locator('.strip-btn.done').count() + ')');
-  check(await p4.locator('.strip-btn[aria-label^="Friday P4"]').evaluate((b) => b.classList.contains('todo') || b.classList.contains('alert')), 'Friday P4 left unfinished to show the checks');
+  check(await p4.locator('.strip-btn[aria-label^="Thursday P4"]').count() === 1 && /★/.test(await p4.locator('.strip-btn[aria-label^="Friday P4"]').innerText()), 'Friday afternoon is marked as a whole-school lesson');
   check(await p4.locator('.tray-tabs button').allInnerTexts().then((t) => t.map((x) => x.replace(/\s*\d+$/, '')).join('|') === 'Groups|Lessons|Left to place|Not in'), 'the tray has four views: groups, lessons to place, left to place, not in');
   check(await p4.locator('.tgroup').count() === 6 && await p4.locator('.tgroup').first().locator('.tgroup-list .chip').count() === 6, 'each group card lists its members');
   check(await p4.locator('.free-rooms, .band-checks').count() === 0, 'no free rooms or checks boxes in the tray');
@@ -946,6 +947,35 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   await p13.locator('.nl-panel .nl-sug').first().click();
   await p13.waitForTimeout(300);
   check(+(await p13.locator('.nl-progress b').innerText()).split(' ')[0] < left1 - 1, 'a suggestion names it in one click');
+  // A teacher who always teaches one thing
+  const leftA = +(await p13.locator('.nl-progress b').innerText()).split(' ')[0];
+  await p13.locator('input[aria-label="Kat usually teaches"]').fill('Forest school');
+  await p13.locator('input[aria-label="Kat usually teaches"]').blur();
+  await p13.locator('.nl-rooms').nth(1).getByRole('button', { name: /^Name \d+ lessons? from these/ }).click();
+  await p13.waitForTimeout(300);
+  j13 = await p13.evaluate(() => JSON.parse(localStorage.getItem('lifehouse_timetabler_v2')));
+  check(j13.people.find((x) => x.name === 'Kat').teaches === 'Forest school' && +(await p13.locator('.nl-progress b').innerText()).split(' ')[0] < leftA, 'a teacher’s usual lesson names their lessons');
+  // Naming one lesson for its whole room
+  const roomName = (await p13.locator('.nl-panel h3 .n').innerText()).trim();
+  await p13.locator('.nl-panel label', { hasText: 'Always this in' }).locator('input').check();
+  await p13.locator('#nl-input').fill('Quiet reading');
+  await p13.locator('#nl-input').press('Enter');
+  await p13.waitForTimeout(300);
+  j13 = await p13.evaluate(() => JSON.parse(localStorage.getItem('lifehouse_timetabler_v2')));
+  const rm = j13.areas.find((a) => a.name === roomName);
+  check(rm && rm.usual === 'Quiet reading' && Object.entries(j13.slots).filter(([k]) => !/^Fri\|P[34]$/.test(k)).map(([, x]) => x).every((x) => !Object.keys(x.at).some((id) => id.startsWith('S') && x.at[id] === rm.id) || x.titles[rm.id]), '“Always this in the room” names every lesson there and saves it as the room’s usual lesson');
+  // Whole-school lessons: Friday afternoon is Champion time, and it can change
+  await setupTo(p13, 'School day');
+  check(await p13.locator('.whole-block tbody tr').count() === 2 && await p13.locator('.whole-block input').first().inputValue() === 'Champion time', 'Friday Lessons 3 and 4 are Champion time for the whole school');
+  await p13.getByRole('button', { name: 'Pupil timetables', exact: true }).click();
+  check(/Champion time/.test(await p13.locator('.pweek tbody tr').nth(2).locator('td').nth(4).innerText()), 'pupil timetables show it');
+  await setupTo(p13, 'School day');
+  await p13.locator('.whole-block select[aria-label="Whole-school lesson day"]').nth(1).selectOption('Thu');
+  await p13.locator('.whole-block input').nth(1).fill('Celebration');
+  await p13.locator('.whole-block input').nth(1).blur();
+  await p13.waitForTimeout(300);
+  j13 = await p13.evaluate(() => JSON.parse(localStorage.getItem('lifehouse_timetabler_v2')));
+  check(j13.wholeSchool.some((w) => w.day === 'Thu' && w.period === 'P4' && w.name === 'Celebration'), 'and can be changed');
   await p13.getByRole('button', { name: 'Printables', exact: true }).click();
   await p13.getByRole('button', { name: 'Generate timetables…' }).click();
   check(/Lessons with no name/.test(await p13.locator('dialog .gen-checks').innerText()), 'Generate timetables lists lessons with no name');
