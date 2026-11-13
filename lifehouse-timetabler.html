@@ -836,6 +836,27 @@ table.gweek { width: 100%; border-collapse: collapse; table-layout: fixed; backg
 .gw-hint { margin: 0 0 10px; }
 .gw-lesson .gw-unnamed, .lg-cell .lg-unnamed { color: var(--muted); font-weight: 600; }
 .seg button .n { margin-left: 6px; padding: 0 5px; background: var(--warn-bg); color: var(--warn); font-size: 11px; font-weight: 700; }
+.champ-hint { max-width: 900px; }
+.champ-wrap { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 14px; align-items: start; }
+@media (max-width: 760px) { .champ-wrap { grid-template-columns: 1fr; } }
+.champ-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; }
+.champ-card { min-height: 84px; padding: 6px 8px; border: 1px solid var(--line); border-left: 4px solid var(--staff); background: var(--surface); }
+.champ-card.none { position: sticky; top: 0; border-left-color: var(--pupil); background: var(--surface-2); min-height: 200px; }
+.champ-card.picking { cursor: pointer; }
+.champ-card.picking:hover { outline: 2px dashed var(--accent); outline-offset: -2px; }
+.champ-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 4px; }
+.champ-head .n { font-size: 11.5px; color: var(--muted); }
+.champ-kids { display: flex; flex-wrap: wrap; gap: 4px; }
+.champ-kids .chip { cursor: grab; }
+.tgroup.champ { --gc: var(--staff); }
+.gw-pupils-line { display: block; font-size: 12px; font-weight: 650; color: var(--pupil); }
+.ds-palette { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; padding: 6px 10px 0; }
+.ds-palette .hint { margin-right: 4px; }
+.subj-chip { padding: 3px 9px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); font-size: 12.5px; font-weight: 650; cursor: grab; }
+.subj-chip:hover { border-color: var(--accent); }
+.subj-chip.on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.ds-palette .txt { width: 140px; }
+.dg-cell.drop-ok, .lg-cell.drop-ok { outline: 3px solid var(--accent) !important; outline-offset: -3px; }
 .whole-note { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 0 16px 8px; padding: 8px 12px; background: var(--accent-soft); border-left: 4px solid var(--accent); font-size: 13px; }
 .whole-block { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--line); }
 .whole-block h4 { margin: 0 0 4px; font-size: 14px; }
@@ -1290,7 +1311,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     return {
       app: APP_ID, version: FILE_VERSION, name: '', school: 'Lifehouse',
       periods,
-      areas: clone(DEFAULT_AREAS), people: [], slots: {}, outlines: clone(LAYOUTS.school.outlines), specials: clone(DEFAULT_SPECIALS), dayRows: cleanDayRows(null, periods), wholeSchool: [{ day: 'Fri', period: 'P3', name: 'Champion time' }, { day: 'Fri', period: 'P4', name: 'Champion time' }], earlyHome: clone(DEFAULT_EARLY), logoId: null, symbols: {}, subjectTypes: {}, groups: [], leadViews: [], requests: [], needs: DEFAULT_NEEDS.map((subject) => ({ subject, perWeek: 0 })),
+      areas: clone(DEFAULT_AREAS), people: [], slots: {}, outlines: clone(LAYOUTS.school.outlines), specials: clone(DEFAULT_SPECIALS), dayRows: cleanDayRows(null, periods), wholeSchool: [{ day: 'Fri', period: 'P3', name: 'Champion time' }, { day: 'Fri', period: 'P4', name: 'Champion time' }], earlyHome: clone(DEFAULT_EARLY), logoId: null, symbols: {}, subjectTypes: {}, groups: [], leadViews: [], requests: [], champions: {}, needs: DEFAULT_NEEDS.map((subject) => ({ subject, perWeek: 0 })),
       map: { imageId: null, w: 0, h: 0, fade: 1 },
       meta: { created: nowIso(), changedAt: null, backedUpAt: null }
     };
@@ -1402,6 +1423,9 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     }));
     // Lessons to place: one pupil's lesson that staff asked for, or therapy, set up on the pupil's page and placed from the tray.
     const pupilIds = new Set(out.people.filter((x) => x.role !== 'staff').map((x) => x.id)), seenR = new Set();
+    // Each child's champion: the adult they spend Champion time with.
+    out.champions = {};
+    for (const [pid, sid] of Object.entries(p.champions && typeof p.champions === 'object' ? p.champions : {})) if (pupilIds.has(pid) && staffIds.has(sid)) out.champions[pid] = sid;
     out.requests = (Array.isArray(p.requests) ? p.requests : []).filter((r) => r && str(r.id) && pupilIds.has(str(r.pupil)) && !seenR.has(str(r.id)) && seenR.add(str(r.id))).map((r) => ({
       id: str(r.id), pupil: str(r.pupil), subject: str(r.subject), staff: staffIds.has(str(r.staff)) ? str(r.staff) : '',
       perWeek: clamp(Math.round(num(r.perWeek, 1)), 1, 10), room: out.areas.some((a) => a.id === r.room) ? r.room : '', note: str(r.note)
@@ -1553,6 +1577,10 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
   // Whole-school lessons, such as Champion time on Friday afternoons: everyone who is in does it, wherever they are on the map.
   const wholeAt = (key) => { const w = (project.wholeSchool || []).find((x) => x.day + '|' + x.period === key); return w ? w.name : ''; };
   const wholeOf = (sl) => wholeAt(slotKeyOf.get(sl));
+  // A whole-school lesson called something like "Champion time" is spent with each child's champion.
+  const isChampionTime = (name) => /champion/i.test(name || '');
+  const championOf = (pid) => person((project.champions || {})[pid]) || null;
+  const championKids = (sid) => pupils().filter((x) => (project.champions || {})[x.id] === sid);
   const person = (id) => peopleById.get(id);
   const isStaff = (p) => p.role === 'staff';
   const isPupil = (p) => p.role !== 'staff';
@@ -1953,7 +1981,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     const notIn = {};
     for (const [k, sl] of Object.entries(project.slots)) for (const [pid, v] of Object.entries(sl.at)) if (v === OUT) (notIn[pid] = notIn[pid] || []).push(k);
     const out = { app: APP_ID, kind: PEOPLE_FILE, version: 1, savedAt: nowIso(), school: project.school,
-      people: full.people, notIn, groups: project.groups, leadViews: project.leadViews, requests: project.requests, needs: project.needs,
+      people: full.people, notIn, groups: project.groups, leadViews: project.leadViews, requests: project.requests, champions: project.champions, needs: project.needs,
       subjectTypes: project.subjectTypes, symbols: full.symbols, logo: full.logo };
     const stamp = new Date();
     const d = stamp.getFullYear() + '-' + String(stamp.getMonth() + 1).padStart(2, '0') + '-' + String(stamp.getDate()).padStart(2, '0');
@@ -1971,6 +1999,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     next.groups = Array.isArray(obj.groups) ? obj.groups : [];
     next.leadViews = Array.isArray(obj.leadViews) ? obj.leadViews : [];
     next.requests = Array.isArray(obj.requests) ? obj.requests : [];
+    if (obj.champions && typeof obj.champions === 'object') next.champions = obj.champions;
     if (Array.isArray(obj.needs) && obj.needs.length) next.needs = obj.needs;
     next.subjectTypes = Object.assign({}, next.subjectTypes, obj.subjectTypes || {});
     next.symbols = Object.assign({}, next.symbols, obj.symbols || {});
@@ -2417,7 +2446,8 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     const noPeople = !project.people.length;
     const reqs = project.requests.filter((r) => str(r.subject) && (requestPlaced(r) < r.perWeek || requestHere(r, s)));
     const tbcs = tbcLessons(s);
-    const tabs = [['groups', 'Groups', project.groups.length], ['lessons', 'Lessons', requestsLeft().length]].concat(tbcs.length ? [['norooms', 'No room yet', tbcs.length]] : [])
+    const champs = isChampionTime(wholeAt(curKey())) ? staff().map((t) => ({ t, kids: championKids(t.id) })).filter((x) => x.kids.length) : [];
+    const tabs = (champs.length ? [['champs', 'Champions', champs.length]] : []).concat([['groups', 'Groups', project.groups.length], ['lessons', 'Lessons', requestsLeft().length]]).concat(tbcs.length ? [['norooms', 'No room yet', tbcs.length]] : [])
       .concat([['left', 'Left to place', unplaced.length], ['out', 'Not in', out.length]]);
     const tab = tabs.some(([id]) => id === ui.trayTab) ? ui.trayTab : project.groups.length ? 'groups' : 'left';
     const issues = st.started ? st.issues : [];
@@ -2426,6 +2456,13 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       groups: () => project.groups.length ? h('div', { class: 'tray-groups' }, project.groups.map((g) => trayGroup(g, s)))
         : h('div', { class: 'tray-empty' }, h('span', null, 'No groups yet. Set up the literacy and numeracy sets, D&D or the woods, then drag a whole group onto a room.'),
           h('button', { type: 'button', class: 'btn small', onclick: () => { ui.lessonTab = 'groups'; go('lessons'); } }, 'Set up groups')),
+      champs: () => h('div', { class: 'tray-groups' }, champs.map(({ t, kids }) => {
+        const at = s.at[t.id], here = at && kids.every((k) => s.at[k.id] === at || s.at[k.id] === OUT) && project.areas.find((a) => a.id === at);
+        return h('div', { class: 'tgroup champ' },
+          h('button', { type: 'button', class: 'gchip champ-chip' + (here ? ' here' : ''), 'data-champ-t': t.id, title: t.name + ' and their champion children: ' + names(kids) + '. Drag onto a room, or tap then tap a room.' },
+            roomIcon('star', 'gchip-ic'), h('span', { class: 'gchip-name' }, t.name), h('span', { class: 'gchip-n' }, kids.length), here ? h('span', { class: 'gchip-at' }, '✓ ' + here.name) : null),
+          h('div', { class: 'tgroup-list' }, [t].concat(kids).map((x) => chip(x, !!s.at[x.id]))));
+      })),
       norooms: () => h('div', { class: 'tray-groups' }, tbcs.map((t) => h('div', { class: 'tgroup tbc' },
         h('button', { type: 'button', class: 'gchip tbc-chip' + (pendingTbc === t.place ? ' sel' : ''), 'data-tbc': t.place, title: (t.title || 'Lesson') + ': ' + names(t.people) + '. Drag onto a room to put everyone there, or tap then tap a room.' },
           roomIcon('door', 'gchip-ic'), h('span', { class: 'gchip-name' }, t.title || 'Lesson'), h('span', { class: 'gchip-n' }, t.people.length)),
@@ -2497,6 +2534,16 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
 
   // Moves everyone in a lesson that has no room yet into a room (or back to not placed), with its lesson name and group.
   let pendingTbc = null;
+  // Champion time on the Plan: an adult and their champion children go to a room together.
+  function champIds(sid, sl) { return [sid].concat(championKids(sid).map((x) => x.id)).filter((id) => sl.at[id] !== OUT); }
+  function moveChamp(sid, zone) {
+    const key = curKey(), a = project.areas.find((x) => x.id === zone), t = person(sid);
+    if (!a) { toast('Drop them onto a room.'); return; }
+    const ids = champIds(sid, slotOf(key));
+    sel.clear();
+    mutate(() => { const sl = slotOf(key, true); ids.forEach((id) => { sl.at[id] = zone; }); if (!str(sl.titles[zone])) sl.titles[zone] = wholeAt(key); });
+    toast(t.name + ' and ' + plural(ids.length - 1, 'child', 'children') + ' in ' + a.name, { label: 'Undo', run: undo });
+  }
   function moveTbc(place, zone) {
     const key = curKey(), s0 = slotOf(key), ppl = peopleAt(s0, place), title = str(s0.titles[place]);
     const a = project.areas.find((x) => x.id === zone);
@@ -2736,7 +2783,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       h('div', { class: 'room-people' }, st2.map((p) => chip(p)), pu.map((p) => chip(p))),
       !editLayout && here.length ? h('div', { class: 'room-foot' + (noStaff ? ' bad' : over ? ' warn' : '') },
         noStaff ? h('span', { class: 'room-flag' }, 'No staff') : over ? h('span', { class: 'room-flag' }, 'Room for ' + a.cap) : null,
-        uncovered(a.id, s).length && a.kind !== 'staff' ? h('button', { type: 'button', class: 'room-create', title: 'Make what is in ' + a.name + ' into a lesson, so it is set up in Lesson setup', onclick: () => createLessonDialog(a) }, 'Create') : null,
+        uncovered(a.id, s).length && a.kind !== 'staff' && !wholeOf(s) ? h('button', { type: 'button', class: 'room-create', title: 'Make what is in ' + a.name + ' into a lesson, so it is set up in Lesson setup', onclick: () => createLessonDialog(a) }, 'Create') : null,
         h('button', { type: 'button', class: 'room-count', title: plural(pu.length, 'pupil') + ', ' + st2.length + ' staff. Click to pick them all up.', 'data-select-room': a.id },
           roomIcon('person', ''), h('span', { class: 'cp' }, pu.length), '/', h('span', { class: 'cs' }, st2.length))) : null,
       editLayout ? [
@@ -3218,15 +3265,44 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
         h('p', { class: 'hint' }, 'Click a name, then a lesson. Choose a suggestion or a subject, or type one and press Enter, and it moves on to the next lesson to name.'),
         pick, h('div', { class: 'nl-wrap' }, h('div', { class: 'gw-grid' }, grid), panel))];
   }
+  // ----- Champions: the adult each child spends Champion time with -----
+  let champPick = null;
+  function setChampion(pid, sid) {
+    const p = person(pid), t = sid && person(sid);
+    champPick = null;
+    mutate((pp) => { pp.champions = Object.assign({}, pp.champions); if (sid) pp.champions[pid] = sid; else delete pp.champions[pid]; });
+    toast(p.name + (t ? '’s champion is ' + t.name : ' has no champion now'), { label: 'Undo', run: undo });
+  }
+  function championsPage() {
+    const ch = project.champions || {};
+    const none = pupils().filter((x) => !person(ch[x.id]));
+    const kidChip = (x) => h('button', { type: 'button', class: 'chip pupil' + (champPick === x.id ? ' sel' : ''), draggable: 'true', 'data-champ-kid': x.id, title: 'Drag onto their champion, or tap then tap the champion',
+      ondragstart: (e) => { e.dataTransfer.setData('text/plain', x.id); e.dataTransfer.effectAllowed = 'move'; },
+      onclick: () => { champPick = champPick === x.id ? null : x.id; render(); } }, x.name);
+    const dropZone = (sid, kids) => h('div', { class: 'champ-card' + (sid ? '' : ' none') + (champPick ? ' picking' : ''), 'data-champ': sid || '',
+      ondragover: (e) => { e.preventDefault(); e.currentTarget.classList.add('drop-ok'); }, ondragleave: (e) => e.currentTarget.classList.remove('drop-ok'),
+      ondrop: (e) => { e.preventDefault(); e.currentTarget.classList.remove('drop-ok'); const pid = e.dataTransfer.getData('text/plain'); if (person(pid) && (ch[pid] || '') !== (sid || '')) setChampion(pid, sid); },
+      onclick: (e) => { if (champPick && !e.target.closest('[data-champ-kid]')) setChampion(champPick, sid); } },
+      h('div', { class: 'champ-head' }, sid ? h('b', { class: 'staff-ink' }, person(sid).name) : h('b', null, 'No champion yet'), h('span', { class: 'n' }, kids.length)),
+      h('div', { class: 'champ-kids' }, kids.length ? kids.map(kidChip) : h('span', { class: 'hint' }, sid ? 'Drop children here' : 'Everyone has a champion')));
+    const champTimes = (project.wholeSchool || []).filter((w) => isChampionTime(w.name));
+    return [
+      h('p', { class: 'hint champ-hint' }, 'Drag each child onto their champion, or tap a child and then the adult. ' + (champTimes.length
+        ? 'In ' + champTimes.map((w) => dayName(w.day) + ' ' + periodOf(w.period).label).join(' and ') + ' (' + champTimes[0].name + ') their timetables show who they are with, and the adult’s timetable lists their children. On the Plan, the tray’s Champions tab places each adult with their children.'
+        : 'Champion time shows on timetables once there is a whole-school lesson called Champion time (Setup → School day).')),
+      h('div', { class: 'champ-wrap' }, dropZone('', none),
+        h('div', { class: 'champ-grid' }, staff().map((t) => dropZone(t.id, pupils().filter((x) => ch[x.id] === t.id)))))];
+  }
   // Lesson setup: the group lessons, and lessons for one pupil (therapy, a staff member's project, wellbeing).
   function renderLessonSetup(root) {
-    const tab = ui.lessonTab === 'pupil' || ui.lessonTab === 'name' ? ui.lessonTab : 'groups';
+    const tab = ['pupil', 'name', 'champs'].includes(ui.lessonTab) ? ui.lessonTab : 'groups';
     const toName = weekLessons().filter((l) => !l.title).length;
     const head = h('div', { class: 'page-head' }, h('h2', null, 'Lesson setup'),
-      h('div', { class: 'seg', role: 'group', 'aria-label': 'Which lessons' }, [['groups', 'Group lessons'], ['pupil', 'Lessons for one pupil'], ['name', 'Name the lessons']].map(([id, label]) =>
+      h('div', { class: 'seg', role: 'group', 'aria-label': 'Which lessons' }, [['groups', 'Group lessons'], ['pupil', 'Lessons for one pupil'], ['name', 'Name the lessons'], ['champs', 'Champions']].map(([id, label]) =>
         h('button', { type: 'button', class: tab === id ? 'on' : '', 'aria-pressed': tab === id ? 'true' : 'false', onclick: () => { ui.lessonTab = id; saveUI(); render(); } }, label, id === 'name' && toName ? h('span', { class: 'n' }, toName) : null))));
     if (tab === 'groups') { root.append(h('div', { class: 'page' }, head, groupsCard())); return; }
     if (tab === 'name') { root.append(h('div', { class: 'page' }, head, nameLessonsPage())); return; }
+    if (tab === 'champs') { root.append(h('div', { class: 'page' }, head, championsPage())); return; }
     const list = pupils();
     if (!list.length) { root.append(h('div', { class: 'page' }, head, h('p', { class: 'hint' }, 'No pupils yet. Add them in Setup.'))); return; }
     const p = person(ui.pupilPage) && isPupil(person(ui.pupilPage)) ? person(ui.pupilPage) : list[0];
@@ -3381,7 +3457,10 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     const place = s.at[p.id];
     if (place === OUT) return { kind: 'out', key: 'out' };
     const w = wholeOf(s);
-    if (w) return { kind: 'lesson', subject: w, type: lessonType(w), room: 'Whole school', roomKind: '', group: '', teachers: '', staffShown: [], key: 'whole|' + w };
+    if (w) {
+      const champ = isChampionTime(w) ? championOf(p.id) : null;
+      return { kind: 'lesson', subject: w, type: lessonType(w), room: 'Whole school', roomKind: '', group: '', teachers: champ ? champ.name : '', staffShown: champ ? [champ] : [], key: 'whole|' + w + '|' + (champ ? champ.id : '') };
+    }
     const a = place && areaById.get(place);
     if (!a) return { kind: 'none', key: '' };
     const here = peopleAt(s, place), staffHere = here.filter(isStaff);
@@ -3395,7 +3474,12 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
   function staffLesson(p, s) {
     const place = s.at[p.id];
     if (place === OUT) return { kind: 'out', key: 'out' };
-    if (wholeOf(s)) return { kind: 'special', text: wholeOf(s), key: 'whole|' + wholeOf(s) };
+    if (wholeOf(s)) {
+      const w = wholeOf(s), kids = isChampionTime(w) ? championKids(p.id).filter((x) => s.at[x.id] !== OUT) : [];
+      if (kids.length) { const pl = s.at[p.id], a = pl && project.areas.find((x) => x.id === pl);
+        return { kind: 'lesson', staffMode: true, subject: w, type: lessonType(w), room: a ? a.name : 'Champion children', roomKind: a ? a.kind : '', pupils: names(kids), key: 'whole|' + w }; }
+      return { kind: 'special', text: w, key: 'whole|' + w };
+    }
     if (place === PPA || place === COVER) return { kind: 'special', text: SPECIAL_NAMES[place], key: place };
     const a = place && areaById.get(place);
     if (!a) return { kind: 'none', key: '' };
@@ -3542,7 +3626,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
   function dayCellParts(p, s) {
     const place = s.at[p.id];
     if (place === OUT) return { kind: 'out', text: '' };
-    if (wholeOf(s)) return { kind: 'whole', text: wholeOf(s) };
+    if (wholeOf(s)) { const w = wholeOf(s); return { kind: 'whole', text: w, pupils: isChampionTime(w) ? names(championKids(p.id).filter((x) => s.at[x.id] !== OUT)) : '' }; }
     if (place === PPA) return { kind: 'ppa', text: 'PPA', place };
     if (place === COVER) return { kind: 'cover', text: 'Cover', place };
     const a = place && areaById.get(place);
@@ -3577,11 +3661,11 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
           list.map((p) => {
             const c = dayCellParts(p, s);
             const desc = c.kind === 'out' ? 'not in' : c.kind === 'none' ? 'not placed' : c.text || [c.subject, c.teacher, c.pupils].filter(Boolean).join(', ');
-            return h('button', {
+            return h('button', Object.assign(subjectTarget(p.id, slotKey(d.id, r.period)), {
               type: 'button', class: 'dg-cell k-' + c.kind + (c.type ? ' lt-' + c.type : '') + (now ? ' now' : ''),
               title: (c.lesson ? c.lesson + ' in ' + c.room + '. ' : c.room ? c.room + '. ' : '') + 'Click to write in this lesson', 'aria-label': p.name + ', ' + r.label + ': ' + desc,
               onclick: () => editLessonDialog(p.id, d.id, r.period)
-            }, c.kind === 'none' ? 'Not placed' : c.text ? c.text : [
+            }), c.kind === 'none' ? 'Not placed' : c.text ? (c.pupils ? [h('span', { class: 'ds-subj' }, c.text), h('span', { class: 'ds-pupils' }, c.pupils)] : c.text) : [
               h('span', { class: 'ds-subj' }, c.subject),
               c.teacher ? h('span', { class: 'ds-teacher' }, c.teacher) : null,
               c.pupils ? h('span', { class: 'ds-pupils' }, c.pupils) : null]);
@@ -3597,9 +3681,9 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     const lessons = dayRows().filter((r) => r.kind === 'period');
     const slots = lessons.map((r) => slotOf(slotKey(d.id, r.period)));
     const tone = (i) => ' l-' + ((i % 4) + 1);
-    const cell = (i, kind, kids, place, label, edit) => h('button', { type: 'button', class: 'lg-cell k-' + kind + tone(i) + (lessons[i].period === nowPeriod ? ' now' : '') + (edit ? ' editable' : ''),
+    const cell = (i, kind, kids, place, label, edit, staffId) => h('button', Object.assign(staffId ? subjectTarget(staffId, slotKey(d.id, lessons[i].period)) : {}, { type: 'button', class: 'lg-cell k-' + kind + tone(i) + (lessons[i].period === nowPeriod ? ' now' : '') + (edit ? ' editable' : ''),
       'aria-label': label + (edit ? '. Click to write in it.' : ''), title: edit ? 'Click to write in this lesson' : pick ? 'Open ' + d.name + ' ' + lessons[i].label + ' on the map' : 'Show ' + d.name + ' ' + lessons[i].label + ' on the main screen',
-      onclick: () => edit ? edit() : show(d.id, lessons[i].period, place) }, kids);
+      onclick: () => edit ? edit() : show(d.id, lessons[i].period, place) }), kids);
     const cols = [];
     if (by === 'rooms') {
       const used = project.areas.filter((a) => slots.some((s) => peopleAt(s, a.id).length || str(s.titles[a.id]))).sort((a, b) => a.name.localeCompare(b.name));
@@ -3623,12 +3707,12 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       staff().forEach((p) => cols.push([h('div', { class: 'lg-name staff', title: p.full || p.name }, p.name), slots.map((s, i) => {
         const c = dayCellParts(p, s), lab = p.name + ', ' + lessons[i].label + ': ';
         const edit = () => editLessonDialog(p.id, d.id, lessons[i].period);
-        if (c.kind === 'out') return cell(i, 'out', h('span', { class: 'lg-quiet' }, 'Not in'), null, lab + 'not in', edit);
-        if (c.kind === 'none') return cell(i, 'none', h('span', { class: 'lg-quiet' }, 'Not placed'), null, lab + 'not placed', edit);
-        if (c.text) return cell(i, c.kind, h('b', null, c.text), c.place, lab + c.text, edit);
+        if (c.kind === 'out') return cell(i, 'out', h('span', { class: 'lg-quiet' }, 'Not in'), null, lab + 'not in', edit, p.id);
+        if (c.kind === 'none') return cell(i, 'none', h('span', { class: 'lg-quiet' }, 'Not placed'), null, lab + 'not placed', edit, p.id);
+        if (c.text) return cell(i, c.kind, [h('b', null, c.text), c.pupils ? h('span', { class: 'lg-pupils' }, c.pupils) : null], c.place, lab + c.text, edit, p.id);
         const others = peopleAt(s, c.place).filter((x) => isStaff(x) && x.id !== p.id);
         return cell(i, c.kind, [c.lesson ? h('b', { class: lgLong(c.subject) }, c.subject) : h('i', { class: 'lg-unnamed', title: 'No lesson name yet' }, c.room), others.length ? h('span', { class: 'lg-staff' }, 'with ' + names(others)) : null,
-          c.pupils ? h('span', { class: 'lg-pupils' }, c.pupils) : null, isTbc(c.place) ? h('span', { class: 'lg-quiet lg-tbc-note' }, 'No room yet') : null], c.place, lab + c.subject, edit);
+          c.pupils ? h('span', { class: 'lg-pupils' }, c.pupils) : null, isTbc(c.place) ? h('span', { class: 'lg-quiet lg-tbc-note' }, 'No room yet') : null], c.place, lab + c.subject, edit, p.id);
       })]));
     }
     if (slots.some((s) => unplacedPupilsIn(s).length)) cols.push([h('div', { class: 'lg-name' }, 'Pupils not placed'),
@@ -3654,7 +3738,45 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
   }
   // The second screen: write in one member of staff's lesson: what it is, the children, and the other staff with them.
   // A lesson written in with no room yet waits on the Plan, under No room yet, to be dragged into a room.
+  // Names a member of staff's lesson from a subject dropped on it. With no lesson yet, it makes one with no room.
+  function setLessonName(staffId, key, name) {
+    const t = person(staffId);
+    if (!t || !str(name)) return;
+    if (wholeAt(key)) { toast(slotLabel(key) + ' is ' + wholeAt(key) + ' for the whole school.'); return; }
+    if (slotOf(key).at[t.id] === OUT) { toast(t.name + ' is not in then.'); return; }
+    let made = false;
+    mutate(() => {
+      const s2 = slotOf(key, true);
+      let pl = s2.at[t.id];
+      if (!pl || !areaById.has(pl)) { pl = newTbc(s2); if (!pl) return; s2.at[t.id] = pl; made = true; }
+      s2.titles[pl] = name;
+      pruneTbc(s2);
+    });
+    toast(t.name + ', ' + slotLabel(key) + ': ' + name + (made ? ' (a new lesson, no room yet)' : ''), { label: 'Undo', run: undo });
+  }
+  let sheetPick = null;
+  function subjectPalette() {
+    const all = [...new Set([...project.needs.map((n) => n.subject), ...Object.values(project.slots).flatMap((x) => Object.values(x.titles)).filter(Boolean), ...project.areas.map((a) => a.usual).filter(Boolean),
+      ...staff().map((x) => x.teaches).filter(Boolean), 'Wellbeing', 'Therapy', 'Intervention'])].map(str).filter(Boolean).sort((a, b) => a.localeCompare(b));
+    const extra = h('input', { class: 'txt sm', placeholder: 'Another subject…', 'aria-label': 'Another subject', onkeydown: (e) => { if (e.key === 'Enter' && str(e.target.value)) { sheetPick = str(e.target.value); render(); } } });
+    return h('div', { class: 'ds-palette', role: 'group', 'aria-label': 'Subjects to drag onto lessons' },
+      h('span', { class: 'hint' }, sheetPick ? 'Tap the lessons to name them “' + sheetPick + '”, or tap the subject again to stop.' : 'Drag a subject onto a lesson, or tap one and then tap lessons:'),
+      all.map((x) => h('button', { type: 'button', class: 'subj-chip' + (sheetPick === x ? ' on' : ''), draggable: 'true', 'aria-pressed': sheetPick === x ? 'true' : 'false',
+        ondragstart: (e) => { e.dataTransfer.setData('text/plain', 'subject:' + x); e.dataTransfer.effectAllowed = 'copy'; },
+        onclick: () => { sheetPick = sheetPick === x ? null : x; render(); } }, x)),
+      sheetPick && !all.includes(sheetPick) ? h('button', { type: 'button', class: 'subj-chip on' }, sheetPick) : null, extra);
+  }
+  // Makes a second-screen lesson cell take a dropped subject, and a tapped one while a subject is picked.
+  function subjectTarget(staffId, key) {
+    return {
+      'data-drop-staff': staffId, 'data-drop-key': key,
+      ondragover: (e) => { if ([...e.dataTransfer.types].includes('text/plain')) { e.preventDefault(); e.currentTarget.classList.add('drop-ok'); } },
+      ondragleave: (e) => e.currentTarget.classList.remove('drop-ok'),
+      ondrop: (e) => { e.preventDefault(); e.currentTarget.classList.remove('drop-ok'); const v = e.dataTransfer.getData('text/plain'); if (v.startsWith('subject:')) setLessonName(staffId, key, v.slice(8)); }
+    };
+  }
   function editLessonDialog(staffId, dayId, periodId) {
+    if (sheetPick) { setLessonName(staffId, slotKey(dayId, periodId), sheetPick); return; }
     const t = person(staffId);
     if (!t) return;
     const key = slotKey(dayId, periodId), sl = slotOf(key);
@@ -4088,6 +4210,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     const m = mainUi();
     const now = ui.sheetFollow && m.day === d.id ? m.period : null;
     $('#view').replaceChildren(
+      sheetLook() !== 'rooms' && project.people.length ? subjectPalette() : null,
       h('div', { class: 'dsheet-screen' }, !(project.people.length || project.areas.length) ? h('p', { class: 'hint ds-empty' }, 'Open the timetabler on the main screen first.')
         : sheetLook() === 'paper' ? staffDayGrid(d, now) : lessonsGrid(d, now, sheetLook())),
       h('div', { class: 'sheets ds-print' }, DAYS.map(staffDaySheet)));
@@ -4625,6 +4748,8 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       drag = Object.assign(base, { kind: handle ? 'resize' : 'move', area: a, el: room, rect: map.getBoundingClientRect(), orig: { x: a.x, y: a.y, w: a.w, h: a.h }, moved: false });
       return;
     }
+    const cc = e.target.closest('.champ-chip');
+    if (cc) { drag = Object.assign(base, { kind: 'champ', sid: cc.dataset.champT, started: false }); return; }
     const tc = e.target.closest('.tbc-chip');
     if (tc) { drag = Object.assign(base, { kind: 'tbc', place: tc.dataset.tbc, started: false }); return; }
     const rc = e.target.closest('.rchip');
@@ -4644,9 +4769,11 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     if (!drag || e.pointerId !== drag.id) return;
     const dist = Math.hypot(e.clientX - drag.x0, e.clientY - drag.y0);
     if (drag.kind === 'tap') { if (dist > 8) drag = null; return; }
-    if (drag.kind === 'chip' || drag.kind === 'group' || drag.kind === 'ppa' || drag.kind === 'support' || drag.kind === 'request' || drag.kind === 'tbc') {
+    if (drag.kind === 'chip' || drag.kind === 'group' || drag.kind === 'ppa' || drag.kind === 'support' || drag.kind === 'request' || drag.kind === 'tbc' || drag.kind === 'champ') {
       if (!drag.started) {
         if (dist < 6) return;
+        if (drag.kind === 'champ') { drag.started = true; drag.ids = []; const src = document.querySelector('.champ-chip[data-champ-t="' + drag.sid + '"]'); drag.ghost = h('div', { class: 'ghost' }, src ? src.cloneNode(true) : null); document.body.append(drag.ghost); document.body.classList.add('dragging'); }
+        else
         if (drag.kind === 'tbc') { drag.started = true; drag.ids = []; const src = document.querySelector('.tbc-chip[data-tbc="' + drag.place + '"]'); drag.ghost = h('div', { class: 'ghost' }, src ? src.cloneNode(true) : null); document.body.append(drag.ghost); document.body.classList.add('dragging'); }
         else
         if (drag.kind === 'request') { drag.started = true; drag.ids = []; drag.ghost = h('div', { class: 'ghost' }, drag.request ? requestChip(drag.request, slotOf(curKey())) : null); document.body.append(drag.ghost); document.body.classList.add('dragging'); }
@@ -4798,7 +4925,8 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
         h('th', { scope: 'row' }, h('b', null, per.label), per.time ? h('small', null, per.time) : null),
         DAYS.map((d) => {
           const key = slotKey(d.id, per.id), sl = slotOf(key);
-          if (wholeAt(key)) return h('td', { 'data-cell': key }, h('span', { class: 'gw-note gw-whole' }, wholeAt(key)), h('span', { class: 'hint' }, 'Whole school'));
+          if (wholeAt(key)) { const ck = isChampionTime(wholeAt(key)) ? championKids(teacher.id).filter((x) => sl.at[x.id] !== OUT) : [];
+            return h('td', { 'data-cell': key }, h('span', { class: 'gw-note gw-whole' }, wholeAt(key)), ck.length ? h('span', { class: 'gw-pupils-line' }, names(ck)) : h('span', { class: 'hint' }, 'Whole school')); }
           const at = sl.at[teacher.id], a = at && areaById.get(at);
           const mine = a ? project.groups.filter((g) => groupPlace(g, sl) === at) : [];
           const split = groups.filter((g) => g.members.includes(teacher.id)).map((g) => ({ g, sp: groupSplit(g, sl) })).filter((x) => x.sp);
@@ -4983,6 +5111,15 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       if (d.room) { pickUpRoom(d.room); return; }
       const z = zoneFromPoint(e.clientX, e.clientY);
       if (sel.size && z && z.dataset.zone === d.zone) placeMany([...sel], d.zone);
+      return;
+    }
+    if (d.kind === 'champ') {
+      if (!d.started) { if (!cancelled) { sel.clear(); champIds(d.sid, slotOf(curKey())).forEach((id) => sel.add(id)); render(); toast('Picked up. Tap a room to put them there.'); } return; }
+      d.ghost.remove();
+      document.body.classList.remove('dragging');
+      if (d.hover) d.hover.classList.remove('drop-ok', 'drop-no');
+      const z = cancelled ? null : zoneFromPoint(e.clientX, e.clientY);
+      if (z) moveChamp(d.sid, z.dataset.zone);
       return;
     }
     if (d.kind === 'tbc') {

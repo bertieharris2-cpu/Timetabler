@@ -366,6 +366,19 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   await sheet.getByRole('button', { name: 'Paper sheet' }).click();
   check(await sheet.locator('.dgrid').count() === 1, 'and back to the paper sheet');
   check(await sheet.evaluate(() => localStorage.getItem('lifehouse_timetabler_v2')) === await p10.evaluate(() => localStorage.getItem('lifehouse_timetabler_v2')), 'looking at the second screen changes nothing');
+  // Dragging a subject onto the paper sheet
+  await sheet.getByRole('button', { name: 'Paper sheet' }).click();
+  await sheet.locator('.tabs .tab', { hasText: 'Monday' }).click();
+  await sheet.locator('.subj-chip', { hasText: /^Science$/ }).dragTo(sheet.locator('.dg-cell[data-drop-staff="T02"]').nth(2));
+  await sheet.waitForTimeout(600);
+  const dj = await p10.evaluate(() => JSON.parse(localStorage.getItem('lifehouse_timetabler_v2')));
+  check(dj.slots['Mon|P3'].titles[dj.slots['Mon|P3'].at.T02] === 'Science', 'a subject dragged onto the sheet names that lesson');
+  await sheet.locator('.subj-chip', { hasText: /^PE$/ }).click();
+  await sheet.locator('.dg-cell[data-drop-staff="T02"]').nth(3).click();
+  await sheet.locator('.subj-chip', { hasText: /^PE$/ }).click();
+  await sheet.waitForTimeout(600);
+  const dj2 = await p10.evaluate(() => JSON.parse(localStorage.getItem('lifehouse_timetabler_v2')));
+  check(dj2.slots['Mon|P4'].titles[dj2.slots['Mon|P4'].at.T02] === 'PE' && await sheet.locator('dialog[open]').count() === 0, 'or tap a subject, then tap lessons');
   // Writing straight onto the second screen's Lessons by staff
   await sheet.getByRole('button', { name: 'Lessons by staff' }).click();
   await sheet.locator('.tabs .tab', { hasText: 'Monday' }).click();
@@ -882,6 +895,10 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   check(!!k12 && !!placed.slots[k12].titles.A2, 'tap it then a room: the pupil and member of staff go there');
   // Create: turn what was dragged into a room into a lesson
   await p12.locator('.tray-tabs button', { hasText: 'Left to place' }).click();
+  // (Friday afternoon is a whole-school lesson to start; take it off to plan it)
+  await setupTo(p12, 'School day');
+  while (await p12.locator('.whole-block .x-btn').count()) { await p12.locator('.whole-block .x-btn').first().click(); await p12.waitForTimeout(150); }
+  await p12.getByRole('button', { name: 'Plan', exact: true }).click();
   await p12.locator('.strip-btn[aria-label^="Friday P4"]').click();
   const kidLeft = p12.locator('[data-zone="NONE"] .chip.pupil').first();
   const kidName = await kidLeft.innerText();
@@ -980,6 +997,33 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   await p13.getByRole('button', { name: 'Generate timetables…' }).click();
   check(/Lessons with no name/.test(await p13.locator('dialog .gen-checks').innerText()), 'Generate timetables lists lessons with no name');
   await p13.locator('dialog').getByRole('button', { name: 'Cancel' }).click();
+  // Champions: each child's adult for Champion time, and placing them together
+  await p13.getByRole('button', { name: 'Lesson setup', exact: true }).click();
+  await p13.getByRole('button', { name: 'Champions' }).click();
+  const champCard = (n) => p13.locator('.champ-card', { has: p13.locator('.champ-head b', { hasText: new RegExp('^' + n + '$') }) });
+  await p13.locator('.champ-card.none [data-champ-kid]', { hasText: /^AB$/ }).dragTo(champCard('Abi'));
+  await p13.locator('.champ-card.none [data-champ-kid]', { hasText: /^CD$/ }).click();
+  await champCard('Abi').click();
+  check(await champCard('Abi').locator('[data-champ-kid]').count() === 2, 'children are given a champion by dragging or tapping');
+  await setupTo(p13, 'School day');
+  await p13.locator('.whole-block select[aria-label="Whole-school lesson day"]').nth(1).selectOption('Fri');
+  await p13.locator('.whole-block input').nth(1).fill('Champion time');
+  await p13.locator('.whole-block input').nth(1).blur();
+  await p13.getByRole('button', { name: 'Pupil timetables', exact: true }).click();
+  await p13.locator('.name-pick button', { hasText: /^AB$/ }).click();
+  check(/Champion time\s*Abi/.test(await p13.locator('.pweek tbody tr').nth(2).locator('td').nth(4).innerText()), 'Champion time shows the child’s champion');
+  await p13.getByRole('button', { name: 'Staff timetables', exact: true }).click();
+  await p13.locator('.name-pick button', { hasText: /^Abi$/ }).click();
+  check(/AB, CD/.test(await p13.locator('td[data-cell="Fri|P3"]').innerText()), 'and the champion’s timetable lists their children');
+  await p13.getByRole('button', { name: 'Plan', exact: true }).click();
+  await p13.locator('.strip-btn[aria-label^="Friday P3"]').click();
+  await p13.locator('.tray-tabs button', { hasText: 'Champions' }).click();
+  const ca = await p13.locator('.champ-chip', { hasText: 'Abi' }).boundingBox(), cz = await p13.locator('.room[data-area="A15"]').boundingBox();
+  await p13.mouse.move(ca.x + ca.width / 2, ca.y + ca.height / 2); await p13.mouse.down();
+  for (let i = 1; i <= 8; i++) await p13.mouse.move(ca.x + (cz.x + cz.width / 2 - ca.x) * i / 8, ca.y + (cz.y + cz.height / 2 - ca.y) * i / 8);
+  await p13.mouse.up(); await p13.waitForTimeout(400);
+  j13 = await p13.evaluate(() => JSON.parse(localStorage.getItem('lifehouse_timetabler_v2')));
+  check(['T01', 'S01', 'S02'].every((id) => j13.slots['Fri|P3'].at[id] === 'A15'), 'on the Plan, a champion and their children are placed together');
   check(err13.length === 0, 'no errors' + (err13.length ? ': ' + err13.join(' | ') : ''));
   await ctx13.close();
 
