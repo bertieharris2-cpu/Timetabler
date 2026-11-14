@@ -9,7 +9,9 @@ It is one HTML file. It needs no internet, no installing and no server, and it n
 | File | What it is |
 | --- | --- |
 | `lifehouse-timetabler.html` | **The app: the one file to open.** Double-click it to run in Chrome or Edge. |
+| `lifehouse-duties.html` | **Duties** (trial, kept separate from the timetable): who watches which child, and who is where, at wellbeing, break and lunch. It reads the timetable and never changes it. |
 | `tests/app.test.js` | Browser test of the whole app (drag and drop, touch, copying, undo, saving, backups, CSV, printing, layout editing, bringing in old saves). |
+| `tests/duties.test.js` | Browser test of Duties: the rules, Suggest a rota, changing it by hand, printing and files. |
 | `reference/handover-oct-2026/` | From the earlier prototype's handover pack: the project brief, the next-steps notes and the room coordinates. |
 
 ## Using it
@@ -56,6 +58,18 @@ The map starts in the **school layout**: the floor plan's buildings and rooms in
 
 **Edit layout** (bottom right of the map) moves, resizes, renames, adds and removes rooms. To make the map look like the school, add a **floor plan picture** (a drawn site plan, or a photo of the fire evacuation plan) and drag the rooms onto it, draw **building outlines** behind the rooms (each with a name tab; the button above an outline changes its colour between building, Village Hall, off-site and outdoors), and place **labels** such as "West building" or "Yard". Double-click any name on the map to rename it. If you redraw the picture later, keep it the same shape and the rooms stay where they are. **Setup** also sets period names and times, and optional limits on how many pupils a room takes. You can also set how many PPA periods each member of staff needs; Staff timetables shows the count and Generate timetables lists anyone short.
 
+## Duties (trial)
+
+`lifehouse-duties.html` is a separate file for the duty rota, so it can be tried without touching the timetable. It **only reads** the timetable: who is in, who is off site, and which adults have which child in each lesson.
+
+1. **Start:** open it in the same browser as the Timetabler and press **Use the timetable in this browser**, or open a timetable backup. **Update from the timetable** reads it again after changes; the rota and rules stay.
+2. **Times and staff:** the duty times come from the school day: Wellbeing, Break, and Lunch split into **Lunch: eating** and **Lunch: play** (change the names and times, or add one). Beside each is the lesson straight before or after it. Teachers start as the staff who lead lessons; untick **Does duties** for anyone who never does them, and tick times someone is never free.
+3. **Children to watch:** add each child who needs an adult with them, the times, how many adults, and if it matters **Only these adults** and **Never with**. A child who is off site or not in drops off the rota for that time, with the reason.
+4. **Areas and activities:** Playground, Dining hall and Lunchtime activity to start: how many adults, at which times and on which days. Add your own.
+5. **Rules:** each rule is **Must** (Suggest never breaks it, and the rota marks it ! if you do), **Try to** (avoided where it can be) or **Off**. To start: nobody on duty next to being off site, everyone has part of lunch off, at most 2 duties a day (all Must); teachers have break off, at break the adult the child was with keeps them, at lunch a different adult from the lesson before, and fair shares (all Try to). Teachers having lunch off and the same adult every day start Off. Nobody is ever put on duty when the timetable says they are not in.
+6. **Rota:** **Suggest a rota** fills every duty still needing someone, for the whole week, hardest first, keeping anything already placed. **Start again** clears the week and suggests afresh. Click any duty to see who can do it (best fit first, with reasons, and anyone a Must rule rules out), or drag names from the staff list onto a duty, between duties, or back to the list. ✓ means fine, ! means something to check (listed under **To check**), and **Needs 1** means it is short. **Week** shows everyone's duties and totals. **Print this day** or **Print the week** gives an A4 sheet per day.
+7. **Save duties file** keeps the rota, rules and a copy of the timetable it read. It has names in it, so keep it on the school's computer or drive.
+
 ## Saving and backups
 
 - Everything saves by itself **in the browser on that computer**. It is not shared between computers or browsers. Clearing browser data deletes it.
@@ -75,6 +89,7 @@ The test uses invented names. It needs Node and Playwright with Chromium:
 
 ```
 NODE_PATH="$(npm root -g)" node tests/app.test.js [folder-for-screenshots]
+NODE_PATH="$(npm root -g)" node tests/duties.test.js [folder-for-screenshots]
 ```
 
 ## Not built yet

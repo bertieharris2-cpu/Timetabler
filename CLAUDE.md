@@ -2,6 +2,8 @@
 
 `lifehouse-timetabler.html` is the whole app: one offline HTML file. Test with `NODE_PATH="$(npm root -g)" node tests/app.test.js`.
 
+`lifehouse-duties.html` is the duty rota, a separate trial file that only reads the timetable (never writes `lifehouse_timetabler_v2`). Test with `NODE_PATH="$(npm root -g)" node tests/duties.test.js`.
+
 ## Design system
 
 The look is defined in the **Lifehouse Timetabler** design system: https://claude.ai/artifact/TawDCssK7c6xQ3K6Rc124c (read its `project/README.md` first). Change the design system first, then apply it here. Key rules:

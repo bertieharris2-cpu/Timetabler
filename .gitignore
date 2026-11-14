@@ -7,3 +7,4 @@ people*.csv
 *people and groups*.json
 *.pdf
 node_modules/
+*duties - *.json

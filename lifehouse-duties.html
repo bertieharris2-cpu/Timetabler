@@ -1,0 +1,943 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lifehouse Duties</title>
+<style>
+/* Duties: who watches which child, and who is where, at wellbeing, break and lunch. Same look as the Timetabler. */
+:root {
+  --ground: #ECEFF3;
+  --surface: #FFFFFF;
+  --surface-2: #F5F7F9;
+  --free: #F8FAFB;
+  --ink: #16202A;
+  --muted: #5A6775;
+  --line: #D4DBE2;
+  --line-strong: #B5C0CB;
+  --map: #F4F6F9;
+  --outline-bg: #EBEFF4;
+  --accent: #1E4E8C;
+  --accent-ink: #FFFFFF;
+  --accent-soft: #E1EBF7;
+  --pupil: #2C52B5;
+  --pupil-bg: #E7EDFB;
+  --pupil-line: #B8C7EF;
+  --staff: #0B7459;
+  --staff-bg: #DDF2EA;
+  --staff-line: #A4D8C6;
+  --ppa: #77419F;
+  --ppa-bg: #F1E8F8;
+  --off: #A2560F;
+  --off-bg: #FDF3E7;
+  --off-line: #C9772B;
+  --out: #2F6B45;
+  --out-bg: #EFF7F1;
+  --out-line: #4F8D63;
+  --hall: #3A4654;
+  --tab-ink: #FFFFFF;
+  --top: #15233A;
+  --top-ink: #E8EEF6;
+  --top-muted: #A9B6C7;
+  --top-line: #2B3B55;
+  --top-tab: #24406B;
+  --save: #F2C66D;
+  --save-ink: #2A1E05;
+  --sheet-line: #8A949E;
+  --sheet-place: #137A3A;
+  --sheet-band-ink: #16202A;
+  --band-lightblue: #DDEBF7;
+  --band-blue: #8CC9EE;
+  --band-green: #8EDC8E;
+  --lesson-wellbeing: #E3F4E3;
+  --lesson-academic: #E2EDF9;
+  --staff-sheet-head: #F8C99B;
+  --lesson-1: #2F6DB5; --lesson-1-bg: #E6EFFA; --lesson-2: #1E7F72; --lesson-2-bg: #E0F2EE;
+  --lesson-3: #A8640A; --lesson-3-bg: #FCEFDA; --lesson-4: #A63F72; --lesson-4-bg: #F8E6EF;
+  --staff-sheet-band: #FDEBD8;
+  --book-head: #4E6B55; --book-gold: #D6A23E; --book-ink: #1F2A24; --book-muted: #4A584F;
+  --book-band: #EEF2EC; --book-band-edge: #9CAE9F; --book-band-ink: #26332B; --book-empty-edge: #93A396;
+  --book-academic: #E9DFF6; --book-academic-edge: #8A68C0; --book-academic-ink: #2B1D40; --book-academic-icon: #5B3E92;
+  --book-numeracy: #FCDDBE; --book-numeracy-edge: #D9822F; --book-numeracy-ink: #3A2208; --book-numeracy-icon: #9A5212;
+  --book-wellbeing: #FBF0C4; --book-wellbeing-edge: #C9A93A; --book-wellbeing-ink: #33270A; --book-wellbeing-icon: #8A6510;
+  --book-champion: #FBEFC2; --book-champion-edge: #C9A23A; --book-champion-ink: #33270A; --book-champion-icon: #8A6510;
+  --ok: #1B7339;
+  --ok-bg: #E0F3E6;
+  --warn: #9A5300;
+  --warn-bg: #FCEFD9;
+  --bad: #B0301D;
+  --bad-bg: #FAE5E1;
+  --tint-s: 52%;
+  --tint-l: 90%;
+  --paper: #FFFFFF;
+  --paper-ink: #111418;
+  --paper-muted: #4A535C;
+  --paper-line: #8A949E;
+  --paper-head: #EEF1F4;
+  --shadow: 0 1px 2px rgba(22, 32, 42, .08), 0 2px 8px rgba(22, 32, 42, .05);
+  --font: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Roboto, Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #11161C; --surface: #19202A; --surface-2: #1F2732; --free: #161C24;
+    --ink: #E5EAF0; --muted: #96A2AE; --line: #2D3845; --line-strong: #3E4B5A; --map: #141A21; --outline-bg: #18202A;
+    --accent: #84ABE6; --accent-ink: #0D1520; --accent-soft: #1E2E44;
+    --pupil: #A3B8F4; --pupil-bg: #22305A; --pupil-line: #34477C;
+    --staff: #84D6BA; --staff-bg: #153B31; --staff-line: #22584A;
+    --ppa: #CCA6EE; --ppa-bg: #33244A; --off: #F0B47A; --off-bg: #33261A; --off-line: #B8743A;
+    --out: #8FD3A6; --out-bg: #16291D; --out-line: #4F8A63; --hall: #A9B4C1; --tab-ink: #0D1520;
+    --top: #0B1220; --top-ink: #E5EAF0; --top-muted: #96A2AE; --top-line: #26324A; --top-tab: #1E3150; --save: #E8B95A;
+    --sheet-line: #3E4B5A; --sheet-place: #7FD49B; --sheet-band-ink: #0D1520; --band-lightblue: #A9C4DE; --band-blue: #6FAFD6; --band-green: #6FBF7A; --lesson-wellbeing: #1B3324; --lesson-academic: #1B2B40;
+    --lesson-1: #3E7CC4; --lesson-1-bg: #1B2A3D; --lesson-2: #23887A; --lesson-2-bg: #16302B; --lesson-3: #B06E14; --lesson-3-bg: #35291A; --lesson-4: #B04A7E; --lesson-4-bg: #35202C;
+    --ok: #82D49D; --ok-bg: #173825; --warn: #F0B866; --warn-bg: #3F2D0F; --bad: #F09C8D; --bad-bg: #481E18;
+    --tint-s: 30%; --tint-l: 24%;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .45);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #11161C; --surface: #19202A; --surface-2: #1F2732; --free: #161C24;
+  --ink: #E5EAF0; --muted: #96A2AE; --line: #2D3845; --line-strong: #3E4B5A; --map: #141A21; --outline-bg: #18202A;
+  --accent: #84ABE6; --accent-ink: #0D1520; --accent-soft: #1E2E44;
+  --pupil: #A3B8F4; --pupil-bg: #22305A; --pupil-line: #34477C;
+  --staff: #84D6BA; --staff-bg: #153B31; --staff-line: #22584A;
+  --ppa: #CCA6EE; --ppa-bg: #33244A; --off: #F0B47A; --off-bg: #33261A; --off-line: #B8743A;
+    --out: #8FD3A6; --out-bg: #16291D; --out-line: #4F8A63; --hall: #A9B4C1; --tab-ink: #0D1520;
+    --top: #0B1220; --top-ink: #E5EAF0; --top-muted: #96A2AE; --top-line: #26324A; --top-tab: #1E3150; --save: #E8B95A;
+    --sheet-line: #3E4B5A; --sheet-place: #7FD49B; --sheet-band-ink: #0D1520; --band-lightblue: #A9C4DE; --band-blue: #6FAFD6; --band-green: #6FBF7A; --lesson-wellbeing: #1B3324; --lesson-academic: #1B2B40;
+    --lesson-1: #3E7CC4; --lesson-1-bg: #1B2A3D; --lesson-2: #23887A; --lesson-2-bg: #16302B; --lesson-3: #B06E14; --lesson-3-bg: #35291A; --lesson-4: #B04A7E; --lesson-4-bg: #35202C;
+  --ok: #82D49D; --ok-bg: #173825; --warn: #F0B866; --warn-bg: #3F2D0F; --bad: #F09C8D; --bad-bg: #481E18;
+  --tint-s: 30%; --tint-l: 24%;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .45);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+/* Square corners throughout, as in the Timetabler. */
+*, *::before, *::after { border-radius: 0 !important; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--ground); color: var(--ink); font: 14px/1.4 var(--font); }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+[hidden] { display: none !important; }
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+.app { min-height: 100%; display: flex; flex-direction: column; }
+
+/* ---------- Top bar ---------- */
+.topbar { display: flex; align-items: center; gap: 10px 18px; flex-wrap: wrap; padding: 7px 16px; background: var(--top); color: var(--top-ink); }
+.brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.brand-mark { width: 30px; height: 30px; color: var(--top-ink); flex: none; }
+.brand-text { display: flex; flex-direction: column; line-height: 1.15; min-width: 0; }
+.brand-name { font-weight: 700; font-size: 15px; letter-spacing: -.01em; }
+.brand-sub { color: var(--top-muted); font-size: 12px; }
+.tabs { display: flex; gap: 2px; flex-wrap: wrap; }
+.tab { border: 0; background: transparent; padding: 7px 14px; font-weight: 600; font-size: 13.5px; color: var(--top-muted); }
+.tab:hover { color: var(--top-ink); }
+.tab.on { background: var(--top-tab); color: var(--top-ink); }
+.top-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.topbar .btn { background: transparent; color: var(--top-ink); border-color: var(--top-line); }
+.topbar .btn:hover:not(:disabled) { background: var(--top-tab); }
+.topbar .btn.save { background: var(--save); border-color: var(--save); color: var(--save-ink); }
+.topbar :focus-visible { outline-color: var(--top-ink); }
+
+.btn { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; font-size: 13px; padding: 6px 11px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); white-space: nowrap; }
+.btn:hover:not(:disabled) { background: var(--surface-2); }
+.btn:disabled { opacity: .45; cursor: default; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.primary:hover:not(:disabled) { background: var(--accent); filter: brightness(1.08); }
+.btn.small { padding: 3px 8px; font-size: 12px; }
+.x-btn { width: 24px; height: 24px; padding: 0; border: 1px solid transparent; background: transparent; color: var(--muted); font-size: 16px; line-height: 1; }
+.x-btn:hover { border-color: var(--line-strong); color: var(--ink); }
+.txt { border: 1px solid var(--line-strong); background: var(--surface); padding: 5px 8px; min-width: 0; }
+.txt.sm { padding: 3px 6px; font-size: 13px; }
+.hint { color: var(--muted); font-size: 13px; }
+.page { padding: 16px; max-width: 1400px; width: 100%; }
+.page > h1 { font-size: 20px; margin-bottom: 4px; }
+.page > .hint { margin: 0 0 14px; max-width: 900px; }
+.card { background: var(--surface); border: 1px solid var(--line); padding: 14px 16px; margin-bottom: 14px; }
+.card h2 { font-size: 15px; margin-bottom: 4px; }
+.card > .hint { margin: 0 0 10px; }
+
+/* Segmented choices: days, rule levels. */
+.seg { display: inline-flex; border: 1px solid var(--line-strong); background: var(--surface); }
+.seg button { border: 0; border-right: 1px solid var(--line); background: transparent; padding: 5px 12px; font-weight: 600; font-size: 13px; color: var(--muted); }
+.seg button:last-child { border-right: 0; }
+.seg button:hover { color: var(--ink); background: var(--surface-2); }
+.seg button.on { background: var(--accent); color: var(--accent-ink); }
+
+/* Names: staff chips have a solid left edge; pupils are blue. */
+.chip { display: inline-flex; align-items: center; gap: 4px; height: 22px; font-weight: 650; font-size: 12px; line-height: 1; padding: 0 7px; border: 1px solid var(--pupil-line); background: var(--pupil-bg); color: var(--pupil); white-space: nowrap; user-select: none; }
+.chip.staff { border-left: 3px solid var(--staff); border-color: var(--staff-line); background: var(--staff-bg); color: var(--staff); cursor: grab; }
+.chip.staff.warn { box-shadow: inset 0 -2px 0 var(--warn); }
+.chip.staff.bad { border-color: var(--bad); border-left-color: var(--bad); background: var(--bad-bg); color: var(--bad); }
+.chip .flag { font-weight: 800; }
+.chip.sel { background: var(--staff); color: var(--surface); border-color: var(--staff); }
+.chip.faded { opacity: .55; }
+
+/* ---------- Start ---------- */
+.start { max-width: 640px; margin: 48px auto; }
+.start h1 { font-size: 24px; margin-bottom: 8px; }
+.start .row { display: flex; gap: 8px; flex-wrap: wrap; margin: 16px 0; }
+
+/* ---------- Rota ---------- */
+.rota-bar { display: flex; align-items: center; gap: 10px 14px; flex-wrap: wrap; margin-bottom: 10px; }
+.rota-bar .spacer { flex: 1; }
+.rota-sum { font-size: 13px; color: var(--muted); margin: 0 0 10px; }
+.rota-sum b { color: var(--ink); }
+.rota-sum .bad { color: var(--bad); font-weight: 700; }
+.rota-sum .warn { color: var(--warn); font-weight: 700; }
+.rota-wrap { display: grid; grid-template-columns: minmax(0, 1fr) 220px; gap: 14px; align-items: start; }
+@media (max-width: 900px) { .rota-wrap { grid-template-columns: 1fr; } }
+.table-scroll { overflow-x: auto; }
+table.rota { border-collapse: collapse; width: 100%; background: var(--surface); min-width: 640px; }
+.rota th, .rota td { border: 1px solid var(--line); padding: 0; vertical-align: top; text-align: left; }
+.rota thead th { background: var(--surface-2); padding: 6px 8px; font-size: 13px; }
+.rota thead th small { display: block; font-weight: 500; color: var(--muted); }
+.rota tbody th { padding: 6px 8px; width: 170px; font-weight: 600; font-size: 13px; }
+.rota tbody th small { display: block; font-weight: 500; color: var(--muted); font-size: 11.5px; }
+.rota tr.band th { background: var(--surface-2); font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); padding: 4px 8px; }
+.cell-btn { cursor: pointer; width: 100%; min-height: 46px; display: flex; flex-wrap: wrap; gap: 4px; align-content: flex-start; align-items: center; padding: 6px; border: 0; background: transparent; text-align: left; }
+.cell-btn:hover { background: var(--surface-2); }
+td.short { background: var(--warn-bg); }
+td.bad { box-shadow: inset 3px 0 0 var(--bad); }
+td.warn { box-shadow: inset 3px 0 0 var(--warn); }
+td.ok { box-shadow: inset 3px 0 0 var(--ok); }
+td.drop-ok { outline: 2px dashed var(--accent); outline-offset: -2px; }
+td.none { background: var(--free); }
+.need { display: inline-flex; align-items: center; height: 22px; padding: 0 7px; border: 1px dashed var(--warn); color: var(--warn); font-size: 12px; font-weight: 650; }
+.away { color: var(--muted); font-size: 12px; font-style: italic; padding: 6px 8px; display: block; }
+.mark { margin-left: auto; font-weight: 800; font-size: 12px; min-width: 14px; text-align: right; }
+.mark.ok { color: var(--ok); }
+.mark.warn { color: var(--warn); }
+.mark.bad { color: var(--bad); }
+.issues { margin-top: 12px; background: var(--surface); border: 1px solid var(--line); padding: 10px 14px; }
+.issues h2 { font-size: 14px; margin-bottom: 6px; }
+.issues ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 3px; font-size: 13px; }
+.issues li { padding-left: 10px; border-left: 3px solid var(--warn); }
+.issues li.bad { border-left-color: var(--bad); }
+.issues li b { font-weight: 650; }
+.tray { background: var(--surface); border: 1px solid var(--line); padding: 10px; position: sticky; top: 8px; }
+.tray.drop-ok { outline: 2px dashed var(--accent); outline-offset: -2px; }
+.tray h2 { font-size: 13px; margin-bottom: 2px; }
+.tray .hint { font-size: 12px; margin: 0 0 8px; }
+.tray-list { display: flex; flex-direction: column; gap: 3px; max-height: 70vh; overflow: auto; }
+.tray-row { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+.tray-row .chip { flex: none; }
+.tray-row .n { margin-left: auto; font-variant-numeric: tabular-nums; }
+
+/* Week: who has what, for fair shares. */
+table.week { border-collapse: collapse; width: 100%; background: var(--surface); font-size: 12.5px; }
+.week th, .week td { border: 1px solid var(--line); padding: 5px 7px; vertical-align: top; text-align: left; }
+.week thead th { background: var(--surface-2); }
+.week td.total { font-weight: 700; font-variant-numeric: tabular-nums; text-align: center; width: 60px; }
+.week td.total.hi { color: var(--warn); background: var(--warn-bg); }
+.week .d { display: block; }
+.week .d i { color: var(--muted); font-style: normal; }
+
+/* ---------- Picker ---------- */
+dialog.dlg { border: 1px solid var(--line); padding: 0; background: var(--surface); color: var(--ink); width: min(560px, calc(100vw - 32px)); box-shadow: 0 20px 50px rgba(0, 0, 0, .25); }
+dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
+.dlg-head { padding: 12px 16px; border-bottom: 1px solid var(--line); display: flex; align-items: flex-start; gap: 8px; }
+.dlg-head h2 { font-size: 16px; }
+.dlg-head .hint { margin: 2px 0 0; }
+.dlg-head .x-btn { margin-left: auto; }
+.dlg-body { padding: 12px 16px; max-height: 65vh; overflow: auto; }
+.dlg-foot { padding: 10px 16px; border-top: 1px solid var(--line); display: flex; justify-content: flex-end; gap: 8px; }
+.now { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.now .chip { cursor: default; }
+.cands { display: grid; gap: 4px; }
+.cand { display: grid; grid-template-columns: 110px 1fr auto; gap: 8px; align-items: center; padding: 6px 8px; border: 1px solid var(--line); background: var(--surface); text-align: left; }
+.cand:hover { border-color: var(--accent); }
+.cand .why { font-size: 12px; color: var(--muted); }
+.cand .why .bad { color: var(--bad); font-weight: 600; }
+.cand .why .warn { color: var(--warn); font-weight: 600; }
+.cand .why .good { color: var(--ok); font-weight: 600; }
+.cand .tag { font-size: 11px; font-weight: 700; padding: 2px 6px; background: var(--accent-soft); color: var(--accent); }
+.cand.blocked { background: var(--surface-2); }
+.sub-h { font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin: 12px 0 4px; font-weight: 700; }
+
+/* ---------- Setup tables ---------- */
+table.set { border-collapse: collapse; width: 100%; font-size: 13px; }
+.set th, .set td { border-bottom: 1px solid var(--line); padding: 6px 6px; text-align: left; vertical-align: middle; }
+.set thead th { font-size: 12px; color: var(--muted); font-weight: 600; }
+.ticks { display: flex; flex-wrap: wrap; gap: 4px 10px; }
+.ticks label { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+.people-line { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.add-row { display: flex; gap: 8px; align-items: center; margin-top: 10px; flex-wrap: wrap; }
+.rule { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 16px; padding: 12px 0; border-bottom: 1px solid var(--line); align-items: center; }
+.rule:last-child { border-bottom: 0; }
+.rule h3 { font-size: 14px; }
+.rule p { margin: 2px 0 0; color: var(--muted); font-size: 13px; max-width: 760px; }
+.rule .n { width: 56px; }
+.pick-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 4px 10px; }
+.pick-list label { display: flex; align-items: center; gap: 6px; }
+
+/* ---------- Toasts ---------- */
+.toasts { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); display: flex; flex-direction: column; gap: 8px; align-items: center; z-index: 2000; pointer-events: none; max-width: calc(100vw - 32px); }
+.toast { pointer-events: auto; display: flex; align-items: center; gap: 12px; background: var(--ink); color: var(--surface); padding: 9px 14px; font-size: 13px; box-shadow: 0 8px 24px rgba(0, 0, 0, .25); }
+.toast button { border: 0; background: none; color: inherit; font-weight: 700; text-decoration: underline; padding: 0; }
+
+/* ---------- Print: a day sheet per page ---------- */
+#print { display: none; }
+@media print {
+  @page { size: A4 landscape; margin: 12mm; }
+  body { background: #fff; color: #000; }
+  .app, .toasts, dialog { display: none !important; }
+  #print { display: block; }
+  .p-day { break-after: page; font-family: var(--font); }
+  .p-day:last-child { break-after: auto; }
+  .p-day h2 { font-size: 18pt; margin-bottom: 6pt; }
+  .p-day p { margin: 0 0 8pt; font-size: 10pt; color: #333; }
+  .p-day table { border-collapse: collapse; width: 100%; font-size: 11pt; }
+  .p-day th, .p-day td { border: 1px solid #666; padding: 5pt 6pt; text-align: left; vertical-align: top; }
+  .p-day thead th { background: #EEF1F4; }
+  .p-day td i { color: #555; }
+}
+</style>
+</head>
+<body>
+<div class="app"><header class="topbar" id="top"></header><main id="view"></main></div>
+<div id="print"></div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+<input type="file" id="file-open" accept=".json,application/json" hidden>
+<script>
+(() => {
+  'use strict';
+  // Lifehouse Duties: reads the timetable (never changes it) and keeps its own rota.
+  const STORE = 'lifehouse_duties_v1', TT_KEY = 'lifehouse_timetabler_v2', APP = 'lifehouse-duties';
+  const DAYS = [{ id: 'Mon', name: 'Monday' }, { id: 'Tue', name: 'Tuesday' }, { id: 'Wed', name: 'Wednesday' }, { id: 'Thu', name: 'Thursday' }, { id: 'Fri', name: 'Friday' }];
+  const DAY_IDS = DAYS.map((d) => d.id);
+  const OUT = 'OUT', NOT_PLACES = new Set(['', 'OUT', 'PPA', 'COVER', 'NONE', 'OFF']);
+  const KINDS = { wellbeing: 'Wellbeing', break: 'Break', lunch: 'Lunch', other: 'Other' };
+  const LEVELS = ['must', 'try', 'off'], LEVEL_NAMES = { must: 'Must', try: 'Try to', off: 'Off' };
+  const DEFAULT_TIMES = [
+    { id: 'W', name: 'Wellbeing', start: '9.00am', end: '9.45am', kind: 'wellbeing' },
+    { id: 'B', name: 'Break', start: '10.45am', end: '11.05am', kind: 'break' },
+    { id: 'L1', name: 'Lunch: eating', start: '12.00pm', end: '12.35pm', kind: 'lunch' },
+    { id: 'L2', name: 'Lunch: play', start: '12.35pm', end: '1.10pm', kind: 'lunch' }];
+  const DEFAULT_POSTS = [
+    { id: 'A1', name: 'Playground', kind: 'area', need: 2, times: ['B', 'L2'], days: DAY_IDS.slice(), note: '' },
+    { id: 'A2', name: 'Dining hall', kind: 'area', need: 2, times: ['L1'], days: DAY_IDS.slice(), note: '' },
+    { id: 'A3', name: 'Lunchtime activity', kind: 'activity', need: 1, times: ['L2'], days: DAY_IDS.slice(), note: '' }];
+  // The rules she sets: each one Must (never broken by Suggest, shown as !), Try to (avoided where it can), or Off.
+  const RULES = [
+    { id: 'offsite', def: 'must', name: 'Not on duty next to being off site', text: 'Nobody is on duty straight after coming back from off site, or just before going out. Off-site places come from the timetable.' },
+    { id: 'lunchOff', def: 'must', name: 'Everyone has part of lunch off', text: 'Nobody is on duty for every part of lunch, so everyone gets a break.' },
+    { id: 'maxDay', def: 'must', name: 'At most a set number of duties a day', text: 'How many duties one person can have in a day.', n: 2 },
+    { id: 'teacherBreak', def: 'try', name: 'Teachers have break off', text: 'Teachers are the staff who lead lessons on the timetable (change this in Times and staff).' },
+    { id: 'teacherLunch', def: 'off', name: 'Teachers have lunch off', text: 'Teachers’ conditions often say they can’t be made to supervise at lunch. Check how this applies to your school.' },
+    { id: 'breakSame', def: 'try', name: 'At break, keep the adult the child was with', text: 'Break is short, so the adult who had the child in the lesson before (or has them next) keeps them, with no handover.' },
+    { id: 'lunchFresh', def: 'try', name: 'At lunch, a different adult from the lesson before', text: 'Someone who has just had the child for a lesson gets a change at lunch.' },
+    { id: 'fair', def: 'try', name: 'Share duties out fairly', text: 'Duties are spread over the week, so nobody has many more than others.', levels: ['try', 'off'] },
+    { id: 'sameWeek', def: 'off', name: 'The same adult for a child every day', text: 'For children who need the same face: whoever watches them at a time on one day does it every day.' }];
+  const RULE = Object.fromEntries(RULES.map((r) => [r.id, r]));
+
+  const str = (v) => (v == null ? '' : String(v)).trim();
+  const arr = (v) => (Array.isArray(v) ? v.map(str).filter(Boolean) : []);
+  const clone = (v) => JSON.parse(JSON.stringify(v));
+  const clampInt = (v, lo, hi, d) => { const n = Math.round(Number(v)); return Number.isFinite(n) ? Math.min(hi, Math.max(lo, n)) : d; };
+  const dayName = (id) => (DAYS.find((d) => d.id === id) || { name: id }).name;
+  const plural = (n, one, many) => n + ' ' + (n === 1 ? one : many || one + 's');
+  const byName = (a, b) => a.name.localeCompare(b.name);
+  const names = (list) => list.map((p) => p.name).join(', ');
+  function h(tag, attrs, ...kids) {
+    const el = document.createElement(tag);
+    if (attrs) for (const [k, v] of Object.entries(attrs)) {
+      if (v == null || v === false) continue;
+      if (k === 'class') el.className = v;
+      else if (k === 'dataset') Object.assign(el.dataset, v);
+      else if (k.startsWith('on') && typeof v === 'function') el.addEventListener(k.slice(2), v);
+      else if (k === 'value') el.value = v;
+      else if (k === 'checked' || k === 'disabled' || k === 'selected') el[k] = !!v;
+      else el.setAttribute(k, v === true ? '' : v);
+    }
+    for (const kid of kids.flat(Infinity)) { if (kid == null || kid === false) continue; el.append(kid.nodeType ? kid : document.createTextNode(String(kid))); }
+    return el;
+  }
+  // "9.00am", "1.10pm", "13:10", "1:10" (after midday when there is no am or pm) as minutes since midnight.
+  function minutesOf(t) {
+    const m = /(\d{1,2})[.:](\d{2})\s*(am|pm)?/i.exec(str(t));
+    if (!m) return null;
+    let hh = +m[1]; const mm = +m[2], ap = (m[3] || '').toLowerCase();
+    if (ap === 'pm' && hh < 12) hh += 12; else if (ap === 'am' && hh === 12) hh = 0; else if (!ap && hh < 8) hh += 12;
+    return hh * 60 + mm;
+  }
+  function clock(min) { const hh = Math.floor(min / 60), mm = min % 60; return (hh > 12 ? hh - 12 : hh) + '.' + String(mm).padStart(2, '0') + (hh >= 12 ? 'pm' : 'am'); }
+
+  // ---------- Saved state ----------
+  function blank() { return { app: APP, v: 1, tt: null, timesEdited: false, times: clone(DEFAULT_TIMES), posts: clone(DEFAULT_POSTS), watches: [], staff: {}, rules: {}, rota: {} }; }
+  function clean(o) {
+    const out = blank();
+    if (!o || typeof o !== 'object') return out;
+    out.tt = o.tt && Array.isArray(o.tt.people) ? o.tt : null;
+    out.timesEdited = !!o.timesEdited;
+    if (Array.isArray(o.times) && o.times.length) {
+      const seen = new Set();
+      out.times = o.times.filter((t) => t && str(t.id) && !seen.has(str(t.id)) && seen.add(str(t.id))).map((t) => ({ id: str(t.id), name: str(t.name) || 'Duty', start: str(t.start), end: str(t.end), kind: KINDS[t.kind] ? t.kind : 'other' }));
+    }
+    const tids = new Set(out.times.map((t) => t.id));
+    if (Array.isArray(o.posts)) out.posts = o.posts.filter((p) => p && str(p.id)).map((p) => ({ id: str(p.id), name: str(p.name) || 'Area', kind: p.kind === 'activity' ? 'activity' : 'area', need: clampInt(p.need, 1, 6, 1),
+      times: arr(p.times).filter((x) => tids.has(x)), days: (Array.isArray(p.days) ? arr(p.days) : DAY_IDS.slice()).filter((x) => DAY_IDS.includes(x)), note: str(p.note) }));
+    if (Array.isArray(o.watches)) {
+      const seen = new Set();
+      out.watches = o.watches.filter((w) => w && str(w.pupil) && !seen.has(str(w.pupil)) && seen.add(str(w.pupil))).map((w) => ({ pupil: str(w.pupil), need: clampInt(w.need, 1, 4, 1),
+        times: arr(w.times).filter((x) => tids.has(x)), only: arr(w.only), never: arr(w.never), note: str(w.note) }));
+    }
+    if (o.staff && typeof o.staff === 'object') for (const [id, s] of Object.entries(o.staff)) if (s && typeof s === 'object')
+      out.staff[id] = { duties: s.duties !== false, teacher: typeof s.teacher === 'boolean' ? s.teacher : null, notAt: arr(s.notAt).filter((x) => tids.has(x)) };
+    if (o.rules && typeof o.rules === 'object') for (const r of RULES) {
+      const v = o.rules[r.id];
+      if (v && (r.levels || LEVELS).includes(v.level)) out.rules[r.id] = { level: v.level, n: r.n ? clampInt(v.n, 1, 8, r.n) : null };
+    }
+    if (o.rota && typeof o.rota === 'object') for (const d of DAY_IDS) {
+      const dd = o.rota[d];
+      if (!dd || typeof dd !== 'object') continue;
+      out.rota[d] = {};
+      for (const [tid, m] of Object.entries(dd)) {
+        if (!tids.has(tid) || !m || typeof m !== 'object') continue;
+        out.rota[d][tid] = {};
+        for (const [k, ids] of Object.entries(m)) { const a = [...new Set(arr(ids))]; if (a.length) out.rota[d][tid][k] = a; }
+      }
+    }
+    return out;
+  }
+  let D = blank(), storageOk = true;
+  try { const t = localStorage.getItem(STORE); if (t) D = clean(JSON.parse(t)); } catch (e) { storageOk = false; }
+  let ui = { view: 'rota', day: 'Mon' };
+  try { Object.assign(ui, JSON.parse(localStorage.getItem(STORE + '_ui') || '{}')); } catch (e) { /* first visit */ }
+  function save() {
+    try { localStorage.setItem(STORE, JSON.stringify(D)); localStorage.setItem(STORE + '_ui', JSON.stringify(ui)); storageOk = true; }
+    catch (e) { if (storageOk) toast('This browser could not save. Save a duties file to keep your work.'); storageOk = false; }
+  }
+  // Undo keeps the rota and rules; the timetable itself is only ever read.
+  const undoStack = [];
+  function pushUndo() { const c = Object.assign({}, D); delete c.tt; undoStack.push(JSON.stringify(c)); if (undoStack.length > 40) undoStack.shift(); }
+  function undo() { const t = undoStack.pop(); if (!t) return; const tt = D.tt; D = clean(Object.assign(JSON.parse(t), { tt })); index(); save(); render(); }
+  function change(fn, msg) { pushUndo(); fn(); save(); render(); if (msg) toast(msg, { label: 'Undo', run: undo }); }
+
+  function toast(text, action) {
+    const el = h('div', { class: 'toast', role: 'status' }, h('span', null, text), action ? h('button', { type: 'button', onclick: () => { action.run(); el.remove(); } }, action.label) : null);
+    const box = document.getElementById('toasts');
+    while (box.children.length > 1) box.firstChild.remove();
+    box.append(el);
+    setTimeout(() => el.remove(), action ? 7000 : 4000);
+  }
+
+  // ---------- The timetable, read only ----------
+  let TT = null;
+  const aroundCache = new Map();
+  function index() {
+    aroundCache.clear();
+    if (!D.tt) { TT = null; return; }
+    const people = D.tt.people.filter((p) => p && p.id && p.name);
+    const rows = Array.isArray(D.tt.dayRows) ? D.tt.dayRows : [];
+    const periods = (D.tt.periods || []).map((p) => {
+      const parts = str(p.time).split(/[–-]/);
+      const row = rows.find((r) => r.kind === 'period' && r.period === p.id);
+      let start = row && minutesOf(row.time) != null ? minutesOf(row.time) : minutesOf(parts[0]);
+      let end = minutesOf(parts[1]);
+      if (end == null && row) { const next = rows.map((r) => minutesOf(r.time)).filter((m) => m != null && m > start).sort((a, b) => a - b)[0]; end = next != null ? next : start + 60; }
+      return { id: p.id, label: (row && /lesson/i.test(row.label) ? str(row.label) : '') || str(p.label) || p.id, start, end };
+    }).filter((p) => p.start != null);
+    TT = { people, byId: new Map(people.map((p) => [p.id, p])), areas: new Map((D.tt.areas || []).map((a) => [a.id, a])), periods,
+      staff: people.filter((p) => p.role === 'staff').sort(byName), pupils: people.filter((p) => p.role !== 'staff').sort(byName) };
+  }
+  // Keeps only what Duties needs from a timetable backup or the Timetabler's saved plan.
+  function readTimetable(obj, from) {
+    if (!obj || !Array.isArray(obj.people) || !obj.slots || typeof obj.slots !== 'object') return false;
+    const slots = {};
+    for (const [k, s] of Object.entries(obj.slots)) if (s && s.at && typeof s.at === 'object') slots[k] = { at: Object.assign({}, s.at) };
+    const tt = { school: str(obj.school), name: str(obj.name), from, loadedAt: new Date().toISOString(),
+      people: obj.people.filter((p) => p && str(p.id) && str(p.name)).map((p) => ({ id: str(p.id), name: str(p.name), role: p.role === 'staff' ? 'staff' : 'student', lead: !!p.lead })),
+      slots, areas: (Array.isArray(obj.areas) ? obj.areas : []).map((a) => ({ id: str(a.id), name: str(a.name), kind: str(a.kind) })),
+      periods: (Array.isArray(obj.periods) ? obj.periods : []).map((p) => ({ id: str(p.id), label: str(p.label), time: str(p.time) })),
+      dayRows: (Array.isArray(obj.dayRows) ? obj.dayRows : []).map((r) => ({ time: str(r.time), label: str(r.label), kind: r.kind === 'period' ? 'period' : 'band', period: str(r.period) })) };
+    D.tt = tt;
+    if (!D.timesEdited) { const t = timesFromDay(tt.dayRows); if (t) D.times = t; }
+    index();
+    return true;
+  }
+  // The duty times from the school day: wellbeing, break, and lunch split in two.
+  function timesFromDay(rows) {
+    const list = rows.map((r) => ({ r, m: minutesOf(r.time) })).filter((x) => x.m != null).sort((a, b) => a.m - b.m);
+    const next = (i) => (list[i + 1] ? list[i + 1].m : null);
+    const find = (re) => list.findIndex((x) => x.r.kind === 'band' && re.test(x.r.label));
+    const w = find(/wellbeing/i), b = find(/break/i), l = find(/lunch/i);
+    if (b < 0 || l < 0 || next(b) == null || next(l) == null) return null;
+    const out = [];
+    if (w >= 0 && next(w) != null) out.push({ id: 'W', name: 'Wellbeing', start: clock(list[w].m), end: clock(next(w)), kind: 'wellbeing' });
+    out.push({ id: 'B', name: 'Break', start: clock(list[b].m), end: clock(next(b)), kind: 'break' });
+    const mid = list[l].m + Math.round((next(l) - list[l].m) / 2 / 5) * 5;
+    out.push({ id: 'L1', name: 'Lunch: eating', start: clock(list[l].m), end: clock(mid), kind: 'lunch' });
+    out.push({ id: 'L2', name: 'Lunch: play', start: clock(mid), end: clock(next(l)), kind: 'lunch' });
+    return out;
+  }
+  const person = (id) => TT && TT.byId.get(id);
+  const timeById = (id) => D.times.find((t) => t.id === id);
+  const sortedTimes = () => D.times.slice().sort((a, b) => (minutesOf(a.start) || 0) - (minutesOf(b.start) || 0));
+  const timeLabel = (t) => t.name + (t.start ? ' (' + t.start + (t.end ? '–' + t.end : '') + ')' : '');
+  const placeOf = (id, day, pid) => str((((D.tt.slots || {})[day + '|' + pid] || {}).at || {})[id]);
+  const isOff = (place) => (TT.areas.get(place) || {}).kind === 'offsite';
+  const placeName = (place) => (TT.areas.get(place) || {}).name || 'a lesson';
+  // The lessons either side of a duty time, and which of them run straight into it (within 10 minutes).
+  function around(t) {
+    if (aroundCache.has(t.id)) return aroundCache.get(t.id);
+    const s = minutesOf(t.start), e = minutesOf(t.end) != null ? minutesOf(t.end) : s;
+    const ps = s == null ? [] : TT.periods;
+    const before = ps.filter((p) => p.start < s).sort((a, b) => b.start - a.start)[0] || null;
+    const after = ps.filter((p) => p.start >= s).sort((a, b) => a.start - b.start)[0] || null;
+    const r = { before, after, touchBefore: before && before.end != null && Math.abs(before.end - s) <= 10 ? before : null, touchAfter: after && Math.abs(after.start - e) <= 10 ? after : null };
+    aroundCache.set(t.id, r);
+    return r;
+  }
+  function notIn(id, day, t) { const a = around(t); for (const p of [a.before, a.after]) if (p && placeOf(id, day, p.id) === OUT) return 'Not in for ' + p.label; return ''; }
+  function offsite(id, day, t) { const a = around(t); for (const p of [a.touchBefore, a.touchAfter]) if (p) { const pl = placeOf(id, day, p.id); if (isOff(pl)) return { lesson: p, place: pl }; } return null; }
+  // The staff in the same lesson as a pupil.
+  function withPupil(day, pid, pupil) {
+    const pl = placeOf(pupil, day, pid);
+    if (NOT_PLACES.has(pl)) return [];
+    return TT.staff.filter((s) => placeOf(s.id, day, pid) === pl);
+  }
+  const staffSet = (sid) => D.staff[sid] || { duties: true, teacher: null, notAt: [] };
+  const isTeacher = (sid) => { const t = staffSet(sid).teacher; return t == null ? !!(person(sid) || {}).lead : t; };
+  const lvl = (id) => (D.rules[id] || {}).level || RULE[id].def;
+  const ruleN = (id) => (D.rules[id] || {}).n || RULE[id].n;
+
+  // ---------- Duties on a day ----------
+  // Each spot is a child to watch or an area or activity, at one time on one day.
+  function spotsAt(day, tid) {
+    const t = timeById(tid), out = [];
+    if (!t || !TT) return out;
+    for (const w of D.watches) {
+      const p = person(w.pupil);
+      if (!p || !w.times.includes(tid)) continue;
+      let away = '';
+      const ni = notIn(w.pupil, day, t), off = !ni && offsite(w.pupil, day, t);
+      if (ni) away = 'Not in';
+      else if (off) { const with_ = withPupil(day, off.lesson.id, w.pupil); away = 'Off site in ' + off.lesson.label + ' (' + placeName(off.place) + ')' + (with_.length ? ' with ' + names(with_) : ''); }
+      out.push({ key: 'w:' + w.pupil, kind: 'watch', w, name: p.name, sub: w.note || (w.need > 1 ? w.need + ' adults' : ''), need: away ? 0 : w.need, away });
+    }
+    for (const po of D.posts) if (po.times.includes(tid) && po.days.includes(day))
+      out.push({ key: 'p:' + po.id, kind: po.kind, po, name: po.name, sub: (po.kind === 'activity' ? 'Activity' : 'Area') + (po.need > 1 ? ', ' + po.need + ' adults' : ''), need: po.need, away: '' });
+    return out;
+  }
+  const cellIds = (day, tid, key) => (((D.rota[day] || {})[tid] || {})[key] || []).filter((id) => person(id));
+  function setCell(day, tid, key, ids) {
+    D.rota[day] = D.rota[day] || {}; D.rota[day][tid] = D.rota[day][tid] || {};
+    if (ids.length) D.rota[day][tid][key] = ids; else delete D.rota[day][tid][key];
+  }
+  function dayDuties(sid, day) {
+    const out = [];
+    for (const t of D.times) for (const s of spotsAt(day, t.id)) if (s.need && cellIds(day, t.id, s.key).includes(sid)) out.push({ t, s });
+    return out;
+  }
+  const weekCount = (sid) => DAY_IDS.reduce((n, d) => n + dayDuties(sid, d).length, 0);
+
+  // What is wrong with one person on one duty: each with its rule's level (must or try).
+  function problems(sid, day, tid, spot) {
+    const t = timeById(tid), P = [];
+    const add = (rule, level, text) => { if (level !== 'off') P.push({ rule, level, text }); };
+    const st = staffSet(sid), pn = spot.kind === 'watch' ? spot.name : '';
+    if (st.duties === false) add('person', 'must', 'Doesn’t do duties');
+    if (st.notAt.includes(tid)) add('person', 'must', 'Not free at ' + t.name);
+    const ni = notIn(sid, day, t);
+    if (ni) add('in', 'must', ni);
+    const off = offsite(sid, day, t);
+    if (off) add('offsite', lvl('offsite'), 'Off site in ' + off.lesson.label + ' (' + placeName(off.place) + ')');
+    const also = spotsAt(day, tid).filter((s) => s.key !== spot.key && s.need && cellIds(day, tid, s.key).includes(sid));
+    if (also.length) add('double', 'must', 'Also on ' + also.map((s) => s.name).join(', '));
+    if (spot.kind === 'watch') {
+      if (spot.w.only.length && !spot.w.only.includes(sid)) add('list', 'must', 'Not one of ' + pn + '’s adults');
+      if (spot.w.never.includes(sid)) add('list', 'must', 'Not to be with ' + pn);
+    }
+    const mine = dayDuties(sid, day).filter((d) => !(d.t.id === tid && d.s.key === spot.key));
+    if (mine.length + 1 > ruleN('maxDay')) add('maxDay', lvl('maxDay'), (mine.length + 1) + ' duties today');
+    if (t.kind === 'lunch') {
+      const lunch = D.times.filter((x) => x.kind === 'lunch').map((x) => x.id);
+      const busy = new Set(mine.filter((d) => d.t.kind === 'lunch').map((d) => d.t.id).concat(tid));
+      if (lunch.length > 1 && busy.size >= lunch.length) add('lunchOff', lvl('lunchOff'), 'No lunch break');
+      if (isTeacher(sid)) add('teacherLunch', lvl('teacherLunch'), 'Teacher: lunch off');
+    }
+    if (t.kind === 'break' && isTeacher(sid)) add('teacherBreak', lvl('teacherBreak'), 'Teacher: break off if possible');
+    if (spot.kind === 'watch') {
+      const a = around(t), pid = spot.w.pupil;
+      if (t.kind === 'break') {
+        const was = a.touchBefore ? withPupil(day, a.touchBefore.id, pid) : [], next = a.touchAfter ? withPupil(day, a.touchAfter.id, pid) : [];
+        if ((was.length || next.length) && !was.concat(next).some((x) => x.id === sid))
+          add('breakSame', lvl('breakSame'), was.length ? names(was) + ' had ' + pn + ' in ' + a.touchBefore.label : names(next) + ' has ' + pn + ' next');
+      }
+      if (t.kind === 'lunch' && a.before && withPupil(day, a.before.id, pid).some((x) => x.id === sid)) add('lunchFresh', lvl('lunchFresh'), 'Had ' + pn + ' in ' + a.before.label);
+      if (lvl('sameWeek') !== 'off') {
+        const other = DAY_IDS.filter((d) => d !== day).map((d) => [d, cellIds(d, tid, spot.key)]).find(([, ids]) => ids.length && !ids.includes(sid));
+        if (other) add('sameWeek', lvl('sameWeek'), names(other[1].map(person)) + ' has ' + pn + ' on ' + dayName(other[0]));
+      }
+    }
+    return P;
+  }
+  // What makes someone a good fit, to show beside their name.
+  function goodFit(sid, day, tid, spot) {
+    const t = timeById(tid), out = [];
+    if (spot.kind === 'watch' && t.kind === 'break') {
+      const a = around(t);
+      if (a.touchBefore && withPupil(day, a.touchBefore.id, spot.w.pupil).some((x) => x.id === sid)) out.push('Had ' + spot.name + ' in ' + a.touchBefore.label);
+      else if (a.touchAfter && withPupil(day, a.touchAfter.id, spot.w.pupil).some((x) => x.id === sid)) out.push('Has ' + spot.name + ' next');
+    }
+    if (spot.kind === 'watch' && lvl('sameWeek') !== 'off' && DAY_IDS.some((d) => d !== day && cellIds(d, tid, spot.key).includes(sid))) out.push('Has ' + spot.name + ' on other days');
+    return out;
+  }
+  // Lower is better; null when a Must rule would be broken.
+  function score(sid, day, tid, spot, i) {
+    const P = problems(sid, day, tid, spot);
+    if (P.some((p) => p.level === 'must')) return null;
+    let sc = P.length * 10 - goodFit(sid, day, tid, spot).reduce((n, g) => n + (/^Had /.test(g) ? 6 : 4), 0);
+    if (lvl('fair') !== 'off') sc += weekCount(sid) * 2 + dayDuties(sid, day).length * 3;
+    return sc + i * 0.001;
+  }
+  function candidates(day, tid, spot) {
+    const here = cellIds(day, tid, spot.key);
+    return TT.staff.map((s, i) => ({ s, sc: here.includes(s.id) ? null : score(s.id, day, tid, spot, i) })).filter((x) => x.sc != null).sort((a, b) => a.sc - b.sc).map((x) => x.s);
+  }
+  // Fills every duty still needing someone, the hardest to fill first, keeping what is already there.
+  function suggest(fresh) {
+    pushUndo();
+    if (fresh) D.rota = {};
+    let added = 0, left = 0;
+    for (const d of DAY_IDS) for (const t of sortedTimes()) {
+      const skip = new Set();
+      for (;;) {
+        const open = spotsAt(d, t.id).filter((s) => !skip.has(s.key) && cellIds(d, t.id, s.key).length < s.need);
+        if (!open.length) break;
+        let best = null;
+        for (const s of open) { const c = candidates(d, t.id, s); if (!best || c.length < best.c.length) best = { s, c }; }
+        if (!best.c.length) { skip.add(best.s.key); left += best.s.need - cellIds(d, t.id, best.s.key).length; continue; }
+        setCell(d, t.id, best.s.key, cellIds(d, t.id, best.s.key).concat(best.c[0].id));
+        added++;
+      }
+    }
+    save(); render();
+    toast((added ? 'Filled ' + plural(added, 'place') : 'Nothing new to fill') + (left ? '; ' + plural(left, 'place') + ' with nobody free under the rules' : ''), { label: 'Undo', run: undo });
+  }
+  // The state of one duty on the rota: who, what is wrong, and how many more are needed.
+  function cellState(day, tid, spot) {
+    const ids = cellIds(day, tid, spot.key);
+    const each = ids.map((id) => ({ p: person(id), P: problems(id, day, tid, spot) }));
+    const short = Math.max(0, spot.need - ids.length);
+    const bad = each.some((x) => x.P.some((p) => p.level === 'must')), warn = each.some((x) => x.P.length);
+    return { ids, each, short, state: !spot.need ? 'none' : bad ? 'bad' : short ? 'short' : warn ? 'warn' : 'ok' };
+  }
+
+  // ---------- Render ----------
+  const ICON = '<svg class="brand-mark" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="2" width="28" height="28"/><path d="M2 13h11V2M13 30V20h17M20 2v11h10"/><circle cx="7.5" cy="20.5" r="2" fill="currentColor" stroke="none"/><circle cx="24" cy="7" r="2" fill="currentColor" stroke="none"/></svg>';
+  const VIEWS = [['rota', 'Rota'], ['children', 'Children to watch'], ['posts', 'Areas and activities'], ['rules', 'Rules'], ['times', 'Times and staff']];
+  function render() {
+    const top = document.getElementById('top'), view = document.getElementById('view');
+    const mark = h('span'); mark.innerHTML = ICON;
+    const when = D.tt ? new Date(D.tt.loadedAt).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' }) : '';
+    top.replaceChildren(
+      h('div', { class: 'brand' }, mark.firstChild, h('div', { class: 'brand-text' }, h('span', { class: 'brand-name' }, 'Lifehouse Duties'),
+        h('span', { class: 'brand-sub' }, D.tt ? (D.tt.school || 'School') + ' · timetable read ' + when : 'Wellbeing, break and lunch'))),
+      D.tt ? h('nav', { class: 'tabs', 'aria-label': 'Pages' }, VIEWS.map(([id, label]) => h('button', { type: 'button', class: 'tab' + (ui.view === id ? ' on' : ''), 'aria-current': ui.view === id ? 'page' : null, onclick: () => { ui.view = id; save(); render(); } }, label))) : null,
+      h('div', { class: 'top-actions' },
+        D.tt ? h('button', { type: 'button', class: 'btn', disabled: !undoStack.length, onclick: undo }, 'Undo') : null,
+        D.tt ? h('button', { type: 'button', class: 'btn', onclick: refreshDialog, title: 'Read the timetable again, after changes to it' }, 'Update from the timetable') : null,
+        h('button', { type: 'button', class: 'btn', onclick: () => openFile() }, 'Open…'),
+        D.tt ? h('button', { type: 'button', class: 'btn save', onclick: saveFile }, 'Save duties file') : null));
+    const page = !D.tt ? startPage() : ui.view === 'children' ? childrenPage() : ui.view === 'posts' ? postsPage() : ui.view === 'rules' ? rulesPage() : ui.view === 'times' ? timesPage() : rotaPage();
+    view.replaceChildren(page);
+  }
+
+  function startPage() {
+    const has = !!ttInBrowser();
+    return h('div', { class: 'page start' },
+      h('h1', null, 'Duties for wellbeing, break and lunch'),
+      h('p', null, 'Duties starts from your timetable, so it knows who is in, who is off site and who has which child. It only reads the timetable and never changes it.'),
+      h('div', { class: 'row' },
+        h('button', { type: 'button', class: 'btn primary', disabled: !has, onclick: useBrowserTimetable }, 'Use the timetable in this browser'),
+        h('button', { type: 'button', class: 'btn', onclick: () => openFile() }, 'Open a timetable backup…')),
+      h('p', { class: 'hint' }, has ? 'The timetable saved in this browser by the Timetabler will be read.' : 'No timetable is saved in this browser. In the Timetabler, use Setup → Plan and files → Save backup, then open that file here.'),
+      h('p', { class: 'hint' }, 'Or open a duties file you saved before.'));
+  }
+  function ttInBrowser() { try { const t = localStorage.getItem(TT_KEY); return t ? JSON.parse(t) : null; } catch (e) { return null; } }
+  function useBrowserTimetable() {
+    const obj = ttInBrowser();
+    if (!readTimetable(obj, 'browser')) { toast('There is no timetable in this browser.'); return; }
+    save(); render();
+    toast('Read the timetable: ' + plural(TT.staff.length, 'member') + ' of staff, ' + plural(TT.pupils.length, 'pupil') + '.');
+  }
+  function refreshDialog() {
+    const has = !!ttInBrowser();
+    const dlg = modal('Update from the timetable', 'Reads the timetable again: who is in, off site and with which child. Your rota and rules stay.', [
+      h('div', { class: 'add-row' },
+        h('button', { type: 'button', class: 'btn primary', disabled: !has, onclick: () => { dlg.close(); useBrowserTimetable(); } }, 'From this browser'),
+        h('button', { type: 'button', class: 'btn', onclick: () => { dlg.close(); openFile(); } }, 'Open a timetable backup…'))]);
+  }
+  function modal(title, sub, body, foot) {
+    const dlg = h('dialog', { class: 'dlg' },
+      h('div', { class: 'dlg-head' }, h('div', null, h('h2', { class: 'dlg-title' }, title), sub ? h('p', { class: 'hint' }, sub) : null), h('button', { type: 'button', class: 'x-btn', 'aria-label': 'Close', onclick: () => dlg.close() }, '×')),
+      h('div', { class: 'dlg-body' }, body), foot ? h('div', { class: 'dlg-foot' }, foot) : null);
+    dlg.addEventListener('close', () => dlg.remove());
+    document.body.append(dlg);
+    dlg.showModal();
+    return dlg;
+  }
+
+  // ----- Rota -----
+  let dragFrom = null;
+  function rotaPage() {
+    const day = DAY_IDS.includes(ui.day) || ui.day === 'week' ? ui.day : 'Mon';
+    const bar = h('div', { class: 'rota-bar' },
+      h('div', { class: 'seg', role: 'group', 'aria-label': 'Day' }, DAYS.map((d) => h('button', { type: 'button', class: day === d.id ? 'on' : '', onclick: () => { ui.day = d.id; save(); render(); } }, d.name)),
+        h('button', { type: 'button', class: day === 'week' ? 'on' : '', onclick: () => { ui.day = 'week'; save(); render(); } }, 'Week')),
+      h('span', { class: 'spacer' }),
+      h('button', { type: 'button', class: 'btn primary', onclick: () => suggest(false), title: 'Fills every duty that still needs someone, for the whole week, keeping what is already there' }, 'Suggest a rota'),
+      h('button', { type: 'button', class: 'btn', onclick: startAgain }, 'Start again'),
+      h('button', { type: 'button', class: 'btn', onclick: () => printDays(day === 'week' ? DAY_IDS : [day]) }, day === 'week' ? 'Print the week' : 'Print this day'));
+    if (!D.watches.length && !D.posts.length) return h('div', { class: 'page' }, bar, h('div', { class: 'card' }, h('h2', null, 'Nothing to put on the rota yet'),
+      h('p', { class: 'hint' }, 'Add the children who need watching, and the areas and activities that need staff. Then set the rules and press Suggest a rota.'),
+      h('div', { class: 'add-row' }, h('button', { type: 'button', class: 'btn', onclick: () => { ui.view = 'children'; render(); } }, 'Children to watch'), h('button', { type: 'button', class: 'btn', onclick: () => { ui.view = 'posts'; render(); } }, 'Areas and activities'))));
+    if (day === 'week') return h('div', { class: 'page' }, bar, weekTable());
+    const times = sortedTimes();
+    const rows = [], issues = [];
+    let filled = 0, need = 0, bad = 0, warn = 0;
+    const keys = new Map();
+    for (const t of times) for (const s of spotsAt(day, t.id)) if (!keys.has(s.key)) keys.set(s.key, s);
+    const watchRows = [...keys.values()].filter((s) => s.kind === 'watch'), postRows = [...keys.values()].filter((s) => s.kind !== 'watch');
+    const rowFor = (s0) => h('tr', null, h('th', { scope: 'row' }, s0.kind === 'watch' ? h('span', { class: 'chip' }, s0.name) : s0.name, s0.sub ? h('small', null, s0.sub) : null),
+      times.map((t) => {
+        const s = spotsAt(day, t.id).find((x) => x.key === s0.key);
+        if (!s) return h('td', { class: 'none' });
+        if (s.away) return h('td', { class: 'none' }, h('span', { class: 'away' }, s.away));
+        const c = cellState(day, t.id, s);
+        need += s.need; filled += Math.min(s.need, c.ids.length);
+        if (c.state === 'bad') bad++; else if (c.state === 'warn') warn++;
+        c.each.forEach((x) => x.P.forEach((p) => issues.push({ level: p.level, text: t.name + ' · ' + s.name + ': ' + x.p.name, why: p.text })));
+        return h('td', { class: c.state, dataset: { day, t: t.id, k: s.key },
+          ondragover: (e) => { e.preventDefault(); e.currentTarget.classList.add('drop-ok'); }, ondragleave: (e) => e.currentTarget.classList.remove('drop-ok'),
+          ondrop: (e) => { e.preventDefault(); e.currentTarget.classList.remove('drop-ok'); dropOn(day, t.id, s.key, e.dataTransfer.getData('text/plain')); } },
+          h('div', { class: 'cell-btn', role: 'button', tabindex: '0', 'aria-label': t.name + ', ' + s.name + ': ' + (c.ids.length ? names(c.ids.map(person)) : 'nobody yet') + '. Click to choose.', onclick: () => picker(day, t.id, s.key),
+            onkeydown: (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); picker(day, t.id, s.key); } } },
+            c.each.map((x) => staffChip(x.p, x.P, day + '|' + t.id + '|' + s.key)),
+            c.short ? h('span', { class: 'need' }, 'Needs ' + c.short) : null,
+            h('span', { class: 'mark ' + (c.state === 'short' ? 'warn' : c.state), 'aria-hidden': 'true' }, c.state === 'ok' ? '✓' : c.state === 'short' ? '' : '!')));
+      }));
+    if (watchRows.length) rows.push(h('tr', { class: 'band' }, h('th', { colspan: times.length + 1 }, 'Children to watch')), watchRows.map(rowFor));
+    if (postRows.length) rows.push(h('tr', { class: 'band' }, h('th', { colspan: times.length + 1 }, 'Areas and activities')), postRows.map(rowFor));
+    const sum = h('p', { class: 'rota-sum' }, h('b', null, dayName(day)), ': ' + filled + ' of ' + plural(need, 'place') + ' filled',
+      need > filled ? [' · ', h('span', { class: 'warn' }, (need - filled) + ' still need someone')] : null,
+      bad ? [' · ', h('span', { class: 'bad' }, plural(bad, 'duty', 'duties') + ' break a Must rule')] : null,
+      warn ? [' · ', h('span', { class: 'warn' }, plural(warn, 'duty', 'duties') + ' to check')] : null);
+    issues.sort((a, b) => (a.level === 'must' ? 0 : 1) - (b.level === 'must' ? 0 : 1));
+    return h('div', { class: 'page' }, bar, sum,
+      h('div', { class: 'rota-wrap' },
+        h('div', null,
+          h('div', { class: 'table-scroll' }, h('table', { class: 'rota' }, h('thead', null, h('tr', null, h('th', null, ''), times.map((t) => h('th', { scope: 'col' }, t.name, h('small', null, t.start + (t.end ? '–' + t.end : '')))))), h('tbody', null, rows))),
+          issues.length ? h('div', { class: 'issues' }, h('h2', null, 'To check'), h('ul', null, issues.map((x) => h('li', { class: x.level === 'must' ? 'bad' : '' }, h('b', null, x.text), ' — ', x.why, x.level === 'must' ? ' (Must)' : '')))) : null),
+        staffTray(day)));
+  }
+  function staffChip(p, P, from) {
+    const bad = P.some((x) => x.level === 'must');
+    return h('span', { class: 'chip staff' + (bad ? ' bad' : P.length ? ' warn' : ''), draggable: 'true', title: P.length ? P.map((x) => x.text).join('; ') : p.name,
+      ondragstart: (e) => { e.stopPropagation(); e.dataTransfer.setData('text/plain', p.id + '|' + (from || '')); e.dataTransfer.effectAllowed = 'move'; } },
+      p.name, P.length ? h('span', { class: 'flag', 'aria-label': bad ? 'breaks a rule' : 'to check' }, '!') : null);
+  }
+  function staffTray(day) {
+    const list = TT.staff.filter((s) => staffSet(s.id).duties !== false);
+    return h('aside', { class: 'tray', 'aria-label': 'Staff',
+      ondragover: (e) => { e.preventDefault(); e.currentTarget.classList.add('drop-ok'); }, ondragleave: (e) => e.currentTarget.classList.remove('drop-ok'),
+      ondrop: (e) => { e.preventDefault(); e.currentTarget.classList.remove('drop-ok'); const [sid, from] = splitDrag(e.dataTransfer.getData('text/plain')); if (from) takeOff(sid, from); } },
+      h('h2', null, 'Staff'), h('p', { class: 'hint' }, 'Drag a name onto a duty, or click a duty to choose. Drag one back here to take them off. Numbers: today, this week.'),
+      h('div', { class: 'tray-list' }, list.map((s) => h('div', { class: 'tray-row' }, staffChip(s, [], ''), isTeacher(s.id) ? 'Teacher' : '', h('span', { class: 'n' }, dayDuties(s.id, day).length + ' · ' + weekCount(s.id))))));
+  }
+  // Drag data is "staff id|day|time|duty" (or just the staff id, from the list).
+  function splitDrag(data) { const t = str(data), i = t.indexOf('|'); return i < 0 ? [t, ''] : [t.slice(0, i), t.slice(i + 1)]; }
+  function dropOn(day, tid, key, data) {
+    const [sid, from] = splitDrag(data);
+    if (!person(sid)) return;
+    const s = spotsAt(day, tid).find((x) => x.key === key);
+    if (!s || (from === day + '|' + tid + '|' + key)) return;
+    change(() => {
+      if (from) { const [d0, t0, k0] = from.split('|'); setCell(d0, t0, k0, cellIds(d0, t0, k0).filter((x) => x !== sid)); }
+      if (!cellIds(day, tid, key).includes(sid)) setCell(day, tid, key, cellIds(day, tid, key).concat(sid));
+    }, person(sid).name + ' on ' + timeById(tid).name + ': ' + s.name);
+  }
+  function takeOff(sid, from) {
+    const [d0, t0, k0] = from.split('|');
+    change(() => setCell(d0, t0, k0, cellIds(d0, t0, k0).filter((x) => x !== sid)), person(sid).name + ' taken off');
+  }
+  function startAgain() {
+    const dlg = modal('Start the rota again?', 'Takes everyone off every duty this week, then suggests a new rota from the rules. You can undo it.', null,
+      [h('button', { type: 'button', class: 'btn', onclick: () => dlg.close() }, 'Cancel'), h('button', { type: 'button', class: 'btn primary', onclick: () => { dlg.close(); suggest(true); } }, 'Start again')]);
+  }
+  // Choosing who does a duty: the best fits first, with the reasons, then anyone a Must rule rules out.
+  function picker(day, tid, key) {
+    const t = timeById(tid), s = spotsAt(day, tid).find((x) => x.key === key);
+    if (!s) return;
+    let dlg = null;
+    const body = () => {
+      const ids = cellIds(day, tid, key);
+      const list = TT.staff.filter((x) => !ids.includes(x.id)).map((x, i) => ({ x, P: problems(x.id, day, tid, s), good: goodFit(x.id, day, tid, s), sc: score(x.id, day, tid, s, i) }));
+      const ok = list.filter((c) => c.sc != null).sort((a, b) => a.sc - b.sc), no = list.filter((c) => c.sc == null && staffSet(c.x.id).duties !== false);
+      const row = (c, i, blocked) => h('button', { type: 'button', class: 'cand' + (blocked ? ' blocked' : ''), onclick: () => add(c.x.id) },
+        h('span', { class: 'chip staff' + (blocked ? ' bad' : c.P.length ? ' warn' : '') }, c.x.name),
+        h('span', { class: 'why' }, c.good.map((g) => h('span', { class: 'good' }, g + '. ')), c.P.map((p) => h('span', { class: p.level === 'must' ? 'bad' : 'warn' }, p.text + '. ')),
+          !c.P.length && !c.good.length ? 'Free. ' : '', plural(dayDuties(c.x.id, day).length, 'duty', 'duties') + ' today, ' + weekCount(c.x.id) + ' this week'),
+        !blocked && i === 0 ? h('span', { class: 'tag' }, 'Best fit') : h('span'));
+      return [
+        h('div', { class: 'now' }, ids.length ? ids.map((id) => h('span', { class: 'chip staff' }, person(id).name, h('button', { type: 'button', class: 'x-btn', 'aria-label': 'Take ' + person(id).name + ' off', onclick: () => remove(id) }, '×'))) : h('span', { class: 'hint' }, 'Nobody yet.'),
+          s.need > ids.length ? h('span', { class: 'need' }, 'Needs ' + (s.need - ids.length)) : null),
+        h('div', { class: 'sub-h' }, 'Can do it'), h('div', { class: 'cands' }, ok.length ? ok.map((c, i) => row(c, i, false)) : h('p', { class: 'hint' }, 'Nobody is free under the Must rules.')),
+        no.length ? [h('div', { class: 'sub-h' }, 'Would break a Must rule'), h('div', { class: 'cands' }, no.map((c, i) => row(c, i, true)))] : null];
+    };
+    const refresh = () => { save(); render(); if (dlg && dlg.open) dlg.querySelector('.dlg-body').replaceChildren(...body().flat(Infinity).filter(Boolean)); };
+    const add = (id) => { pushUndo(); setCell(day, tid, key, cellIds(day, tid, key).concat(id)); if (cellIds(day, tid, key).length >= s.need) { dlg.close(); save(); render(); toast(person(id).name + ' on ' + t.name + ': ' + s.name, { label: 'Undo', run: undo }); } else refresh(); };
+    const remove = (id) => { pushUndo(); setCell(day, tid, key, cellIds(day, tid, key).filter((x) => x !== id)); refresh(); };
+    dlg = modal(dayName(day) + ' · ' + timeLabel(t), (s.kind === 'watch' ? 'Watching ' + s.name : s.name + ' (' + (s.kind === 'activity' ? 'activity' : 'area') + ')') + (s.need > 1 ? ', ' + s.need + ' adults' : ''), body(),
+      [h('button', { type: 'button', class: 'btn', onclick: () => dlg.close() }, 'Done')]);
+  }
+  function weekTable() {
+    const times = sortedTimes(), counts = TT.staff.map((s) => weekCount(s.id)), on = counts.filter((n) => n), avg = on.length ? on.reduce((a, b) => a + b, 0) / on.length : 0;
+    return h('div', null, h('p', { class: 'hint' }, 'Who has which duties each day. Totals well above the others’ are marked.'),
+      h('div', { class: 'table-scroll' }, h('table', { class: 'week' },
+        h('thead', null, h('tr', null, h('th', null, 'Staff'), DAYS.map((d) => h('th', null, d.name)), h('th', null, 'Total'))),
+        h('tbody', null, TT.staff.filter((s) => staffSet(s.id).duties !== false).map((s) => {
+          const n = weekCount(s.id);
+          return h('tr', null, h('th', { scope: 'row' }, s.name),
+            DAYS.map((d) => h('td', null, dayDuties(s.id, d.id).sort((a, b) => times.indexOf(a.t) - times.indexOf(b.t)).map((x) => h('span', { class: 'd' }, h('i', null, x.t.name + ': '), x.s.name)))),
+            h('td', { class: 'total' + (avg && n >= avg + 2 ? ' hi' : '') }, n, avg && n >= avg + 2 ? ' !' : ''));
+        })))));
+  }
+  function printDays(days) {
+    const times = sortedTimes();
+    document.getElementById('print').replaceChildren(...days.map((day) => {
+      const keys = new Map();
+      for (const t of times) for (const s of spotsAt(day, t.id)) if (!keys.has(s.key)) keys.set(s.key, s);
+      return h('section', { class: 'p-day' }, h('h2', null, dayName(day) + ' duties'),
+        h('p', null, (D.tt.school || '') + ' · Adults on a watch stay with that child; on an area, follow where the children are.'),
+        h('table', null, h('thead', null, h('tr', null, h('th', null, ''), times.map((t) => h('th', null, t.name + ' ' + t.start)))),
+          h('tbody', null, [...keys.values()].map((s0) => h('tr', null, h('th', null, s0.kind === 'watch' ? 'Watch ' + s0.name : s0.name),
+            times.map((t) => { const s = spotsAt(day, t.id).find((x) => x.key === s0.key); return h('td', null, !s ? '' : s.away ? h('i', null, s.away) : names(cellIds(day, t.id, s.key).map(person)) || '—'); }))))));
+    }));
+    window.print();
+  }
+
+  // ----- Children to watch -----
+  function childrenPage() {
+    const times = sortedTimes(), have = new Set(D.watches.map((w) => w.pupil));
+    const sel = h('select', { class: 'txt', 'aria-label': 'Child to add' }, h('option', { value: '' }, 'Choose a child…'), TT.pupils.filter((p) => !have.has(p.id)).map((p) => h('option', { value: p.id }, p.name)));
+    const upd = (i, fn) => change(() => fn(D.watches[i]));
+    return h('div', { class: 'page' }, h('h1', null, 'Children to watch'),
+      h('p', { class: 'hint' }, 'Children who need an adult with them at wellbeing, break or lunch. Choose the times, how many adults, and, if it matters, which adults can (or must not) be with them. When a child is off site or not in, the rota leaves their watch out.'),
+      h('div', { class: 'card' }, D.watches.length ? h('table', { class: 'set' },
+        h('thead', null, h('tr', null, h('th', null, 'Child'), h('th', null, 'Times'), h('th', null, 'Adults'), h('th', null, 'Only these adults'), h('th', null, 'Never with'), h('th', null, 'Note'), h('th', null, ''))),
+        h('tbody', null, D.watches.map((w, i) => { const p = person(w.pupil); if (!p) return null;
+          return h('tr', { dataset: { watch: w.pupil } },
+            h('th', { scope: 'row' }, h('span', { class: 'chip' }, p.name)),
+            h('td', null, h('div', { class: 'ticks' }, times.map((t) => h('label', null, h('input', { type: 'checkbox', checked: w.times.includes(t.id), 'aria-label': p.name + ' at ' + t.name,
+              onchange: (e) => upd(i, (x) => { x.times = e.target.checked ? x.times.concat(t.id) : x.times.filter((y) => y !== t.id); }) }), t.name)))),
+            h('td', null, h('select', { class: 'txt sm', 'aria-label': 'Adults for ' + p.name, onchange: (e) => upd(i, (x) => { x.need = +e.target.value; }) }, [1, 2, 3].map((n) => h('option', { value: n, selected: w.need === n }, n)))),
+            h('td', null, peopleCell(w.only, 'Anyone', () => choosePeople('Who can watch ' + p.name + '?', 'Leave all unticked for anyone.', w.only, (ids) => upd(i, (x) => { x.only = ids; })))),
+            h('td', null, peopleCell(w.never, 'Nobody', () => choosePeople('Who must not be with ' + p.name + '?', '', w.never, (ids) => upd(i, (x) => { x.never = ids; })))),
+            h('td', null, h('input', { class: 'txt sm', value: w.note, placeholder: 'e.g. likes to be outside', 'aria-label': 'Note for ' + p.name, onchange: (e) => upd(i, (x) => { x.note = str(e.target.value); }) })),
+            h('td', null, h('button', { type: 'button', class: 'x-btn', title: 'Remove', 'aria-label': 'Remove ' + p.name, onclick: () => change(() => { D.watches.splice(i, 1); }, p.name + ' taken off the list') }, '×')));
+        }))) : h('p', { class: 'hint' }, 'No children yet.'),
+        h('div', { class: 'add-row' }, sel, h('button', { type: 'button', class: 'btn primary', onclick: () => { if (!sel.value) return; const id = sel.value; change(() => { D.watches.push({ pupil: id, need: 1, times: times.map((t) => t.id), only: [], never: [], note: '' }); }, person(id).name + ' added, at every time'); } }, 'Add'))));
+  }
+  function peopleCell(ids, emptyText, onEdit) {
+    const list = ids.map(person).filter(Boolean);
+    return h('div', { class: 'people-line' }, list.length ? list.map((p) => h('span', { class: 'chip staff' }, p.name)) : h('span', { class: 'hint' }, emptyText), h('button', { type: 'button', class: 'btn small', onclick: onEdit }, 'Choose…'));
+  }
+  function choosePeople(title, sub, ids, done) {
+    const boxes = TT.staff.map((s) => h('input', { type: 'checkbox', value: s.id, checked: ids.includes(s.id) }));
+    const dlg = modal(title, sub, h('div', { class: 'pick-list' }, TT.staff.map((s, i) => h('label', null, boxes[i], s.name))),
+      [h('button', { type: 'button', class: 'btn', onclick: () => dlg.close() }, 'Cancel'), h('button', { type: 'button', class: 'btn primary', onclick: () => { dlg.close(); done(boxes.filter((b) => b.checked).map((b) => b.value)); } }, 'Save')]);
+  }
+
+  // ----- Areas and activities -----
+  function postsPage() {
+    const times = sortedTimes();
+    const upd = (i, fn) => change(() => fn(D.posts[i]));
+    const addPost = (kind) => change(() => { let n = 1; while (D.posts.some((p) => p.id === 'A' + n)) n++; D.posts.push({ id: 'A' + n, name: kind === 'activity' ? 'New activity' : 'New area', kind, need: 1, times: times.filter((t) => t.kind !== 'wellbeing').map((t) => t.id), days: DAY_IDS.slice(), note: '' }); });
+    return h('div', { class: 'page' }, h('h1', null, 'Areas and activities'),
+      h('p', { class: 'hint' }, 'The places that need adults, and the lunchtime activities. These are starting points: staff still move to where the children are.'),
+      h('div', { class: 'card' }, h('table', { class: 'set' },
+        h('thead', null, h('tr', null, h('th', null, 'Name'), h('th', null, 'Kind'), h('th', null, 'Adults'), h('th', null, 'Times'), h('th', null, 'Days'), h('th', null, ''))),
+        h('tbody', null, D.posts.map((p, i) => h('tr', { dataset: { post: p.id } },
+          h('td', null, h('input', { class: 'txt sm', value: p.name, 'aria-label': 'Name', onchange: (e) => upd(i, (x) => { x.name = str(e.target.value) || x.name; }) })),
+          h('td', null, h('select', { class: 'txt sm', 'aria-label': 'Kind', onchange: (e) => upd(i, (x) => { x.kind = e.target.value; }) }, h('option', { value: 'area', selected: p.kind === 'area' }, 'Area'), h('option', { value: 'activity', selected: p.kind === 'activity' }, 'Activity'))),
+          h('td', null, h('select', { class: 'txt sm', 'aria-label': 'Adults for ' + p.name, onchange: (e) => upd(i, (x) => { x.need = +e.target.value; }) }, [1, 2, 3, 4, 5, 6].map((n) => h('option', { value: n, selected: p.need === n }, n)))),
+          h('td', null, h('div', { class: 'ticks' }, times.map((t) => h('label', null, h('input', { type: 'checkbox', checked: p.times.includes(t.id), 'aria-label': p.name + ' at ' + t.name, onchange: (e) => upd(i, (x) => { x.times = e.target.checked ? x.times.concat(t.id) : x.times.filter((y) => y !== t.id); }) }), t.name)))),
+          h('td', null, h('div', { class: 'ticks' }, DAYS.map((d) => h('label', null, h('input', { type: 'checkbox', checked: p.days.includes(d.id), 'aria-label': p.name + ' on ' + d.name, onchange: (e) => upd(i, (x) => { x.days = e.target.checked ? x.days.concat(d.id) : x.days.filter((y) => y !== d.id); }) }), d.name.slice(0, 3))))),
+          h('td', null, h('button', { type: 'button', class: 'x-btn', 'aria-label': 'Remove ' + p.name, onclick: () => change(() => { D.posts.splice(i, 1); }, p.name + ' removed') }, '×')))))),
+        h('div', { class: 'add-row' }, h('button', { type: 'button', class: 'btn', onclick: () => addPost('area') }, 'Add an area'), h('button', { type: 'button', class: 'btn', onclick: () => addPost('activity') }, 'Add an activity'))));
+  }
+
+  // ----- Rules -----
+  function rulesPage() {
+    const set = (id, patch) => change(() => { D.rules[id] = Object.assign({ level: lvl(id), n: ruleN(id) || null }, D.rules[id], patch); });
+    return h('div', { class: 'page' }, h('h1', null, 'Rules'),
+      h('p', { class: 'hint' }, 'Must: Suggest never breaks it, and the rota marks it ! if someone does. Try to: Suggest avoids it where it can. Off: ignored. Nobody is ever put on duty when the timetable says they are not in.'),
+      h('div', { class: 'card' }, RULES.map((r) => h('div', { class: 'rule', dataset: { rule: r.id } },
+        h('div', null, h('h3', null, r.name), h('p', null, r.text),
+          r.n ? h('label', { class: 'hint' }, 'At most ', h('input', { class: 'txt sm n', type: 'number', min: 1, max: 8, value: ruleN(r.id), 'aria-label': 'Most duties a day', onchange: (e) => set(r.id, { n: clampInt(e.target.value, 1, 8, r.n) }) }), ' a day') : null),
+        h('div', { class: 'seg', role: 'group', 'aria-label': r.name }, (r.levels || LEVELS).map((l) => h('button', { type: 'button', class: lvl(r.id) === l ? 'on' : '', 'aria-pressed': lvl(r.id) === l ? 'true' : 'false', onclick: () => set(r.id, { level: l }) }, LEVEL_NAMES[l])))))));
+  }
+
+  // ----- Times and staff -----
+  function timesPage() {
+    const times = sortedTimes();
+    const updT = (id, fn) => change(() => { fn(timeById(id)); D.timesEdited = true; aroundCache.clear(); });
+    const next = (t) => { const a = around(t); return [a.touchBefore ? 'after ' + a.touchBefore.label : '', a.touchAfter ? 'before ' + a.touchAfter.label : ''].filter(Boolean).join(', ') || '—'; };
+    const updS = (sid, fn) => change(() => { D.staff[sid] = Object.assign({ duties: true, teacher: null, notAt: [] }, D.staff[sid]); fn(D.staff[sid]); });
+    return h('div', { class: 'page' }, h('h1', null, 'Times and staff'),
+      h('div', { class: 'card' }, h('h2', null, 'Duty times'), h('p', { class: 'hint' }, 'Taken from the school day in the Timetabler, with lunch split in two. A lesson that ends or starts within 10 minutes counts as straight before or after.'),
+        h('table', { class: 'set' }, h('thead', null, h('tr', null, h('th', null, 'Name'), h('th', null, 'From'), h('th', null, 'To'), h('th', null, 'Kind'), h('th', null, 'Next to'), h('th', null, ''))),
+          h('tbody', null, times.map((t) => h('tr', { dataset: { time: t.id } },
+            h('td', null, h('input', { class: 'txt sm', value: t.name, 'aria-label': 'Name', onchange: (e) => updT(t.id, (x) => { x.name = str(e.target.value) || x.name; }) })),
+            h('td', null, h('input', { class: 'txt sm', value: t.start, size: 7, 'aria-label': t.name + ' from', onchange: (e) => updT(t.id, (x) => { const m = minutesOf(e.target.value); if (m != null) x.start = clock(m); }) })),
+            h('td', null, h('input', { class: 'txt sm', value: t.end, size: 7, 'aria-label': t.name + ' to', onchange: (e) => updT(t.id, (x) => { const m = minutesOf(e.target.value); if (m != null) x.end = clock(m); }) })),
+            h('td', null, h('select', { class: 'txt sm', 'aria-label': t.name + ' kind', onchange: (e) => updT(t.id, (x) => { x.kind = e.target.value; }) }, Object.entries(KINDS).map(([k, v]) => h('option', { value: k, selected: t.kind === k }, v)))),
+            h('td', { class: 'hint' }, next(t)),
+            h('td', null, times.length > 1 ? h('button', { type: 'button', class: 'x-btn', 'aria-label': 'Remove ' + t.name, onclick: () => change(() => { D.times = D.times.filter((x) => x.id !== t.id); D.timesEdited = true; aroundCache.clear(); }, t.name + ' removed') }, '×') : null))))),
+        h('div', { class: 'add-row' }, h('button', { type: 'button', class: 'btn', onclick: () => change(() => { let n = 1; while (D.times.some((x) => x.id === 'T' + n)) n++; D.times.push({ id: 'T' + n, name: 'New duty time', start: '3.10pm', end: '3.30pm', kind: 'other' }); D.timesEdited = true; aroundCache.clear(); }) }, 'Add a time'))),
+      h('div', { class: 'card' }, h('h2', null, 'Staff'), h('p', { class: 'hint' }, 'Teachers start as the staff who lead lessons on the timetable. Untick Does duties for anyone who never does them, and tick the times someone is never free.'),
+        h('table', { class: 'set' }, h('thead', null, h('tr', null, h('th', null, 'Name'), h('th', null, 'Teacher'), h('th', null, 'Does duties'), h('th', null, 'Never free at'))),
+          h('tbody', null, TT.staff.map((s) => { const st = staffSet(s.id);
+            return h('tr', { dataset: { staff: s.id } }, h('th', { scope: 'row' }, s.name),
+              h('td', null, h('input', { type: 'checkbox', checked: isTeacher(s.id), 'aria-label': s.name + ' is a teacher', onchange: (e) => updS(s.id, (x) => { x.teacher = e.target.checked; }) })),
+              h('td', null, h('input', { type: 'checkbox', checked: st.duties !== false, 'aria-label': s.name + ' does duties', onchange: (e) => updS(s.id, (x) => { x.duties = e.target.checked; }) })),
+              h('td', null, h('div', { class: 'ticks' }, times.map((t) => h('label', null, h('input', { type: 'checkbox', checked: st.notAt.includes(t.id), 'aria-label': s.name + ' never free at ' + t.name, onchange: (e) => updS(s.id, (x) => { x.notAt = e.target.checked ? x.notAt.concat(t.id) : x.notAt.filter((y) => y !== t.id); }) }), t.name)))));
+          })))));
+  }
+
+  // ---------- Files ----------
+  function download(name, text) {
+    const a = h('a', { href: URL.createObjectURL(new Blob([text], { type: 'application/json' })), download: name });
+    document.body.append(a); a.click(); a.remove();
+  }
+  function saveFile() {
+    const d = new Date(), stamp = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    const name = ((D.tt.school || 'School') + ' duties - ' + stamp).replace(/[\\/:*?"<>|]+/g, ' ') + '.json';
+    download(name, JSON.stringify(D, null, 1));
+    toast('Saved “' + name + '”. Keep it safe: it has names in it.');
+  }
+  function openFile() { const inp = document.getElementById('file-open'); inp.value = ''; inp.click(); }
+  document.getElementById('file-open').addEventListener('change', async (e) => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    let obj;
+    try { obj = JSON.parse((await f.text()).replace(/^﻿/, '')); } catch (err) { toast('“' + f.name + '” is not a duties file or timetable backup.'); return; }
+    if (obj && obj.app === APP) {
+      pushUndo(); D = clean(obj); index(); save(); render();
+      toast('Opened the duties in “' + f.name + '”.', { label: 'Undo', run: undo });
+    } else if (readTimetable(obj, 'file')) { save(); render(); toast('Read the timetable in “' + f.name + '”: ' + plural(TT.staff.length, 'member') + ' of staff, ' + plural(TT.pupils.length, 'pupil') + '.'); }
+    else toast('“' + f.name + '” is not a duties file or timetable backup.');
+  });
+  document.addEventListener('keydown', (e) => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && !/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName) && !document.querySelector('dialog[open]')) { e.preventDefault(); undo(); } });
+
+  index();
+  render();
+})();
+</script>
+</body>
+</html>
