@@ -848,6 +848,9 @@ table.gweek { width: 100%; border-collapse: collapse; table-layout: fixed; backg
 .champ-head .n { font-size: 11.5px; color: var(--muted); }
 .champ-kids { display: flex; flex-wrap: wrap; gap: 4px; }
 .champ-kids .chip { cursor: grab; }
+.champ-kid { display: inline-flex; align-items: center; }
+.champ-kid .x-btn { margin-left: 1px; }
+.champ-also { margin-left: 4px; font-size: 10.5px; font-weight: 600; opacity: .75; }
 .tgroup.champ { --gc: var(--staff); }
 .gw-pupils-line { display: block; font-size: 12px; font-weight: 650; color: var(--pupil); }
 .ds-palette { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; padding: 6px 10px 0; }
@@ -1423,9 +1426,12 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     }));
     // Lessons to place: one pupil's lesson that staff asked for, or therapy, set up on the pupil's page and placed from the tray.
     const pupilIds = new Set(out.people.filter((x) => x.role !== 'staff').map((x) => x.id)), seenR = new Set();
-    // Each child's champion: the adult they spend Champion time with.
+    // Each child's champions: the adults they spend Champion time with (one or more). Saves from before had one each.
     out.champions = {};
-    for (const [pid, sid] of Object.entries(p.champions && typeof p.champions === 'object' ? p.champions : {})) if (pupilIds.has(pid) && staffIds.has(sid)) out.champions[pid] = sid;
+    for (const [pid, v] of Object.entries(p.champions && typeof p.champions === 'object' ? p.champions : {})) {
+      const ids = [...new Set((Array.isArray(v) ? v : [v]).filter((sid) => staffIds.has(sid)))];
+      if (pupilIds.has(pid) && ids.length) out.champions[pid] = ids;
+    }
     out.requests = (Array.isArray(p.requests) ? p.requests : []).filter((r) => r && str(r.id) && pupilIds.has(str(r.pupil)) && !seenR.has(str(r.id)) && seenR.add(str(r.id))).map((r) => ({
       id: str(r.id), pupil: str(r.pupil), subject: str(r.subject), staff: staffIds.has(str(r.staff)) ? str(r.staff) : '',
       perWeek: clamp(Math.round(num(r.perWeek, 1)), 1, 10), room: out.areas.some((a) => a.id === r.room) ? r.room : '', note: str(r.note)
@@ -1579,8 +1585,21 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
   const wholeOf = (sl) => wholeAt(slotKeyOf.get(sl));
   // A whole-school lesson called something like "Champion time" is spent with each child's champion.
   const isChampionTime = (name) => /champion/i.test(name || '');
-  const championOf = (pid) => person((project.champions || {})[pid]) || null;
-  const championKids = (sid) => pupils().filter((x) => (project.champions || {})[x.id] === sid);
+  const championIds = (pid) => ((project.champions || {})[pid] || []).filter((sid) => person(sid));
+  const championsOf = (pid) => championIds(pid).map(person);
+  const championKids = (sid) => pupils().filter((x) => championIds(x.id).includes(sid));
+  // Champions who share a child spend Champion time together: each team is those adults and all their children.
+  function championTeams() {
+    const teams = [], seen = new Set();
+    for (const t of staff()) {
+      if (seen.has(t.id) || !championKids(t.id).length) continue;
+      const adults = [t.id], kids = new Set();
+      for (let i = 0; i < adults.length; i++) for (const k of championKids(adults[i])) { kids.add(k.id); for (const sid of championIds(k.id)) if (!adults.includes(sid)) adults.push(sid); }
+      adults.forEach((id) => seen.add(id));
+      teams.push({ id: t.id, adults: adults.map(person), kids: pupils().filter((x) => kids.has(x.id)) });
+    }
+    return teams;
+  }
   const person = (id) => peopleById.get(id);
   const isStaff = (p) => p.role === 'staff';
   const isPupil = (p) => p.role !== 'staff';
@@ -2446,7 +2465,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     const noPeople = !project.people.length;
     const reqs = project.requests.filter((r) => str(r.subject) && (requestPlaced(r) < r.perWeek || requestHere(r, s)));
     const tbcs = tbcLessons(s);
-    const champs = isChampionTime(wholeAt(curKey())) ? staff().map((t) => ({ t, kids: championKids(t.id) })).filter((x) => x.kids.length) : [];
+    const champs = isChampionTime(wholeAt(curKey())) ? championTeams() : [];
     const tabs = (champs.length ? [['champs', 'Champions', champs.length]] : []).concat([['groups', 'Groups', project.groups.length], ['lessons', 'Lessons', requestsLeft().length]]).concat(tbcs.length ? [['norooms', 'No room yet', tbcs.length]] : [])
       .concat([['left', 'Left to place', unplaced.length], ['out', 'Not in', out.length]]);
     const tab = tabs.some(([id]) => id === ui.trayTab) ? ui.trayTab : project.groups.length ? 'groups' : 'left';
@@ -2456,12 +2475,13 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       groups: () => project.groups.length ? h('div', { class: 'tray-groups' }, project.groups.map((g) => trayGroup(g, s)))
         : h('div', { class: 'tray-empty' }, h('span', null, 'No groups yet. Set up the literacy and numeracy sets, D&D or the woods, then drag a whole group onto a room.'),
           h('button', { type: 'button', class: 'btn small', onclick: () => { ui.lessonTab = 'groups'; go('lessons'); } }, 'Set up groups')),
-      champs: () => h('div', { class: 'tray-groups' }, champs.map(({ t, kids }) => {
-        const at = s.at[t.id], here = at && kids.every((k) => s.at[k.id] === at || s.at[k.id] === OUT) && project.areas.find((a) => a.id === at);
+      champs: () => h('div', { class: 'tray-groups' }, champs.map(({ id, adults, kids }) => {
+        const all = adults.concat(kids).filter((x) => s.at[x.id] !== OUT), at = s.at[adults[0].id];
+        const here = at && all.every((x) => s.at[x.id] === at) && project.areas.find((a) => a.id === at);
         return h('div', { class: 'tgroup champ' },
-          h('button', { type: 'button', class: 'gchip champ-chip' + (here ? ' here' : ''), 'data-champ-t': t.id, title: t.name + ' and their champion children: ' + names(kids) + '. Drag onto a room, or tap then tap a room.' },
-            roomIcon('star', 'gchip-ic'), h('span', { class: 'gchip-name' }, t.name), h('span', { class: 'gchip-n' }, kids.length), here ? h('span', { class: 'gchip-at' }, '✓ ' + here.name) : null),
-          h('div', { class: 'tgroup-list' }, [t].concat(kids).map((x) => chip(x, !!s.at[x.id]))));
+          h('button', { type: 'button', class: 'gchip champ-chip' + (here ? ' here' : ''), 'data-champ-t': id, title: names(adults) + ' and their champion children: ' + names(kids) + '. Drag onto a room, or tap then tap a room.' },
+            roomIcon('star', 'gchip-ic'), h('span', { class: 'gchip-name' }, names(adults)), h('span', { class: 'gchip-n' }, kids.length), here ? h('span', { class: 'gchip-at' }, '✓ ' + here.name) : null),
+          h('div', { class: 'tgroup-list' }, adults.concat(kids).map((x) => chip(x, !!s.at[x.id]))));
       })),
       norooms: () => h('div', { class: 'tray-groups' }, tbcs.map((t) => h('div', { class: 'tgroup tbc' },
         h('button', { type: 'button', class: 'gchip tbc-chip' + (pendingTbc === t.place ? ' sel' : ''), 'data-tbc': t.place, title: (t.title || 'Lesson') + ': ' + names(t.people) + '. Drag onto a room to put everyone there, or tap then tap a room.' },
@@ -2535,14 +2555,15 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
   // Moves everyone in a lesson that has no room yet into a room (or back to not placed), with its lesson name and group.
   let pendingTbc = null;
   // Champion time on the Plan: an adult and their champion children go to a room together.
-  function champIds(sid, sl) { return [sid].concat(championKids(sid).map((x) => x.id)).filter((id) => sl.at[id] !== OUT); }
+  function champTeam(sid) { return championTeams().find((t) => t.adults.some((x) => x.id === sid)) || { adults: [person(sid)], kids: [] }; }
+  function champIds(sid, sl) { const t = champTeam(sid); return t.adults.concat(t.kids).map((x) => x.id).filter((id) => sl.at[id] !== OUT); }
   function moveChamp(sid, zone) {
-    const key = curKey(), a = project.areas.find((x) => x.id === zone), t = person(sid);
+    const key = curKey(), a = project.areas.find((x) => x.id === zone), team = champTeam(sid);
     if (!a) { toast('Drop them onto a room.'); return; }
-    const ids = champIds(sid, slotOf(key));
+    const ids = champIds(sid, slotOf(key)), nKids = ids.filter((id) => isPupil(person(id))).length;
     sel.clear();
     mutate(() => { const sl = slotOf(key, true); ids.forEach((id) => { sl.at[id] = zone; }); if (!str(sl.titles[zone])) sl.titles[zone] = wholeAt(key); });
-    toast(t.name + ' and ' + plural(ids.length - 1, 'child', 'children') + ' in ' + a.name, { label: 'Undo', run: undo });
+    toast(names(team.adults) + ' and ' + plural(nKids, 'child', 'children') + ' in ' + a.name, { label: 'Undo', run: undo });
   }
   function moveTbc(place, zone) {
     const key = curKey(), s0 = slotOf(key), ppl = peopleAt(s0, place), title = str(s0.titles[place]);
@@ -3267,31 +3288,45 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
   }
   // ----- Champions: the adult each child spends Champion time with -----
   let champPick = null;
-  function setChampion(pid, sid) {
-    const p = person(pid), t = sid && person(sid);
+  // Adds a champion (sid) to a child, or with no sid takes one away (from).
+  function setChampion(pid, sid, from) {
+    const p = person(pid), t = sid && person(sid), f = from && person(from), had = championIds(pid);
     champPick = null;
-    mutate((pp) => { pp.champions = Object.assign({}, pp.champions); if (sid) pp.champions[pid] = sid; else delete pp.champions[pid]; });
-    toast(p.name + (t ? '’s champion is ' + t.name : ' has no champion now'), { label: 'Undo', run: undo });
+    if (sid ? had.includes(sid) : !had.includes(from)) { render(); return; }
+    mutate((pp) => {
+      pp.champions = Object.assign({}, pp.champions);
+      const next = sid ? had.concat(sid) : had.filter((x) => x !== from);
+      if (next.length) pp.champions[pid] = next; else delete pp.champions[pid];
+    });
+    const left = championsOf(pid);
+    toast(t ? p.name + '’s ' + (had.length ? 'champions are ' + names(left) : 'champion is ' + t.name)
+      : f.name + ' is no longer ' + p.name + '’s champion' + (left.length ? '' : '; ' + p.name + ' has no champion now'), { label: 'Undo', run: undo });
   }
   function championsPage() {
-    const ch = project.champions || {};
-    const none = pupils().filter((x) => !person(ch[x.id]));
-    const kidChip = (x) => h('button', { type: 'button', class: 'chip pupil' + (champPick === x.id ? ' sel' : ''), draggable: 'true', 'data-champ-kid': x.id, title: 'Drag onto their champion, or tap then tap the champion',
-      ondragstart: (e) => { e.dataTransfer.setData('text/plain', x.id); e.dataTransfer.effectAllowed = 'move'; },
-      onclick: () => { champPick = champPick === x.id ? null : x.id; render(); } }, x.name);
+    const none = pupils().filter((x) => !championIds(x.id).length);
+    const kidChip = (x, sid) => {
+      const others = championsOf(x.id).filter((t) => t.id !== sid);
+      return h('span', { class: 'champ-kid' },
+        h('button', { type: 'button', class: 'chip pupil' + (champPick === x.id ? ' sel' : ''), draggable: 'true', 'data-champ-kid': x.id,
+          title: (others.length ? 'Also with ' + names(others) + '. ' : '') + 'Drag onto a champion, or tap then tap the champion, to add one. Drag onto No champion yet to take this one away.',
+          ondragstart: (e) => { e.dataTransfer.setData('text/plain', x.id + '|' + (sid || '')); e.dataTransfer.effectAllowed = 'copyMove'; },
+          onclick: () => { champPick = champPick === x.id ? null : x.id; render(); } }, x.name, others.length ? h('span', { class: 'champ-also' }, '+' + others.length) : null),
+        sid ? h('button', { type: 'button', class: 'x-btn', title: 'Take ' + person(sid).name + ' off as ' + x.name + '’s champion', 'aria-label': 'Take ' + x.name + ' off ' + person(sid).name, onclick: () => setChampion(x.id, null, sid) }, '×') : null);
+    };
     const dropZone = (sid, kids) => h('div', { class: 'champ-card' + (sid ? '' : ' none') + (champPick ? ' picking' : ''), 'data-champ': sid || '',
       ondragover: (e) => { e.preventDefault(); e.currentTarget.classList.add('drop-ok'); }, ondragleave: (e) => e.currentTarget.classList.remove('drop-ok'),
-      ondrop: (e) => { e.preventDefault(); e.currentTarget.classList.remove('drop-ok'); const pid = e.dataTransfer.getData('text/plain'); if (person(pid) && (ch[pid] || '') !== (sid || '')) setChampion(pid, sid); },
+      ondrop: (e) => { e.preventDefault(); e.currentTarget.classList.remove('drop-ok'); const [pid, from] = e.dataTransfer.getData('text/plain').split('|'); if (!person(pid)) return;
+        if (sid) setChampion(pid, sid); else if (from) setChampion(pid, null, from); },
       onclick: (e) => { if (champPick && !e.target.closest('[data-champ-kid]')) setChampion(champPick, sid); } },
       h('div', { class: 'champ-head' }, sid ? h('b', { class: 'staff-ink' }, person(sid).name) : h('b', null, 'No champion yet'), h('span', { class: 'n' }, kids.length)),
-      h('div', { class: 'champ-kids' }, kids.length ? kids.map(kidChip) : h('span', { class: 'hint' }, sid ? 'Drop children here' : 'Everyone has a champion')));
+      h('div', { class: 'champ-kids' }, kids.length ? kids.map((x) => kidChip(x, sid)) : h('span', { class: 'hint' }, sid ? 'Drop children here' : 'Everyone has a champion')));
     const champTimes = (project.wholeSchool || []).filter((w) => isChampionTime(w.name));
     return [
-      h('p', { class: 'hint champ-hint' }, 'Drag each child onto their champion, or tap a child and then the adult. ' + (champTimes.length
+      h('p', { class: 'hint champ-hint' }, 'Drag each child onto their champion, or tap a child and then the adult. A child can have more than one: drag them on to another adult too, and × takes one away. Adults who share a child are placed together. ' + (champTimes.length
         ? 'In ' + champTimes.map((w) => dayName(w.day) + ' ' + periodOf(w.period).label).join(' and ') + ' (' + champTimes[0].name + ') their timetables show who they are with, and the adult’s timetable lists their children. On the Plan, the tray’s Champions tab places each adult with their children.'
         : 'Champion time shows on timetables once there is a whole-school lesson called Champion time (Setup → School day).')),
       h('div', { class: 'champ-wrap' }, dropZone('', none),
-        h('div', { class: 'champ-grid' }, staff().map((t) => dropZone(t.id, pupils().filter((x) => ch[x.id] === t.id)))))];
+        h('div', { class: 'champ-grid' }, staff().map((t) => dropZone(t.id, championKids(t.id)))))];
   }
   // Lesson setup: the group lessons, and lessons for one pupil (therapy, a staff member's project, wellbeing).
   function renderLessonSetup(root) {
@@ -3458,8 +3493,8 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     if (place === OUT) return { kind: 'out', key: 'out' };
     const w = wholeOf(s);
     if (w) {
-      const champ = isChampionTime(w) ? championOf(p.id) : null;
-      return { kind: 'lesson', subject: w, type: lessonType(w), room: 'Whole school', roomKind: '', group: '', teachers: champ ? champ.name : '', staffShown: champ ? [champ] : [], key: 'whole|' + w + '|' + (champ ? champ.id : '') };
+      const champs = isChampionTime(w) ? championsOf(p.id).filter((t) => s.at[t.id] !== OUT) : [];
+      return { kind: 'lesson', subject: w, type: lessonType(w), room: 'Whole school', roomKind: '', group: '', teachers: names(champs), staffShown: champs, key: 'whole|' + w + '|' + champs.map((t) => t.id).join(',') };
     }
     const a = place && areaById.get(place);
     if (!a) return { kind: 'none', key: '' };
