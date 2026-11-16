@@ -50,13 +50,16 @@ async function shot(page, name) { if (SHOTS) await page.screenshot({ path: path.
   await du.getByRole('button', { name: 'Children to watch' }).click();
   for (const n of ['AB', 'CD', 'HM']) { await du.locator('select[aria-label="Child to add"]').selectOption({ label: n }); await du.getByRole('button', { name: 'Add', exact: true }).click(); }
   await du.locator('select[aria-label="Adults for CD"]').selectOption('2');
-  await du.locator('tr[data-watch="' + id('HM') + '"] td').nth(3).getByRole('button', { name: 'Choose…' }).click();
+  await du.locator('tr[data-watch="' + id('HM') + '"] td').nth(4).getByRole('button', { name: 'Choose…' }).click();
   await du.locator('dialog label', { hasText: /^Carys$/ }).locator('input').check();
   await du.locator('dialog').getByRole('button', { name: 'Save' }).click();
   await du.locator('input[aria-label="HM at Wellbeing"]').uncheck();
+  await du.locator('input[aria-label="HM on Friday"]').uncheck();
   j = await store();
   const hm = j.watches.find((w) => w.pupil === id('HM'));
-  check(j.watches.length === 3 && hm.never.includes(id('Carys')) && !hm.times.includes('W') && j.watches.find((w) => w.pupil === id('CD')).need === 2, 'children are added with their times, how many adults, and who they must not be with');
+  check(j.watches.length === 3 && hm.never.includes(id('Carys')) && !hm.times.includes('W') && !hm.days.includes('Fri') && j.watches.find((w) => w.pupil === id('CD')).need === 2, 'children are added with their times and days, how many adults, and who they must not be with');
+  const ls = plan.areas.filter((a) => /learning space/i.test(a.name)).map((a) => a.id).sort(), sci = plan.areas.find((a) => /science/i.test(a.name)).id;
+  check(j.posts[0].name === 'Main room' && JSON.stringify(j.posts[0].rooms.slice().sort()) === JSON.stringify(ls) && !j.posts.some((p) => /playground/i.test(p.name)) && j.outOfBounds.includes(sci), 'children roam: the learning spaces are one main room, and the science room is out of bounds');
   await du.getByRole('button', { name: 'Rules', exact: true }).click();
   await du.locator('.rule[data-rule="teacherLunch"] .seg button', { hasText: 'Must' }).click();
   j = await store();
@@ -70,6 +73,7 @@ async function shot(page, name) { if (SHOTS) await page.screenshot({ path: path.
   check(/Filled \d+ places/.test(await du.locator('.toast').last().innerText()), 'Suggest a rota fills the week');
   await shot(du, 'duties-rota');
   j = await store();
+  check(!DAYS.some((d) => ((j.rota[d] || {}).B || {})['w:' + id('HM')] && d === 'Fri'), 'a watch is only on its days');
   // The rules, checked against the timetable itself.
   const at = (pid, day, per) => ((plan.slots[day + '|' + per] || {}).at || {})[pid] || '';
   const offsite = new Set(plan.areas.filter((a) => a.kind === 'offsite').map((a) => a.id));
@@ -111,8 +115,33 @@ async function shot(page, name) { if (SHOTS) await page.screenshot({ path: path.
   check(keepable > 0 && kept === keepable, 'at break, AB stays with an adult from Lesson 1 or 2 (' + kept + ' of ' + keepable + ' days)');
   check(freshBreak === 0, 'at lunch, AB has a different adult from Lesson 2');
 
+  console.log('The layout');
+  check(await du.locator('.strip-btn').count() === 20 && await du.locator('.lay-now').innerText().then((x) => x.startsWith('Monday · Wellbeing')), 'the layout has a button for each day and duty time, like the Plan');
+  await du.locator('.strip-btn[aria-label^="Tuesday Break"]').click();
+  check(await du.locator('.room.duty').count() === ls.length && await du.locator('.room.oob[data-area="' + sci + '"]').count() === 1 && await du.locator('.room').count() === plan.areas.length, 'the map shows the school, the main room’s rooms together and the science room out of bounds');
+  await shot(du, 'duties-layout');
+  const before = ((((await store()).rota.Tue || {}).B || {})['p:A1'] || []).length;
+  const freeChip = du.locator('.tray .tray-row', { hasNot: du.locator('.st') }).locator('.chip').first();
+  const freeName = await freeChip.innerText();
+  await freeChip.dragTo(du.locator('.room[data-area="' + ls[0] + '"]'));
+  const tueB = ((await store()).rota.Tue || {}).B || {};
+  check((tueB['p:A1'] || []).length === before + 1 && (tueB['p:A1'] || []).includes(id(freeName)), 'dragging a name onto a room of the main room puts them on that duty');
+  await du.getByRole('button', { name: 'Set up areas' }).click();
+  const kitchen = plan.areas.find((a) => a.name === 'Kitchen').id;
+  await du.locator('.room[data-area="' + kitchen + '"]').click({ position: { x: 10, y: 10 } });
+  await du.locator('dialog .opt', { hasText: 'Out of bounds' }).click();
+  check((await store()).outOfBounds.includes(kitchen) && await du.locator('.room.oob[data-area="' + kitchen + '"]').count() === 1, 'Set up areas: a room can be made out of bounds');
+  await du.locator('.room[data-area="' + kitchen + '"]').click({ position: { x: 10, y: 10 } });
+  await du.locator('dialog .opt', { hasText: 'Part of Main room' }).click();
+  check((await store()).posts[0].rooms.includes(kitchen) && !(await store()).outOfBounds.includes(kitchen), 'or part of the main room');
+  await du.locator('#top').getByRole('button', { name: 'Undo', exact: true }).click();
+  await du.locator('#top').getByRole('button', { name: 'Undo', exact: true }).click();
+  await du.getByRole('button', { name: 'Done setting up areas' }).click();
+
   console.log('Changing it by hand');
-  const cell = (k, t) => du.locator('td[data-k="' + k + '"][data-t="' + t + '"]');
+  await du.getByRole('button', { name: 'Table', exact: true }).click();
+  check(await du.locator('table.week-rota thead th').count() === 6, 'the table shows every day at once');
+  const cell = (k, t) => du.locator('td[data-day="Mon"][data-k="' + k + '"][data-t="' + t + '"]');
   await cell('w:' + id('AB'), 'B').locator('.cell-btn').click();
   check((await du.locator('dialog .dlg-title').innerText()).startsWith('Monday · Break') && await du.locator('dialog .cand .tag', { hasText: 'Best fit' }).count() === 1, 'clicking a duty lists who can do it, best fit first');
   await shot(du, 'duties-picker');
@@ -134,7 +163,7 @@ async function shot(page, name) { if (SHOTS) await page.screenshot({ path: path.
   check(!(await play.innerText()).includes(mover.split('\n')[0]) && (await lunchPlay.innerText()).includes(mover.split('\n')[0]), 'a name dragged from one duty to another moves there');
 
   console.log('The week, printing and files');
-  await du.locator('.seg button', { hasText: 'Week' }).click();
+  await du.getByRole('button', { name: 'Staff totals' }).click();
   check(await du.locator('table.week tbody tr').count() === 22, 'the week shows everyone who does duties, with their totals');
   await shot(du, 'duties-week');
   await du.evaluate(() => { window.print = () => { window.__printed = true; }; });

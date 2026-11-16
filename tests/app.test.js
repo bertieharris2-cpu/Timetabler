@@ -204,7 +204,9 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   await page.emulateMedia({ media: 'screen' });
   await page.locator('.print-controls .seg button', { hasText: /^Staff$/ }).click();
   check(await page.locator('.sheet').count() === 3, 'one page per member of staff');
-  check(await page.locator('.sheet.staffsheet .pt-name').count() === 3 && await page.locator('.sheet.staffsheet .pt-name').first().evaluate((e) => getComputedStyle(e).backgroundColor) === 'rgb(248, 201, 155)', 'staff timetables use the pupils’ layout, in orange');
+  const sbBox = await page.locator('.sheet.staffbook').first().boundingBox();
+  check(await page.locator('.sheet.staffbook').count() === 3 && Math.abs(sbBox.width / sbBox.height - 297 / 210) < 0.01 && /Staff timetable/i.test(await page.locator('.sheet.staffbook .sb-sub').first().innerText()), 'staff timetables follow the book’s grid, A4 landscape, so they differ from the pupils’');
+  check(await page.locator('.sheet.staffbook .sb-band', { hasText: 'Prep and Meeting' }).count() === 3, 'and keep the staff-only rows');
   await page.locator('.print-controls .seg button', { hasText: /^Rooms$/ }).click();
   check((await page.locator('.sheet').first().boundingBox()).height > 300, 'room timetables show as full pages');
   check(await page.locator('.print-controls .seg button', { hasText: 'Days by room' }).count() === 0, 'no Days by room');
@@ -467,6 +469,8 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   await fc2.setFiles(picFile);
   await p10.getByRole('button', { name: 'Change the picture for Animal care' }).waitFor();
   check(await p10.locator('select[aria-label="Animal care type"]').inputValue() === 'wellbeing' && await p10.locator('select[aria-label="Phonics type"]').inputValue() === 'academic', 'lesson types guessed from the name');
+  const typeOf = async (re) => { const all = await p10.locator('select.lt-pick').evaluateAll((els) => els.map((e) => [e.getAttribute('aria-label'), e.value])); return (all.find(([l]) => re.test(l)) || [])[1]; };
+  check(await typeOf(/^Humanities type$/) === 'academic' && ['academic', undefined].includes(await typeOf(/^Expressive arts type$/i)) && ['academic', undefined].includes(await typeOf(/^Woods maths type$/i)), 'Humanities (and Expressive Arts, Woods Maths) are academic');
   await p10.locator('select[aria-label="Phonics type"]').selectOption('wellbeing');
   const [fc3] = await Promise.all([p10.waitForEvent('filechooser'), p10.getByRole('button', { name: 'Choose logo…' }).click()]);
   await fc3.setFiles(picFile);
@@ -1030,6 +1034,23 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   await p13.mouse.up(); await p13.waitForTimeout(400);
   j13 = await p13.evaluate(() => JSON.parse(localStorage.getItem('lifehouse_timetabler_v2')));
   check(['T01', 'T02', 'S01', 'S02'].every((id) => j13.slots['Fri|P3'].at[id] === 'A15') && j13.champions.S01.length === 2, 'on the Plan, champions who share a child are placed with their children together');
+  // Staff timetables: every pupil in each lesson, coloured by the school's own academic subjects
+  await p13.evaluate(() => { const k = 'lifehouse_timetabler_v2', j = JSON.parse(localStorage.getItem(k));
+    const names = { 'Mon|P1': 'Humanities', 'Tue|P1': 'Expressive Arts', 'Wed|P1': 'Woods Maths', 'Thu|P1': 'PFA', 'Mon|P2': 'History' };
+    for (const [key, name] of Object.entries(names)) { const sl = j.slots[key], at = sl && sl.at.T02; if (at && !['OUT', 'PPA', 'COVER'].includes(at)) sl.titles[at] = name; }
+    localStorage.setItem(k, JSON.stringify(j)); });
+  await p13.reload();
+  await p13.getByRole('button', { name: 'Printables', exact: true }).click();
+  await p13.locator('.print-controls .seg button', { hasText: /^Staff$/ }).click();
+  await p13.locator('#print-who').selectOption({ label: 'Ben' });
+  const sbCell = (subj) => p13.locator('.sheet.staffbook .sb-cell', { has: p13.locator('.sb-subj', { hasText: new RegExp('^' + subj + '$') }) }).first();
+  const tones = {};
+  for (const subj of ['Humanities', 'Expressive Arts', 'Woods Maths', 'PFA', 'History']) if (await sbCell(subj).count()) tones[subj] = await sbCell(subj).getAttribute('class');
+  check(Object.keys(tones).length >= 3 && Object.entries(tones).every(([subj, c]) => (subj === 'Woods Maths' ? /sb-numeracy/ : /sb-academic/).test(c)), 'Humanities, Expressive Arts, PFA and History are academic, Woods Maths is maths (' + Object.entries(tones).map(([k, v]) => k + ': ' + v.replace('sb-cell ', '')).join('; ') + ')');
+  j13 = await p13.evaluate(() => JSON.parse(localStorage.getItem('lifehouse_timetabler_v2')));
+  const monAt = j13.slots['Mon|P1'].at.T02, monKids = j13.people.filter((x) => x.role !== 'staff' && j13.slots['Mon|P1'].at[x.id] === monAt).map((x) => x.name);
+  const monText = await sbCell('Humanities').innerText().catch(() => '');
+  check(monKids.length > 0 && monKids.every((n) => monText.includes(n)), 'a staff timetable lists every pupil in the lesson (' + monKids.join(', ') + ')');
   check(err13.length === 0, 'no errors' + (err13.length ? ': ' + err13.join(' | ') : ''));
   await ctx13.close();
 
