@@ -105,6 +105,11 @@ async function shot(page, name) { if (SHOTS) await page.screenshot({ path: path.
     for (const t of ['L1', 'L2']) if ((((j.rota[d] || {})[t] || {})['w:' + ab] || []).some((s) => had2.includes(s))) freshBreak++;
   }
   check(total > 60, 'the week has ' + total + ' duties filled');
+  check(j.published && Object.keys(j.published.staff).length > 10, 'a summary of everyone’s duties is saved for the Timetabler');
+  await tt.reload();
+  await tt.getByRole('button', { name: 'Printables', exact: true }).click();
+  await tt.locator('.print-controls .seg button', { hasText: /^Staff$/ }).click();
+  check(await tt.locator('.sheet.staffbook .sb-duty').count() > 20, 'and the duties show on the staff timetables in the Timetabler');
   check(double === 0, 'nobody has two duties at once');
   check(tooMany === 0, 'nobody has more than 2 duties a day');
   check(noLunch === 0, 'everyone has part of lunch off');

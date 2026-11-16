@@ -570,7 +570,17 @@ table.set { border-collapse: collapse; width: 100%; font-size: 13px; }
   try { const t = localStorage.getItem(STORE); if (t) D = clean(JSON.parse(t)); } catch (e) { storageOk = false; }
   let ui = { view: 'rota', day: 'Mon' };
   try { Object.assign(ui, JSON.parse(localStorage.getItem(STORE + '_ui') || '{}')); } catch (e) { /* first visit */ }
+  // A summary of each person's duties, which the Timetabler reads to show them on staff timetables.
+  function published() {
+    const staff = {};
+    for (const d of DAY_IDS) for (const t of sortedTimes()) for (const s of spotsAt(d, t.id)) {
+      if (!s.need) continue;
+      for (const sid of cellIds(d, t.id, s.key)) ((staff[sid] = staff[sid] || {})[d] = staff[sid][d] || []).push({ time: t.start, name: t.name, what: s.kind === 'watch' ? 'Watch ' + s.name : s.name });
+    }
+    return { savedAt: new Date().toISOString(), staff };
+  }
   function save() {
+    if (TT) D.published = published();
     try { localStorage.setItem(STORE, JSON.stringify(D)); localStorage.setItem(STORE + '_ui', JSON.stringify(ui)); storageOk = true; }
     catch (e) { if (storageOk) toast('This browser could not save. Save a duties file to keep your work.'); storageOk = false; }
   }
@@ -1213,6 +1223,7 @@ table.set { border-collapse: collapse; width: 100%; font-size: 13px; }
   function saveFile() {
     const d = new Date(), stamp = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
     const name = ((D.tt.school || 'School') + ' duties - ' + stamp).replace(/[\\/:*?"<>|]+/g, ' ') + '.json';
+    if (TT) D.published = published();
     download(name, JSON.stringify(D, null, 1));
     toast('Saved “' + name + '”. Keep it safe: it has names in it.');
   }

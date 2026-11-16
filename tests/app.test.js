@@ -205,7 +205,7 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   await page.locator('.print-controls .seg button', { hasText: /^Staff$/ }).click();
   check(await page.locator('.sheet').count() === 3, 'one page per member of staff');
   const sbBox = await page.locator('.sheet.staffbook').first().boundingBox();
-  check(await page.locator('.sheet.staffbook').count() === 3 && Math.abs(sbBox.width / sbBox.height - 297 / 210) < 0.01 && /Staff timetable/i.test(await page.locator('.sheet.staffbook .sb-sub').first().innerText()), 'staff timetables follow the book’s grid, A4 landscape, so they differ from the pupils’');
+  check(await page.locator('.sheet.staffbook').count() === 3 && Math.abs(sbBox.width / sbBox.height - 210 / 297) < 0.01 && /Staff timetable/i.test(await page.locator('.sheet.staffbook .sb-sub').first().innerText()), 'staff timetables follow the book’s grid, plainer and A4 portrait');
   check(await page.locator('.sheet.staffbook .sb-band', { hasText: 'Prep and Meeting' }).count() === 3, 'and keep the staff-only rows');
   await page.locator('.print-controls .seg button', { hasText: /^Rooms$/ }).click();
   check((await page.locator('.sheet').first().boundingBox()).height > 300, 'room timetables show as full pages');
@@ -390,11 +390,14 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   await sheet.getByRole('button', { name: 'Take Abi out' }).click();
   await sheet.waitForTimeout(600);
   check(!(await p10.evaluate(() => JSON.parse(localStorage.getItem('lifehouse_timetabler_v2')).slots['Mon|P2'].at.T01)), 'a teacher can be taken out of a lesson');
+  await sheet.waitForTimeout(1200);
   await abiL2().click();
   await sheet.locator('dialog input[aria-label="Lesson"]').fill('Story time');
   await sheet.locator('dialog input[aria-label="Children"]').fill('AB, cd, Nobody');
   await sheet.locator('dialog input[aria-label="Other staff"]').fill('Ben');
-  check(await sheet.locator('dialog .le-chips .chip').count() === 3 && await sheet.locator('dialog .le-unknown').innerText() === '? Nobody', 'typed names are matched, and unknown ones shown');
+  await sheet.waitForTimeout(200);
+  const leChips = await sheet.locator('dialog .le-chips .chip').allInnerTexts(), leUnknown = await sheet.locator('dialog .le-unknown').allInnerTexts();
+  check(leChips.length === 3 && leUnknown.join('') === '? Nobody', 'typed names are matched, and unknown ones shown (' + leChips.join(', ') + ' / ' + leUnknown.join(', ') + ' / dialogs ' + await sheet.locator('dialog[open]').count() + ' / with=' + await sheet.locator('dialog input[aria-label="Other staff"]').inputValue() + ' / ' + await sheet.locator('dialog .dlg-title').innerText() + ' / ' + (await sheet.locator('dialog .le-chips').allInnerTexts()).join(' | ') + ')');
   await sheet.locator('dialog .le-make input[type="checkbox"]').check();
   await sheet.locator('dialog input[aria-label="Group name"]').fill('Story group');
   await sheet.locator('dialog').getByRole('button', { name: 'Save' }).click();
@@ -1051,6 +1054,53 @@ const roomPeople = (page, area) => page.locator('.room[data-area="' + area + '"]
   const monAt = j13.slots['Mon|P1'].at.T02, monKids = j13.people.filter((x) => x.role !== 'staff' && j13.slots['Mon|P1'].at[x.id] === monAt).map((x) => x.name);
   const monText = await sbCell('Humanities').innerText().catch(() => '');
   check(monKids.length > 0 && monKids.every((n) => monText.includes(n)), 'a staff timetable lists every pupil in the lesson (' + monKids.join(', ') + ')');
+  // Duties from Lifehouse Duties on staff timetables: saved in this browser, or from a duties file
+  await p13.evaluate(() => localStorage.setItem('lifehouse_duties_v1', JSON.stringify({ app: 'lifehouse-duties', published: { savedAt: new Date().toISOString(),
+    staff: { T02: { Mon: [{ time: '10.45am', name: 'Break', what: 'Main room' }], Tue: [{ time: '12.00pm', name: 'Lunch: eating', what: 'Watch AB' }, { time: '12.35pm', name: 'Lunch: play', what: 'Main room' }] } } } })));
+  await p13.reload();
+  await p13.getByRole('button', { name: 'Printables', exact: true }).click();
+  await p13.locator('.print-controls .seg button', { hasText: /^Staff$/ }).click();
+  await p13.locator('#print-who').selectOption({ label: 'Ben' });
+  const dutyText = (await p13.locator('.sheet.staffbook .sb-duty').allInnerTexts()).join(' | ');
+  check(await p13.locator('.sheet.staffbook .sb-duty').count() === 2 && /Main room/.test(dutyText) && /12\.00pm Watch AB/.test(dutyText) && /12\.35pm Main room/.test(dutyText) && /Duties: 3 this week/.test(await p13.locator('.sheet.staffbook .sb-foot').innerText()), 'a staff timetable shows their duties in the Break and Lunch rows (' + dutyText.replace(/\n/g, ' ') + ')');
+  await p13.getByRole('button', { name: 'Staff timetables', exact: true }).click();
+  await p13.locator('.name-pick button', { hasText: /^Ben$/ }).click();
+  check(await p13.locator('.gweek tfoot .gw-duty').count() === 3, 'and so does their week on Staff timetables');
+  await p13.evaluate(() => localStorage.removeItem('lifehouse_duties_v1'));
+  const dutiesFile = path.join(TMP, 'Example duties - 2026-11-16.json');
+  fs.writeFileSync(dutiesFile, JSON.stringify({ app: 'lifehouse-duties', published: { savedAt: '2026-11-16T09:00:00Z', staff: { T02: { Wed: [{ time: '9.00am', name: 'Wellbeing', what: 'Watch CD' }] } } } }));
+  await p13.setInputFiles('#file-open', dutiesFile);
+  await p13.waitForTimeout(300);
+  check(await p13.locator('.gweek tfoot .gw-duty').count() === 1 && /Watch CD/.test(await p13.locator('.gweek tfoot').innerText()), 'a duties file opened here brings its duties in');
+  // Extra pupil designs, chosen per pupil; the book stays as it was
+  const shotPic = path.join(TMP, 'room.png');
+  fs.writeFileSync(shotPic, Buffer.from(await p13.evaluate(() => { const c = document.createElement('canvas'); c.width = 320; c.height = 200; const g = c.getContext('2d'); g.fillStyle = '#d8c8a8'; g.fillRect(0, 0, 320, 200); return c.toDataURL('image/png').split(',')[1]; }), 'base64'));
+  await setupTo(p13, 'Rooms and map');
+  for (const room of ['Kitchen', 'Learning Space 3', 'Brook Room']) {
+    const [fcr] = await Promise.all([p13.waitForEvent('filechooser'), p13.getByRole('button', { name: 'Add a photo of ' + room, exact: true }).click()]);
+    await fcr.setFiles(shotPic);
+    await p13.getByRole('button', { name: 'Change the photo of ' + room, exact: true }).waitFor();
+  }
+  const [fcs] = await Promise.all([p13.waitForEvent('filechooser'), (async () => { await setupTo(p13, 'Staff'); await p13.getByRole('button', { name: 'Add a photo of Abi', exact: true }).click(); })()]);
+  await fcs.setFiles(shotPic);
+  await p13.getByRole('button', { name: 'Change Abi’s photo', exact: true }).waitFor();
+  await p13.getByRole('button', { name: 'Printables', exact: true }).click();
+  await p13.locator('.print-controls .seg button', { hasText: /^Pupils$/ }).click();
+  await p13.locator('.print-controls .seg button', { hasText: /^Book$/ }).click();
+  check(await p13.locator('.sheet.book').count() === 21 && await p13.locator('.sheet .bk-rich, .sheet .bk-room, .sheet .bk-faces').count() === 0, 'the Book design is unchanged by the extra designs');
+  await setupTo(p13, 'Pupils');
+  await p13.locator('select[aria-label="AB timetable design"]').selectOption('symbols');
+  await p13.locator('select[aria-label="CD timetable design"]').selectOption('photos');
+  await p13.waitForTimeout(600);
+  j13 = await p13.evaluate(() => JSON.parse(localStorage.getItem('lifehouse_timetabler_v2')));
+  check(j13.people.find((x) => x.name === 'AB').design === 'symbols' && j13.areas.find((a) => a.name === 'Kitchen').photo.startsWith('data:image/jpeg'), 'each pupil’s design and the room photos are saved');
+  await p13.getByRole('button', { name: 'Printables', exact: true }).click();
+  await p13.locator('.print-controls .seg button', { hasText: 'Each pupil’s own' }).click();
+  const sheetOf = (n) => p13.locator('.sheet.book', { has: p13.locator('.bk-name', { hasText: new RegExp('^' + n + '$') }) });
+  check(await sheetOf('AB').locator('.bk-look-symbols').count() > 5 && await sheetOf('AB').locator('.bk-faces img').count() > 0 && await sheetOf('CD').locator('.bk-look-photos').count() > 5 && await sheetOf('DR').locator('.bk-rich').count() === 0,
+    'Each pupil’s own: AB has symbols and faces, CD photos, and the rest the book');
+  await p13.locator('.print-controls .seg button', { hasText: /^Photos$/ }).click();
+  check(await p13.locator('.sheet img.bk-room').count() > 0, 'the Photos design shows the room photo');
   check(err13.length === 0, 'no errors' + (err13.length ? ': ' + err13.join(' | ') : ''));
   await ctx13.close();
 

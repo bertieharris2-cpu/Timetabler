@@ -638,14 +638,14 @@ button.lg-cell:hover { outline: 2px solid var(--accent); outline-offset: -2px; }
 .pictures .pt .pt-double .pt-ic { width: 72px; height: 72px; }
 .pt .pt-name, .pt .pt-band td, .pt thead th, .pt .pt-when { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 /* Staff timetables: the book's grid made plainer, A4 landscape, so they are never mistaken for a pupil's. Paper colours, the same in both themes. */
-.sheet.staffbook { width: 297mm; height: 210mm; max-width: none; flex: none; box-sizing: border-box; padding: 11mm 12mm 9mm; background: #fff; color: var(--book-ink); display: flex; flex-direction: column; gap: 7px; }
+.sheet.staffbook { width: 210mm; height: 297mm; max-width: none; flex: none; box-sizing: border-box; padding: 11mm 10mm 10mm; background: #fff; color: var(--book-ink); display: flex; flex-direction: column; gap: 7px; }
 .sheet.staffbook * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 .sb-head { display: flex; align-items: flex-end; gap: 14px; padding-bottom: 6px; border-bottom: 3px solid var(--staff-sheet-rule); }
 .sb-logo { height: 46px; width: auto; max-width: 30%; object-fit: contain; }
 .sb-name { margin: 0; font-size: 26px; font-weight: 700; line-height: 1.1; color: var(--staff-sheet-head); }
 .sb-sub { margin-top: 3px; font-size: 11px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--book-muted); }
 .sb-meta { margin-left: auto; text-align: right; font-size: 11px; color: var(--book-muted); line-height: 1.4; }
-.sb-grid { flex: 1; display: grid; grid-template-columns: 74px repeat(5, minmax(0, 1fr)); gap: 3px; min-height: 0; }
+.sb-grid { flex: 1; display: grid; grid-template-columns: 64px repeat(5, minmax(0, 1fr)); gap: 3px; min-height: 0; }
 .sb-day, .sb-corner { background: var(--staff-sheet-head); color: #fff; font-weight: 600; font-size: 13px; display: flex; align-items: center; justify-content: center; }
 .sb-corner { justify-content: flex-start; padding: 0 8px; font-size: 11.5px; }
 .sb-when { background: var(--staff-sheet-band); padding: 3px 8px; display: flex; flex-direction: column; justify-content: center; font-size: 11px; color: var(--book-muted); min-height: 0; }
@@ -653,10 +653,10 @@ button.lg-cell:hover { outline: 2px solid var(--accent); outline-offset: -2px; }
 .sb-band { background: var(--staff-sheet-band); display: flex; align-items: center; gap: 10px; padding: 0 8px; font-size: 11px; font-weight: 600; color: var(--book-muted); }
 .sb-band b { color: var(--book-ink); min-width: 58px; }
 .sb-stack { display: flex; min-height: 0; min-width: 0; }
-.sb-cell { flex: 1; min-width: 0; min-height: 0; overflow: hidden; box-sizing: border-box; background: #fff; border: 1px solid var(--book-empty-edge); border-left: 4px solid var(--book-empty-edge); padding: 4px 7px; display: flex; flex-direction: column; gap: 1px; font-size: 11px; line-height: 1.25; }
+.sb-cell { flex: 1; min-width: 0; min-height: 0; overflow: hidden; box-sizing: border-box; background: #fff; border: 1px solid var(--book-empty-edge); border-left: 4px solid var(--book-empty-edge); padding: 4px 5px; display: flex; flex-direction: column; gap: 1px; font-size: 10px; line-height: 1.25; }
 .sb-cell.sb-free { border-left-width: 1px; border-color: #D3DAD5; }
-.sb-subj { display: flex; align-items: center; gap: 5px; font-weight: 700; font-size: 13px; line-height: 1.2; color: var(--book-ink); }
-.sb-subj .sb-ic { width: 15px; height: 15px; flex: none; stroke-width: 1.7; }
+.sb-subj { display: flex; align-items: center; gap: 4px; font-weight: 700; font-size: 12px; line-height: 1.2; color: var(--book-ink); }
+.sb-subj .sb-ic { width: 14px; height: 14px; flex: none; stroke-width: 1.7; }
 .sb-subj img.sb-ic { object-fit: contain; }
 .sb-where { color: var(--book-muted); }
 .sb-pupils { margin-top: 2px; font-weight: 600; overflow-wrap: anywhere; }
@@ -675,7 +675,34 @@ button.lg-cell:hover { outline: 2px solid var(--accent); outline-offset: -2px; }
 .sb-cover { border-color: #1E4E8C; background: #E1EBF7; }
 .sb-cover .sb-subj { color: #1E4E8C; }
 .sb-cell:is(.sb-academic, .sb-numeracy, .sb-wellbeing, .sb-champion, .sb-ppa, .sb-cover) { border-top-color: var(--book-empty-edge); border-right-color: var(--book-empty-edge); border-bottom-color: var(--book-empty-edge); }
-.sb-double .sb-subj { font-size: 14px; }
+.sb-double .sb-subj { font-size: 13px; }
+.sb-band-when { background: var(--staff-sheet-band); }
+.sb-when span, .sb-when b { white-space: nowrap; }
+.sb-when { padding: 3px 6px; font-size: 10.5px; }
+.bk-rich .bk-subject { font-size: 16px; overflow-wrap: normal; }
+.bk-rich .bk-subject.bk-long { font-size: 13.5px; }
+.bk-rich .bk-subject.bk-longer { font-size: 12px; }
+.sb-band-day { padding: 0; }
+.sb-duty { background: #fff; border: 1px solid #D3DAD5; border-left: 3px solid var(--staff-sheet-rule); padding: 2px 5px; font-size: 10px; line-height: 1.3; color: var(--book-ink); display: flex; flex-direction: column; justify-content: center; }
+.sb-duty b { font-size: 9px; text-transform: uppercase; letter-spacing: .06em; color: var(--book-muted); }
+/* Extra book designs: a big symbol or a photo of the room, and the adults' faces. */
+.bk-rich { gap: 3px; padding: 4px; }
+.bk-rich .bk-ic.bk-big { width: 40px; height: 40px; }
+.bk-rich img.bk-ic.bk-big { width: 58px; height: 58px; }
+.bk-double.bk-rich .bk-ic.bk-big { width: 56px; height: 56px; }
+.bk-double.bk-rich img.bk-ic.bk-big { width: 84px; height: 84px; }
+.bk-room { width: 100%; height: 42%; min-height: 0; flex: none; object-fit: cover; border: 1px solid var(--book-empty-edge); }
+.bk-double .bk-room { height: 46%; }
+.bk-faces { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; }
+.bk-faces figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 1px; font-size: 12px; font-weight: 600; line-height: 1.1; }
+.bk-faces img { width: 44px; height: 44px; object-fit: cover; border: 1.5px solid var(--book-empty-edge); }
+.bk-double .bk-faces img { width: 58px; height: 58px; }
+.bk-look-photos .bk-subject { font-size: 15px; }
+/* The duties row under a member of staff's week, from Lifehouse Duties. */
+.gweek tfoot th, .gweek tfoot td { height: auto; border-top: 2px solid var(--line-strong); background: var(--surface-2); vertical-align: top; }
+.gweek tfoot small { display: block; font-weight: 500; color: var(--muted); }
+.gw-duty { display: block; font-size: 12px; padding: 2px 0 2px 6px; border-left: 3px solid var(--staff-sheet-rule); margin-bottom: 3px; }
+.photo-btn.wide { width: 54px; }
 .sb-foot { font-size: 11px; color: var(--book-muted); }
 /* Book timetables: the school's design for pupils' books. An A4 page with a wider margin on the right and bottom for the guillotine. */
 .sheet.book { width: 210mm; height: 297mm; max-width: none; flex: none; box-sizing: border-box; padding: 22px 44px 44px 22px; background: #fff; color: var(--book-ink);
@@ -1030,7 +1057,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
   @page wide { size: A3 landscape; margin: 8mm; }
   @page portrait { size: A4 portrait; margin: 12mm; }
   @page book { size: A4 portrait; margin: 0; }
-  @page staffbook { size: A4 landscape; margin: 0; }
+  @page staffbook { size: A4 portrait; margin: 0; }
   html, body { height: auto; background: #fff; color: #000; }
   .topbar, .page-head, .print-controls, .print-hint, .toasts { display: none !important; }
   .app, #view { display: block; height: auto; overflow: visible; }
@@ -1056,7 +1083,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
   .pictures .pt .pt-name { font-size: 18px; padding: 3px; }
   .pictures .pt thead tr:nth-child(2) th { padding: 3px; }
   .sheet.pupil:not(.pictures) { page: portrait; }
-  .sheet.staffbook { page: staffbook; width: 297mm; height: 209mm; padding: 11mm 12mm 9mm; break-inside: avoid; }
+  .sheet.staffbook { page: staffbook; width: 210mm; height: 296mm; padding: 11mm 10mm 10mm; break-inside: avoid; }
   .sheet.book { page: book; width: 210mm; height: 296mm; padding: 22px 44px 44px 22px; break-inside: avoid; }
   body.second .dsheet-screen { display: none !important; }
   body.second .ds-print { display: block !important; }
@@ -1336,6 +1363,12 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     for (const [k, id] of Object.entries(project.symbols || {})) if (images.has(id)) out.symbols[k] = images.get(id);
     delete out.logoId;
     out.logo = project.logoId && images.has(project.logoId) ? images.get(project.logoId) : null;
+    out.areas = project.areas.map((a) => {
+      const y = Object.assign({}, a);
+      delete y.photoId;
+      if (a.photoId && images.has(a.photoId)) y.photo = images.get(a.photoId);
+      return y;
+    });
     out.people = project.people.map((x) => {
       const y = Object.assign({}, x);
       delete y.photoId;
@@ -1359,7 +1392,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     return {
       app: APP_ID, version: FILE_VERSION, name: '', school: 'Lifehouse',
       periods,
-      areas: clone(DEFAULT_AREAS), people: [], slots: {}, outlines: clone(LAYOUTS.school.outlines), specials: clone(DEFAULT_SPECIALS), dayRows: cleanDayRows(null, periods), wholeSchool: [{ day: 'Fri', period: 'P3', name: 'Champion time' }, { day: 'Fri', period: 'P4', name: 'Champion time' }], earlyHome: clone(DEFAULT_EARLY), logoId: null, symbols: {}, subjectTypes: {}, groups: [], leadViews: [], requests: [], champions: {}, needs: DEFAULT_NEEDS.map((subject) => ({ subject, perWeek: 0 })),
+      areas: clone(DEFAULT_AREAS), people: [], slots: {}, duties: null, outlines: clone(LAYOUTS.school.outlines), specials: clone(DEFAULT_SPECIALS), dayRows: cleanDayRows(null, periods), wholeSchool: [{ day: 'Fri', period: 'P3', name: 'Champion time' }, { day: 'Fri', period: 'P4', name: 'Champion time' }], earlyHome: clone(DEFAULT_EARLY), logoId: null, symbols: {}, subjectTypes: {}, groups: [], leadViews: [], requests: [], champions: {}, needs: DEFAULT_NEEDS.map((subject) => ({ subject, perWeek: 0 })),
       map: { imageId: null, w: 0, h: 0, fade: 1 },
       meta: { created: nowIso(), changedAt: null, backedUpAt: null }
     };
@@ -1398,6 +1431,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
         x: clamp(num(a.x, 5), 0, 100 - w), y: clamp(num(a.y, 5), 0, 100 - hh), w, h: hh,
         cap: +a.cap > 0 ? Math.round(+a.cap) : null,
         kind: KINDS[a.kind] ? a.kind : a.teach === false ? 'staff' : 'room',
+        photoId: typeof a.photo === 'string' && a.photo.startsWith('data:image/') ? rememberImage(a.photo) : a.photoId && images.has(a.photoId) ? a.photoId : null,
         // What is usually taught there, used to name lessons that have no name yet.
         usual: str(a.usual),
         // Part of an open-plan room. Plans from before this was saved: the learning spaces are.
@@ -1452,6 +1486,8 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       lead: x.role === 'staff' && !!x.lead,
       // What they usually teach, to name lessons that have no name yet.
       teaches: x.role === 'staff' ? str(x.teaches) : '',
+      // Which pupil timetable design this pupil gets ('' is the book).
+      design: x.role !== 'staff' && PUPIL_DESIGNS[x.design] ? x.design : '',
       photoId: typeof x.photo === 'string' && x.photo.startsWith('data:image/') ? rememberImage(x.photo) : x.photoId && images.has(x.photoId) ? x.photoId : null
     }));
 
@@ -1471,6 +1507,8 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     }));
     // Lessons to place: one pupil's lesson that staff asked for, or therapy, set up on the pupil's page and placed from the tray.
     const pupilIds = new Set(out.people.filter((x) => x.role !== 'staff').map((x) => x.id)), seenR = new Set();
+    // Duties brought in from a Lifehouse Duties file, shown on staff timetables: { savedAt, staff: { id: { Mon: [{ time, name, what }] } } }.
+    out.duties = cleanDuties(p.duties);
     // Each child's champions: the adults they spend Champion time with (one or more). Saves from before had one each.
     out.champions = {};
     for (const [pid, v] of Object.entries(p.champions && typeof p.champions === 'object' ? p.champions : {})) {
@@ -1625,6 +1663,27 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
   }
   // Which period a slot is, so a lesson can tell when the whole school is doing the same thing.
   const slotKeyOf = new WeakMap();
+  // ----- Duties from Lifehouse Duties (a separate file that keeps the wellbeing, break and lunch rota) -----
+  // Read from this browser, where Duties saves a summary, or from a duties file opened here, whichever is newer. Never written back.
+  const DUTIES_KEY = 'lifehouse_duties_v1';
+  function cleanDuties(d) {
+    if (!d || typeof d !== 'object' || !d.staff || typeof d.staff !== 'object') return null;
+    const staffOut = {};
+    for (const [sid, days] of Object.entries(d.staff)) {
+      if (!days || typeof days !== 'object') continue;
+      for (const day of ['Mon', 'Tue', 'Wed', 'Thu', 'Fri']) {
+        const list = (Array.isArray(days[day]) ? days[day] : []).filter((x) => x && str(x.what)).map((x) => ({ time: str(x.time), name: str(x.name), what: str(x.what) }));
+        if (list.length) (staffOut[str(sid)] = staffOut[str(sid)] || {})[day] = list;
+      }
+    }
+    return { savedAt: str(d.savedAt), staff: staffOut };
+  }
+  function dutiesData() {
+    let local = null;
+    try { const t = localStorage.getItem(DUTIES_KEY); local = t ? cleanDuties((JSON.parse(t) || {}).published) : null; } catch (e) { local = null; }
+    return [local, project.duties].filter(Boolean).sort((a, b) => b.savedAt.localeCompare(a.savedAt))[0] || null;
+  }
+  const dutiesOn = (dd, sid, day) => (dd && dd.staff[sid] && dd.staff[sid][day]) || [];
   // Whole-school lessons, such as Champion time on Friday afternoons: everyone who is in does it, wherever they are on the map.
   const wholeAt = (key) => { const w = (project.wholeSchool || []).find((x) => x.day + '|' + x.period === key); return w ? w.name : ''; };
   const wholeOf = (sl) => wholeAt(slotKeyOf.get(sl));
@@ -2122,7 +2181,8 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
   photoInput.addEventListener('change', () => {
     const f = photoInput.files && photoInput.files[0];
     photoInput.value = '';
-    if (f && photoFor) loadPhoto(f, photoFor);
+    if (f && photoFor && photoFor.startsWith('room:')) loadRoomPhoto(f, photoFor.slice(5));
+    else if (f && photoFor) loadPhoto(f, photoFor);
   });
   const imageInput = $('#image-open');
   imageInput.addEventListener('change', () => {
@@ -2138,6 +2198,13 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     try { obj = JSON.parse(t); } catch (e) { toast('“' + filename + '” is not a timetable backup.'); return; }
     let incoming = null, what = '';
     if (obj && obj.kind === PEOPLE_FILE) { openPeopleFile(obj, filename); return; }
+    if (obj && obj.app === 'lifehouse-duties') {
+      const dd = cleanDuties(obj.published);
+      if (!dd) { toast('“' + filename + '” has no rota yet. Open it in Lifehouse Duties, make the rota, and save it again.'); return; }
+      mutate((pp) => { pp.duties = dd; });
+      toast('Duties from “' + filename + '” now show on staff timetables.', { label: 'Undo', run: undo });
+      return;
+    }
     if (obj && (obj.app === APP_ID || obj.slots)) { incoming = sanitize(obj); what = 'backup'; }
     else if (obj && obj.assignments && obj.areas) { incoming = sanitize(fromOldFormat(obj)); what = 'old'; }
     if (!incoming) { toast('“' + filename + '” is not a timetable backup.'); return; }
@@ -3439,12 +3506,12 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
 
     let sheets;
     const style = ui.pupilStyle || 'book';
-    if (bundle) sheets = bundle.flatMap((k) => k === 'pupils' ? pupils().map((p) => bookSheet(p)) : k === 'words' ? pupils().map((p) => pupilSheet(p, false)) : k === 'pictures' ? pupils().map((p) => pupilSheet(p, true))
+    if (bundle) sheets = bundle.flatMap((k) => k === 'pupils' ? pupils().map((p) => pupilDesignSheet(p, designOf(p))) : k === 'words' ? pupils().map((p) => pupilSheet(p, false)) : k === 'pictures' ? pupils().map((p) => pupilSheet(p, true))
       : k === 'staff' ? staff().map((p) => staffSheet(p)) : k === 'days' ? DAYS.map((d) => staffDaySheet(d)) : []);
     else if (what === 'use') sheets = [roomUseSheet()];
     else if (wide) sheets = chosen.map((d) => staffDaySheet(d));
     else if (what === 'room') sheets = chosen.map((a) => roomSheet(a));
-    else if (what === 'student') sheets = chosen.map((p) => style === 'book' ? bookSheet(p) : pupilSheet(p, style === 'pictures'));
+    else if (what === 'student') sheets = chosen.map((p) => style === 'book' ? bookSheet(p) : style === 'own' ? pupilDesignSheet(p, designOf(p)) : pupilDesignSheet(p, style));
     else sheets = chosen.map((p) => staffSheet(p));
 
     root.append(h('div', { class: 'page' },
@@ -3454,11 +3521,11 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
         h('div', { class: 'seg', role: 'group', 'aria-label': 'Which timetables' }, [['student', 'Pupils'], ['staff', 'Staff'], ['room', 'Rooms'], ['staffday', 'Days by staff']].concat(ui.printBundle ? [['bundle', 'Generated set']] : []).concat(what === 'use' ? [['use', 'Room use report']] : []).map(([id, label]) =>
           h('button', { type: 'button', class: what === id ? 'on' : '', 'aria-pressed': what === id ? 'true' : 'false', onclick: () => { ui.printWhat = id; ui.printWho = 'all'; saveUI(); render(); } }, label))),
         bundle || what === 'use' ? null : h('label', null, 'Show', whoSelect),
-        what === 'student' ? h('div', { class: 'seg', role: 'group', 'aria-label': 'Which design' }, [['book', 'Book'], ['words', 'Words'], ['pictures', 'Pictures']].map(([v, label]) =>
+        what === 'student' ? h('div', { class: 'seg', role: 'group', 'aria-label': 'Which design' }, [['book', 'Book'], ['words', 'Words'], ['pictures', 'Pictures'], ['symbols', 'Symbols and faces'], ['photos', 'Photos'], ['own', 'Each pupil’s own']].map(([v, label]) =>
           h('button', { type: 'button', class: style === v ? 'on' : '', 'aria-pressed': style === v ? 'true' : 'false', onclick: () => { ui.pupilStyle = v; saveUI(); render(); } }, label))) : null,
         h('label', null, h('input', { type: 'checkbox', id: 'print-times', checked: ui.printTimes, onchange: (e) => { ui.printTimes = e.target.checked; saveUI(); render(); } }), 'Show times'),
         h('button', { type: 'button', class: 'btn primary', onclick: () => window.print(), disabled: !sheets.length }, 'Print ' + plural(sheets.length, 'page')),
-        h('span', { class: 'hint print-hint' }, bundle ? 'Everything from Generate timetables, each on its own page size.' : (what === 'use' ? 'Each place, least used first: how many of the week’s periods had pupils in it.' : wide ? 'Each day is a strip 10cm tall, two to an A3 landscape page.' : what === 'student' && style === 'book' ? 'One A4 page each, with a wider margin on the right and bottom for the guillotine, to stick in their books.' : what === 'student' && style === 'words' ? 'One A4 portrait page each, to go in their books.' : 'One A4 landscape page each.') + ' To email them, choose “Save as PDF” as the printer.')),
+        h('span', { class: 'hint print-hint' }, bundle ? 'Everything from Generate timetables, each on its own page size.' : (what === 'use' ? 'Each place, least used first: how many of the week’s periods had pupils in it.' : wide ? 'Each day is a strip 10cm tall, two to an A3 landscape page.' : what === 'student' && style === 'book' ? 'One A4 page each, with a wider margin on the right and bottom for the guillotine, to stick in their books.' : what === 'student' && style === 'symbols' ? 'The book design with a big symbol for each lesson (the school’s own, such as Widgit symbols, from Setup → Subjects) and photos of the adults (Setup → Staff).' : what === 'student' && style === 'photos' ? 'The book design with a photo of the room (Setup → Rooms and map) and photos of the adults (Setup → Staff).' : what === 'student' && style === 'own' ? 'Each pupil in the design chosen for them in Setup → Pupils → Timetable (the book unless chosen).' : what === 'student' && style === 'words' ? 'One A4 portrait page each, to go in their books.' : what === 'staff' ? 'One A4 portrait page each, with their duties from Lifehouse Duties when there are any.' : 'One A4 landscape page each.') + ' To email them, choose “Save as PDF” as the printer.')),
       sheets.length ? h('div', { class: 'sheets' }, sheets) : h('p', { class: 'hint' }, 'Nobody to show yet. Add pupils and staff in Setup.')
     ));
   }
@@ -3486,9 +3553,9 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     cats.push({ title: 'Staff PPA', items: staff().filter((p) => p.ppa > 0 && ppaCount(p.id) < p.ppa).map((p) => ({ text: p.name + ': ' + ppaCount(p.id) + ' of ' + p.ppa + ' PPA periods', go: () => { ui.setupTab = 'staff'; go('setup'); } })) });
     return cats.filter((c) => c.items.length);
   }
-  const OUTPUTS = [['pupils', 'Pupil timetables', 'The book design, one A4 page each to cut out', true], ['words', 'Pupil timetables in words', 'The plain table, one A4 page each', false],
+  const OUTPUTS = [['pupils', 'Pupil timetables', 'Each pupil’s own design (the book unless chosen in Setup → Pupils), one A4 page each', true], ['words', 'Pupil timetables in words', 'The plain table, one A4 page each', false],
     ['pictures', 'Picture timetables', 'With a symbol for each lesson', false],
-    ['staff', 'Staff timetables', 'One A4 page each', true], ['days', 'Day sheets to print', 'A3 strips, a column per member of staff', true], ['excel', 'Day sheets in Excel', 'A workbook with a tab per day', true]];
+    ['staff', 'Staff timetables', 'One A4 portrait page each, with their duties', true], ['days', 'Day sheets to print', 'A3 strips, a column per member of staff', true], ['excel', 'Day sheets in Excel', 'A workbook with a tab per day', true]];
   function generateDialog() {
     const cats = finalChecks();
     const total = cats.reduce((n, c) => n + c.items.length, 0);
@@ -3547,7 +3614,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     const leads = staffHere.filter((x) => x.lead);
     const shown = leads.length ? leads : staffHere;
     const subject = str(s.titles[place]) || a.name;
-    return { kind: 'lesson', subject, type: lessonType(subject), room: a.name, roomKind: a.kind, group: groupWord(here.filter(isPupil).length), teachers: names(shown), staffShown: shown,
+    return { kind: 'lesson', subject, type: lessonType(subject), room: a.name, roomKind: a.kind, areaId: a.id, group: groupWord(here.filter(isPupil).length), teachers: names(shown), staffShown: shown,
       key: place + '|' + subject + '|' + shown.map((x) => x.id).join(',') };
   }
   // A member of staff's lesson for their own timetable: the subject, the room, and the pupils with them.
@@ -3612,13 +3679,22 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
   }
   // ----- Book timetables: the school's own design, cut out and stuck in pupils' books -----
   // Lessons are coloured by kind: numeracy orange, Champion time gold, other academic lessons purple, wellbeing yellow.
+  // Pupil timetable designs. The book is the standard; the others are extra, chosen per pupil in Setup → Pupils or on Printables.
+  const PUPIL_DESIGNS = { book: 'Book', words: 'Words', pictures: 'Pictures', symbols: 'Symbols and faces', photos: 'Photos' };
+  const designOf = (p) => p.design || 'book';
+  function pupilDesignSheet(p, design) {
+    if (design === 'words') return pupilSheet(p, false);
+    if (design === 'pictures') return pupilSheet(p, true);
+    if (design === 'symbols' || design === 'photos') return bookSheet(p, design);
+    return bookSheet(p);
+  }
   function bookTone(c) {
     if (/champion|golden/i.test(c.subject)) return 'champion';
     if (/numeracy|math|number/i.test(c.subject)) return 'numeracy';
     return c.type === 'wellbeing' || c.type === 'academic' ? c.type : '';
   }
   const longest = (t) => Math.max(0, ...str(t).split(/\s+/).map((w) => w.length));
-  function bookSheet(p) {
+  function bookSheet(p, look) {
     const rows = dayRows().filter((r) => r.kind === 'period' || r.pupils);
     const starts = rows.map((r) => minutesOf(r.time));
     // On a day with an early finish, rows that start after it are left blank and Home time sits in the row it falls in.
@@ -3638,6 +3714,7 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     const lesson = (c, n) => {
       if (!c || c.kind === 'none') return h('div', { class: 'bk-cell' });
       if (c.kind === 'out') return h('div', { class: 'bk-cell' }, h('span', { class: 'bk-na' }, 'Not in'));
+      if (look === 'symbols' || look === 'photos') return richLesson(c, n, look);
       const photos = c.staffShown.filter((x) => x.photoId && images.has(x.photoId));
       return h('div', { class: 'bk-cell' + (bookTone(c) ? ' bk-' + bookTone(c) : '') + (n > 1 ? ' bk-double' : '') },
         lessonSymbol(c.subject, c.room, c.roomKind, 'bk-ic'),
@@ -3683,6 +3760,13 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
     const cells = DAYS.map((d) => rows.map((r) => r.kind === 'period' ? staffLesson(p, slotOf(slotKey(d.id, r.period))) : null));
     const span = DAYS.map(() => rows.map(() => 1));
     cells.forEach((col, di) => { for (let i = rows.length - 1; i > 0; i--) { const a = col[i - 1], b = col[i]; if (a && b && a.key && a.key === b.key) { span[di][i - 1] += span[di][i]; span[di][i] = 0; } } });
+    // Duties from Lifehouse Duties go in the row of the day they fall in (a 10.45am duty in Break, 12.00pm and 12.35pm in Lunch).
+    const dd = dutiesData(), starts = rows.map((r) => minutesOf(r.time));
+    const rowOf = (time) => { const m = minutesOf(time); if (m === Infinity) return -1; let at = -1; starts.forEach((v, i) => { if (v !== Infinity && v <= m) at = i; }); return at; };
+    const duties = DAYS.map((d) => rows.map(() => []));
+    let dutyCount = 0;
+    DAYS.forEach((d, di) => dutiesOn(dd, p.id, d.id).forEach((x) => { const i = rowOf(x.time); if (i >= 0) { duties[di][i].push(x); dutyCount++; } }));
+    const dutyRow = rows.map((r, i) => r.kind === 'band' && duties.some((col) => col[i].length));
     const cell = (c, n) => {
       if (!c || c.kind === 'none') return h('div', { class: 'sb-cell sb-free' });
       if (c.kind === 'out') return h('div', { class: 'sb-cell sb-free' }, h('span', { class: 'sb-na' }, 'Not in'));
@@ -3698,6 +3782,14 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       ...DAYS.map((d, di) => h('div', { class: 'sb-day', style: { gridRow: '1', gridColumn: String(di + 2) } }, d.name))];
     rows.forEach((r, i) => {
       const time = ui.printTimes && r.time ? h('b', null, r.time) : null;
+      if (r.kind === 'band' && dutyRow[i]) {
+        const parts = new Set(duties.flatMap((col) => col[i].map((x) => x.time))).size > 1;
+        grid.push(h('div', { class: 'sb-when sb-band-when', style: { gridRow: String(i + 2), gridColumn: '1' } }, time, h('span', null, r.label)));
+        DAYS.forEach((d, di) => grid.push(duties[di][i].length
+          ? h('div', { class: 'sb-duty', style: { gridRow: String(i + 2), gridColumn: String(di + 2) } }, duties[di][i].map((x) => h('div', null, h('b', null, 'Duty'), ' ' + (parts ? x.time + ' ' : '') + x.what)))
+          : h('div', { class: 'sb-band sb-band-day', style: { gridRow: String(i + 2), gridColumn: String(di + 2) } })));
+        return;
+      }
       if (r.kind === 'band') { grid.push(h('div', { class: 'sb-band', style: { gridRow: String(i + 2), gridColumn: '1 / span ' + (DAYS.length + 1) } }, time, h('span', null, r.label))); return; }
       grid.push(h('div', { class: 'sb-when', style: { gridRow: String(i + 2), gridColumn: '1' } }, time, h('span', null, r.label)));
       DAYS.forEach((d, di) => { const n = span[di][i]; if (n) grid.push(h('div', { class: 'sb-stack', style: { gridRow: (i + 2) + ' / span ' + n, gridColumn: String(di + 2) } }, cell(cells[di][i], n))); });
@@ -3708,8 +3800,21 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       h('header', { class: 'sb-head' }, logo,
         h('div', { class: 'sb-title' }, h('h3', { class: 'sb-name' }, p.full || p.name), h('div', { class: 'sb-sub' }, 'Staff timetable' + (project.school ? ' · ' + project.school : ''))),
         h('div', { class: 'sb-meta' }, project.name ? h('div', null, project.name) : null, h('div', null, 'Printed ' + today))),
-      h('div', { class: 'sb-grid', style: { gridTemplateRows: '26px ' + rows.map((r) => r.kind === 'band' ? '19px' : 'minmax(0, 1fr)').join(' ') } }, grid),
-      h('footer', { class: 'sb-foot' }, 'PPA: ' + plural(ppaCount(p.id), 'period') + (p.ppa ? ' (' + p.ppa + ' needed)' : '')));
+      h('div', { class: 'sb-grid', style: { gridTemplateRows: '26px ' + rows.map((r, i) => r.kind === 'band' ? (dutyRow[i] ? 'minmax(19px, auto)' : '19px') : 'minmax(0, 1fr)').join(' ') } }, grid),
+      h('footer', { class: 'sb-foot' }, 'PPA: ' + plural(ppaCount(p.id), 'period') + (p.ppa ? ' (' + p.ppa + ' needed)' : '') + (dutyCount ? ' · Duties: ' + dutyCount + ' this week, from Lifehouse Duties' : '')));
+  }
+  // A lesson on the extra book designs: a big symbol (the school's own, such as a Widgit symbol, if one was chosen) or a photo of
+  // the room, the subject, then the faces of the adults with their names (names alone for anyone without a photo).
+  function richLesson(c, n, look) {
+    const a = c.areaId && areaById.get(c.areaId);
+    const room = look === 'photos' && a && a.photoId && images.has(a.photoId) ? h('img', { class: 'bk-room', src: images.get(a.photoId), alt: '' }) : null;
+    const faces = c.staffShown.filter((x) => x.photoId && images.has(x.photoId)), plain = c.staffShown.filter((x) => !faces.includes(x));
+    const tone = bookTone(c);
+    return h('div', { class: 'bk-cell bk-rich bk-look-' + look + (tone ? ' bk-' + tone : '') + (n > 1 ? ' bk-double' : '') },
+      room || lessonSymbol(c.subject, c.room, c.roomKind, 'bk-ic bk-big'),
+      h('div', { class: 'bk-subject' + (longest(c.subject) > 13 ? ' bk-longer' : longest(c.subject) > 10 ? ' bk-long' : '') }, c.subject),
+      faces.length ? h('div', { class: 'bk-faces' }, faces.map((x) => h('figure', null, h('img', { src: images.get(x.photoId), alt: '' }), h('figcaption', null, x.full || x.name)))) : null,
+      plain.length ? h('div', { class: 'bk-teacher' }, plain.map((x) => x.full || x.name).join(', ')) : null);
   }
   function roomSheet(a) {
     const head = h('thead', null, h('tr', null, h('th', null, ''), DAYS.map((d) => h('th', { scope: 'col' }, d.name))));
@@ -4172,14 +4277,15 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       img.onload = () => {
         const iw = img.naturalWidth, ih = img.naturalHeight;
         const side = Math.min(iw, ih);
-        const sw = photo ? side : iw, sh = photo ? side : ih;
+        const crop = photo === true;
+        const sw = crop ? side : iw, sh = crop ? side : ih;
         const scale = Math.min(1, (most || 240) / Math.max(sw, sh));
         const w = Math.max(1, Math.round(sw * scale)), hh = Math.max(1, Math.round(sh * scale));
         const c = document.createElement('canvas');
         c.width = w; c.height = hh;
         const g = c.getContext('2d');
         if (photo) { g.fillStyle = '#ffffff'; g.fillRect(0, 0, w, hh); }
-        g.drawImage(img, photo ? (iw - sw) / 2 : 0, photo ? (ih - sh) / 2 : 0, sw, sh, 0, 0, w, hh);
+        g.drawImage(img, crop ? (iw - sw) / 2 : 0, crop ? (ih - sh) / 2 : 0, sw, sh, 0, 0, w, hh);
         done(rememberImage(photo ? c.toDataURL('image/jpeg', 0.85) : c.toDataURL('image/png')));
       };
       img.onerror = () => toast('That picture could not be opened. Try a PNG or JPG.');
@@ -4200,6 +4306,12 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       mutate((proj) => { const x = proj.people.find((q) => q.id === pid); if (x) x.photoId = id; });
       toast('Photo added. It stays on this computer and in your backups.');
     });
+  }
+  function loadRoomPhoto(file, aid) {
+    loadSmallPicture(file, 'wide', (id) => {
+      mutate((proj) => { const x = proj.areas.find((q) => q.id === aid); if (x) x.photoId = id; });
+      toast('Photo added. It stays on this computer and in your backups.');
+    }, 360);
   }
   function symbolsCard() {
     const list = subjectsInUse();
@@ -4568,6 +4680,13 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
         oninput: (e) => setTeaches(p.id, e.target.value) })) : null,
       role === 'staff' ? h('td', { class: 'num' }, h('input', { type: 'checkbox', checked: p.lead, 'aria-label': p.name + ' leads lessons', title: 'Named on pupil timetables. Leave unticked for support staff.',
         onchange: (e) => mutate((proj) => { const x = proj.people.find((q) => q.id === p.id); if (x) x.lead = e.target.checked; }) })) : null,
+      role === 'student' ? h('td', null, (() => {
+        const sel = h('select', { class: 'txt sm', 'aria-label': p.name + ' timetable design', title: 'Which design ' + p.name + '’s printed timetable uses',
+          onchange: (e) => mutate((proj) => { const x = proj.people.find((q) => q.id === p.id); if (x) x.design = e.target.value === 'book' ? '' : e.target.value; }) },
+          Object.entries(PUPIL_DESIGNS).map(([k, label]) => h('option', { value: k }, label)));
+        sel.value = designOf(p);
+        return sel;
+      })()) : null,
       role === 'staff' ? h('td', { class: 'photo-cell' },
         h('button', { type: 'button', class: 'photo-btn', title: p.photoId ? 'Change ' + p.name + '’s photo' : 'Add a photo of ' + p.name, 'aria-label': p.photoId ? 'Change ' + p.name + '’s photo' : 'Add a photo of ' + p.name, onclick: () => choosePhoto(p.id) },
           p.photoId && images.has(p.photoId) ? h('img', { src: images.get(p.photoId), alt: '' }) : '+'),
@@ -4586,7 +4705,8 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       h('h3', null, label, h('span', { class: 'n' }, list.length ? String(list.length) : 'none yet'), role === 'student' ? h('span', { style: { marginLeft: 'auto', fontWeight: 400 } }, alertsToggle()) : null),
       list.length ? h('div', { class: 'table-box' }, h('table', { class: 'edit-table' },
         h('thead', null, h('tr', null, h('th', { title: 'What shows on the map: initials or first names' }, 'On the map'), h('th', null, 'Full name'), role === 'student' ? project.needs.map((n) => needHead(n)) : h('th', null, 'In on'), role === 'staff' ? h('th', { title: 'PPA periods needed each week' }, 'PPA') : null, role === 'staff' ? h('th', { title: 'Lessons they are in with no name can take it (Lesson setup → Name the lessons)' }, 'Usually teaches') : null,
-          role === 'staff' ? h('th', { title: 'Named on pupil timetables. Leave unticked for support staff.' }, 'Leads') : null, role === 'staff' ? h('th', null, 'Photo') : null, h('th', null, ''))),
+          role === 'staff' ? h('th', { title: 'Named on pupil timetables. Leave unticked for support staff.' }, 'Leads') : null, role === 'staff' ? h('th', null, 'Photo') : null,
+          role === 'student' ? h('th', { title: 'Which design their printed timetable uses: the book unless chosen. Symbols and faces, and Photos, are for pupils who need them.' }, 'Timetable') : null, h('th', null, ''))),
         h('tbody', null, rows))) : null,
       h('div', { class: 'add-box' },
         h('label', { class: 'field', for: 'add-' + role }, 'Add ' + label.toLowerCase() + (role === 'staff' ? '' : ' (initials or first names)')),
@@ -4617,12 +4737,16 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
       })()),
       h('td', null, a.kind === 'staff' ? h('span', { class: 'hint' }, '–') : h('input', { class: 'txt sm', value: a.usual, placeholder: usualGuess(a) ? 'e.g. ' + usualGuess(a) : '', 'aria-label': a.name + ' usual lesson', style: { width: '130px' },
         oninput: (e) => setUsual(a.id, e.target.value) })),
+      h('td', { class: 'photo-cell' }, a.kind === 'staff' ? null : [
+        h('button', { type: 'button', class: 'photo-btn wide', title: a.photoId ? 'Change the photo of ' + a.name : 'Add a photo of ' + a.name, 'aria-label': a.photoId ? 'Change the photo of ' + a.name : 'Add a photo of ' + a.name, onclick: () => choosePhoto('room:' + a.id) },
+          a.photoId && images.has(a.photoId) ? h('img', { src: images.get(a.photoId), alt: '' }) : '+'),
+        a.photoId ? h('button', { type: 'button', class: 'link-btn photo-del', 'aria-label': 'Remove the photo of ' + a.name, onclick: () => mutate((pp) => { const x = pp.areas.find((q) => q.id === a.id); if (x) x.photoId = null; }) }, 'Remove') : null]),
       h('td', { class: 'num' }, uses[a.id] ? plural(uses[a.id], 'placement') : 'unused'),
       h('td', null, h('button', { type: 'button', class: 'x-btn', title: 'Remove ' + a.name, 'aria-label': 'Remove ' + a.name, onclick: () => removeAreaDialog(a) }, '×'))));
     return h('section', { class: 'card' },
       h('h3', null, 'Rooms and spaces', h('span', { class: 'n' }, String(project.areas.length))),
       h('div', { class: 'table-box' }, h('table', { class: 'edit-table' },
-        h('thead', null, h('tr', null, h('th', null, 'Name'), h('th', { title: 'Most pupils this room can take. Leave blank for no limit.' }, 'Room for'), h('th', { title: 'Staff spaces and off-site places are left out of room use and free rooms.' }, 'Type'), h('th', { title: 'What is usually taught there. Lessons there with no name can take it (Lesson setup → Name the lessons).' }, 'Usual lesson'), h('th', null, 'Used'), h('th', null, ''))),
+        h('thead', null, h('tr', null, h('th', null, 'Name'), h('th', { title: 'Most pupils this room can take. Leave blank for no limit.' }, 'Room for'), h('th', { title: 'Staff spaces and off-site places are left out of room use and free rooms.' }, 'Type'), h('th', { title: 'What is usually taught there. Lessons there with no name can take it (Lesson setup → Name the lessons).' }, 'Usual lesson'), h('th', { title: 'A photo of the room, for the Photos pupil timetable' }, 'Photo'), h('th', null, 'Used'), h('th', null, ''))),
         h('tbody', null, rows))),
       h('div', { class: 'row', style: { display: 'flex', gap: '8px', flexWrap: 'wrap' } },
         h('button', { type: 'button', class: 'btn small', onclick: () => { ui.view = 'plan'; editLayout = true; saveUI(); render(); } }, 'Arrange rooms on the map'),
@@ -5063,7 +5187,11 @@ dialog.dlg::backdrop { background: rgba(10, 16, 24, .45); }
             at === COVER ? h('span', { class: 'gw-note' }, 'Cover') : null,
             at === OUT ? h('span', { class: 'gw-note' }, 'Not in') : null,
             split.map(({ g, sp }) => h('span', { class: 'gw-split', title: g.name + ' is split: ' + names(sp.away) + ' elsewhere' }, '! ' + g.name + ': ' + names(sp.away) + ' elsewhere')));
-        })))));
+        })))),
+      (() => { const dd = dutiesData(); return DAYS.some((d) => dutiesOn(dd, teacher.id, d.id).length)
+        ? h('tfoot', null, h('tr', { class: 'gw-duties' }, h('th', { scope: 'row' }, h('b', null, 'Duties'), h('small', null, 'From Lifehouse Duties')),
+          DAYS.map((d) => h('td', null, dutiesOn(dd, teacher.id, d.id).map((x) => h('span', { class: 'gw-duty' }, h('b', null, x.name), ' ' + x.what))))))
+        : null; })());
     root.append(h('div', { class: 'page gw-page' }, head,
       namePicker(list, teacher.id, (id) => { ui.staffPage = id; saveUI(); render(); }, 'Whose timetable'),
       h('p', { class: 'hint gw-hint' }, 'Drag a group or a one-to-one lesson onto ' + teacher.name + '’s week and they go in with it. Drag support staff onto a group, and PPA onto a free lesson. Drag anything back to the side to take it off.'),
